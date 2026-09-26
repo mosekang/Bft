@@ -1,5 +1,6 @@
 import type { Appearance } from "../lib/appearance.js";
 import type { AnyClip } from "./clips.js";
+import type { Aura, ItemLook } from "./synergyFx.js";
 
 /** One figure on the field, dugout or stage. Mutable: stages update actors in place each frame. */
 export interface Actor {
@@ -21,6 +22,12 @@ export interface Actor {
   away?: boolean;
   star?: 1 | 2 | 3;
   hidden?: boolean;
+  /** Synergy auras (§18.1). */
+  auras?: Aura[];
+  /** Item props (§18.2). */
+  look?: ItemLook;
+  /** Sleeve patch colour for quiet origins. */
+  patch?: string;
 }
 
 export const yawTo = (from: readonly [number, number, number], to: readonly [number, number, number]): number => Math.atan2(to[0] - from[0], to[2] - from[2]);

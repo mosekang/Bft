@@ -159,3 +159,10 @@ canvas { touch-action: none; display: block; }
 .juice-banner { animation: juice-banner 1100ms ease-out forwards; text-shadow: 0 4px 18px rgba(0,0,0,0.6); }
 @keyframes juice-banner { 0% { transform: scale(0.6); opacity: 0; } 18% { transform: scale(1.12); opacity: 1; } 30% { transform: scale(1); } 80% { opacity: 1; } 100% { transform: translateY(-24px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .flip-in, .lock-spin, .coin-fly, .hud-shake, .juice-banner { animation-duration: 1ms; } }
+
+/* §18.2 star particles on cards: silver shimmer for ★★, gold for ★★★. */
+.bcard--star2, .bcard--star3 { position: relative; overflow: hidden; }
+.bcard--star2::before, .bcard--star3::before { content: ""; position: absolute; inset: -40% -60%; pointer-events: none; background: linear-gradient(110deg, transparent 40%, rgba(226,232,240,0.55) 50%, transparent 60%); animation: shimmer 2.4s linear infinite; }
+.bcard--star3::before { background: linear-gradient(110deg, transparent 38%, rgba(251,191,36,0.7) 50%, transparent 62%); animation-duration: 1.6s; }
+@keyframes shimmer { from { transform: translateX(-45%); } to { transform: translateX(45%); } }
+@media (prefers-reduced-motion: reduce) { .bcard--star2::before, .bcard--star3::before { animation: none; } }

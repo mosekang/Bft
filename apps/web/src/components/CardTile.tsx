@@ -29,7 +29,7 @@ export function CardTile({ def, card, size = "md", selected, dim, badge, onClick
       onPointerDown={() => { if (onLongPress) timer = setTimeout(onLongPress, 450); }}
       onPointerUp={() => { if (timer) clearTimeout(timer); }}
       onPointerLeave={() => { if (timer) clearTimeout(timer); }}
-      className={`bcard cost-${def.cost} ${h} w-full text-left ${selected ? "bcard--sel" : ""} ${dim ? "bcard--dim" : ""} ${card && card.star === 3 ? "bcard--star3" : ""} ${card && card.star > 1 ? "sparkle" : ""}`}
+      className={`bcard cost-${def.cost} ${h} w-full text-left ${selected ? "bcard--sel" : ""} ${dim ? "bcard--dim" : ""} ${card && card.star === 3 ? "bcard--star3" : card && card.star === 2 ? "bcard--star2" : ""} ${card && card.star > 1 ? "sparkle" : ""}`}
       aria-label={`${def.name} ${def.cost}${t("card.cost")}${card ? ` ★${card.star}` : ""}`}
     >
       <div className="bcard__band" style={{ background: color }}>

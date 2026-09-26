@@ -113,7 +113,7 @@ export function Particles({ api, clock }: { api: React.MutableRefObject<FxApi | 
   return <><primitive object={small.points} /><primitive object={big.points} /></>;
 }
 
-export interface BallFlight { points: [number, number, number][]; start: number; flightTime: number; glow: boolean }
+export interface BallFlight { points: [number, number, number][]; start: number; flightTime: number; glow: boolean; color?: string }
 
 /** Ball + fading trail; `flight` is set by the timeline player (world coordinates). */
 export function Ball({ flight, clock, position }: { flight: React.MutableRefObject<BallFlight | null>; clock: React.MutableRefObject<number>; position: React.MutableRefObject<THREE.Vector3 | null> }) {
@@ -150,7 +150,8 @@ export function Ball({ flight, clock, position }: { flight: React.MutableRefObje
     const arr = trail.geometry.attributes["position"]!.array as Float32Array;
     for (let k = 0; k < N; k++) { const q = h[Math.min(k, h.length - 1)]!; arr.set([q.x, q.y, q.z], k * 3); }
     trail.geometry.attributes["position"]!.needsUpdate = true;
-    (trail.material as THREE.LineBasicMaterial).color.set(f.glow ? "#ffcc66" : "#ffffff");
+    (trail.material as THREE.LineBasicMaterial).color.set(f.color ?? (f.glow ? "#ffcc66" : "#ffffff"));
+    (gl.material as THREE.SpriteMaterial).color.set(f.color ?? "#ffd27a");
     trail.visible = u < 1;
   });
   return (

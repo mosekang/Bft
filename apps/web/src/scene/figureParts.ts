@@ -126,7 +126,7 @@ const sleeveColor = (a: Actor) => (a.ap.uniform === "sleeve" ? a.ap.primary : je
 const pants = (a: Actor) => (a.ap.replacement ? "#9ca3af" : a.away ? "#b9bec6" : "#f2f2ee");
 const hairOn = (a: Actor, ...styles: number[]) => !a.ap.replacement && styles.includes(a.ap.hairStyle);
 const BATS = ["#d9b27c", "#1f1f1f", "#7a3b1f", "#e7c35a"];
-const GLOVES = ["#8b5a2b", "#1f1f1f", "#b4432e"];
+const GLOVES = ["#8b5a2b", "#1f1f1f", "#b4432e", "#e7c35a"];
 
 export const PARTS: PartDef[] = [
   { key: "torso", joint: "spine", geometry: () => cap(0.19, 0.3, 0.28, 0.72), material: "jersey", applies: () => true, color: jerseyBase, pickable: true, castShadow: true },
@@ -153,18 +153,20 @@ export const PARTS: PartDef[] = [
   { key: "uArmR", joint: "shR", geometry: () => cap(0.066, 0.18, -0.14), material: "toon", applies: () => true, color: sleeveColor },
   { key: "bandL", joint: "shL", geometry: () => cyl(0.072, 0.072, 0.035, -0.2, 10), material: "toon", applies: (a) => !a.ap.replacement, color: (a) => a.ap.sleeve },
   { key: "bandR", joint: "shR", geometry: () => cyl(0.072, 0.072, 0.035, -0.2, 10), material: "toon", applies: (a) => !a.ap.replacement, color: (a) => a.ap.sleeve },
+  { key: "wristband", joint: "elR", geometry: () => cyl(0.064, 0.064, 0.06, -0.22, 10), material: "toon", applies: (a) => !!a.look?.band, color: (a) => a.look?.band ?? "#60a5fa" },
+  { key: "patch", joint: "shL", geometry: () => box(0.03, 0.08, 0.08, 0.066, -0.08, 0), material: "toon", applies: (a) => !!a.patch, color: (a) => a.patch ?? "#1e3a8a" },
   { key: "fArmL", joint: "elL", geometry: () => cap(0.055, 0.17, -0.13), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#9aa0a6" : a.role === "P" ? shade(a.ap.primary, 0.5) : a.ap.skin) },
   { key: "fArmR", joint: "elR", geometry: () => cap(0.055, 0.17, -0.13), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#9aa0a6" : a.role === "P" ? shade(a.ap.primary, 0.5) : a.ap.skin) },
   { key: "handL", joint: "elL", geometry: () => sphere(0.055, 0, -0.29, 0, [1, 1.1, 0.8], 8), material: "toon", applies: () => true, color: (a) => (a.prop === "bat" ? a.ap.secondary : a.ap.skin) },
   { key: "handR", joint: "elR", geometry: () => sphere(0.055, 0, -0.29, 0, [1, 1.1, 0.8], 8), material: "toon", applies: () => true, color: (a) => (a.prop === "bat" ? a.ap.secondary : a.ap.skin) },
-  { key: "glove", joint: "elL", geometry: () => sphere(0.11, 0.01, -0.31, 0.03, [0.9, 1.25, 0.55], 10), material: "toon", applies: (a) => a.prop === "glove", color: (a) => GLOVES[a.ap.glove % 3]!, side: "glove" },
+  { key: "glove", joint: "elL", geometry: () => sphere(0.11, 0.01, -0.31, 0.03, [0.9, 1.25, 0.55], 10), material: "toon", applies: (a) => a.prop === "glove", color: (a) => GLOVES[a.look?.glove ?? a.ap.glove % 3]!, side: "glove" },
   { key: "thighL", joint: "hipL", geometry: () => cap(0.088, 0.26, -0.22), material: "toon", applies: () => true, color: pants, pickable: true },
   { key: "thighR", joint: "hipR", geometry: () => cap(0.088, 0.26, -0.22), material: "toon", applies: () => true, color: pants, pickable: true },
   { key: "shinL", joint: "knL", geometry: () => cap(0.066, 0.28, -0.22), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#6b7280" : a.ap.primary) },
   { key: "shinR", joint: "knR", geometry: () => cap(0.066, 0.28, -0.22), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#6b7280" : a.ap.primary) },
   { key: "shoeL", joint: "knL", geometry: () => box(0.1, 0.07, 0.24, 0, -0.46, 0.05), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#374151" : "#141414") },
   { key: "shoeR", joint: "knR", geometry: () => box(0.1, 0.07, 0.24, 0, -0.46, 0.05), material: "toon", applies: () => true, color: (a) => (a.ap.replacement ? "#374151" : "#141414") },
-  { key: "bat", joint: "bat", geometry: () => { const g = new THREE.CylinderGeometry(0.036, 0.018, 0.84, 8); g.translate(0, 0.42, 0); return g; }, material: "toon", applies: (a) => a.prop === "bat", color: (a) => BATS[a.ap.bat % 4]!, castShadow: true },
+  { key: "bat", joint: "bat", geometry: () => { const g = new THREE.CylinderGeometry(0.036, 0.018, 0.84, 8); g.translate(0, 0.42, 0); return g; }, material: "toon", applies: (a) => a.prop === "bat", color: (a) => BATS[a.look?.bat ?? a.ap.bat % 4]!, castShadow: true },
   { key: "number", joint: "spine", geometry: () => { const g = new THREE.PlaneGeometry(0.2, 0.2); g.rotateY(Math.PI); g.translate(0, 0.33, -0.142); return g; }, material: "decal", applies: () => true, color: (a) => (a.ap.replacement ? "#d1d5db" : a.ap.uniform === "plain" ? a.ap.secondary : a.ap.primary) },
 ];
 

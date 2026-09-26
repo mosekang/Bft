@@ -23,6 +23,11 @@ import type { BoardData } from "./scoreboard.js";
 import { Stadium, crowdUniforms } from "./Stadium.js";
 import { Ticker } from "./stageKit.js";
 import { sideClub } from "./teams.js";
+import { Auras } from "./Auras.js";
+import { aurasFor, itemLook, visualTags } from "./synergyFx.js";
+import { SYNERGIES, computeEffects } from "@dugout/engine";
+import type { SynergyId } from "@dugout/protocol";
+import { ctx as packCtx } from "../lib/pack.js";
 
 const SCALE = 1.25;
 const FIELD_POS: Pos[] = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
@@ -87,6 +92,30 @@ function Scene(props: MatchStageProps & { reel: Reel; setBoard: (b: Partial<Boar
   const home = useMemo(() => sideClub(state, m.home), [state, m.home]);
   const away = useMemo(() => sideClub(state, m.away), [state, m.away]);
 
+  // Active synergy tiers per side, for auras and ball-trail colours (§18.1).
+  const tiersOf = useMemo(() => {
+    const max = new Map<SynergyId, number>((Object.keys(SYNERGIES) as SynergyId[]).map((id) => [id, SYNERGIES[id].thresholds.length]));
+    const stage = Number(state.round.split("-")[0]);
+    const one = (p: typeof home.player) => new Map<SynergyId, number>(p ? computeEffects(p, state.cards, packCtx, stage).run.synergies.map((x) => [x.id, x.penalised ? 0 : x.tier]) : []);
+    return { home: one(home.player), away: one(away.player), max };
+  }, [state, home, away]);
+  const dress = (a: Actor, id: string, side: "home" | "away"): Actor => {
+    const card = state.cards[id];
+    if (!card) return a;
+    const def = defOf(card.defId);
+    return { ...a, auras: aurasFor(def, tiersOf[side], tiersOf.max), look: itemLook(card.items) };
+  };
+  const trailColor = (batterId: string, side: "home" | "away"): string | undefined => {
+    const card = state.cards[batterId];
+    if (!card) return undefined;
+    const tags = visualTags(defOf(card.defId));
+    const t = tiersOf[side];
+    if (tags.includes("SLUGGER") && (t.get("SLUGGER") ?? 0) > 0) return "#ff8a3d";
+    if (tags.includes("CONTACT_HITTER") && (t.get("CONTACT_HITTER") ?? 0) > 0) return "#60a5fa";
+    return undefined;
+  };
+  const battingSide = useRef<"home" | "away">("away");
+  const batterId = useRef("");
   const lookOf = (id: string, side: "home" | "away"): Appearance => {
     const card = state.cards[id];
     if (card) return appearanceOf(defOf(card.defId));
@@ -101,7 +130,7 @@ function Scene(props: MatchStageProps & { reel: Reel; setBoard: (b: Partial<Boar
     return out;
   };
 
-  const put = (a: Actor) => { actors.current.push(a); byId.current.set(a.id, a); baseClip.current.set(a.id, a.clip); };
+  const put = (raw: Actor, cardId?: string, side?: "home" | "away") => { const a = cardId && side ? dress(raw, cardId, side) : raw; actors.current.push(a); byId.current.set(a.id, a); baseClip.current.set(a.id, a.clip); };
   const setup = (tl: Timeline) => {
     const idx = tl.eventIndex ?? tl.eventRange?.[1] ?? m.events.length - 1;
     const e = m.events[Math.min(idx, m.events.length - 1)]!;
@@ -119,15 +148,17 @@ function Scene(props: MatchStageProps & { reel: Reel; setBoard: (b: Partial<Boar
     for (const p of FIELD_POS) {
       const pos = W(layout[p]);
       const look = lookOf(ids[p]!, fielding);
-      put({ id: `fld:${p}`, ap: look, pos: [pos.x, 0, pos.z], yaw: p === "C" ? 0 : Math.atan2(-pos.x, -pos.z), scale: SCALE, clip: p === "C" ? "idle_catcher" : "idle_field", clipStart: now - Math.random(), mirror: look.lefty, headgear: p === "C" ? "mask" : "cap", prop: "glove", role: "H", away: fielding === "away" });
+      put({ id: `fld:${p}`, ap: look, pos: [pos.x, 0, pos.z], yaw: p === "C" ? 0 : Math.atan2(-pos.x, -pos.z), scale: SCALE, clip: p === "C" ? "idle_catcher" : "idle_field", clipStart: now - Math.random(), mirror: look.lefty, headgear: p === "C" ? "mask" : "cap", prop: "glove", role: "H", away: fielding === "away" }, ids[p]!, fielding);
     }
     const pl = W(layout.P);
     const pAp = e.pitcher ? lookOf(e.pitcher, fielding) : genericAppearance("p", "#64748b");
-    put({ id: "fld:P", ap: pAp, pos: [pl.x, 0.25, pl.z], yaw: Math.PI, scale: SCALE, clip: "idle_pitcher", clipStart: now, mirror: meta["pitcherHand"] === "L" || pAp.lefty, headgear: "cap", prop: "glove", role: "P", away: fielding === "away" });
+    put({ id: "fld:P", ap: pAp, pos: [pl.x, 0.25, pl.z], yaw: Math.PI, scale: SCALE, clip: "idle_pitcher", clipStart: now, mirror: meta["pitcherHand"] === "L" || pAp.lefty, headgear: "cap", prop: "glove", role: "P", away: fielding === "away" }, e.pitcher, fielding);
     if (e.batter) {
       const x = bh === "R" ? 0.95 : -0.95;
-      put({ id: "bat", ap: lookOf(e.batter, batting), pos: [x, 0, 0.1], yaw: bh === "R" ? -Math.PI / 2 : Math.PI / 2, scale: SCALE, clip: "idle_batter", clipStart: now, mirror: bh === "L", headgear: "helmet", prop: "bat", role: "H", away: batting === "away" });
+      put({ id: "bat", ap: lookOf(e.batter, batting), pos: [x, 0, 0.1], yaw: bh === "R" ? -Math.PI / 2 : Math.PI / 2, scale: SCALE, clip: "idle_batter", clipStart: now, mirror: bh === "L", headgear: "helmet", prop: "bat", role: "H", away: batting === "away" }, e.batter, batting);
     }
+    battingSide.current = batting;
+    batterId.current = e.batter;
     const moves = (meta["runnerMoves"] as { runner: string; from: number }[] | undefined) ?? [];
     e.runners.forEach((on, i) => {
       if (!on) return;
@@ -208,7 +239,7 @@ function Scene(props: MatchStageProps & { reel: Reel; setBoard: (b: Partial<Boar
         }
         break;
       }
-      case "ball": flight.current = { points: s.path.points.map((p) => { const v = W(p); return [v.x, v.y, v.z] as [number, number, number]; }), start: now, flightTime: s.path.flightTime, glow: s.path.trail === "glow" }; prevBall.current = null; break;
+      case "ball": { const col = trailColor(batterId.current, battingSide.current); flight.current = { points: s.path.points.map((p) => { const v = W(p); return [v.x, v.y, v.z] as [number, number, number]; }), start: now, flightTime: s.path.flightTime, glow: s.path.trail === "glow" || !!col, ...(col ? { color: col } : {}) }; prevBall.current = null; break; }
       case "hitstop": if (!reduced) play.current.hitstopUntil = real + s.ms / 1000; break;
       case "timeScale": play.current.slowUntil = real + s.dur; play.current.slowScale = s.scale; break;
       case "shake": if (!reduced) cam.current.shake = { amp: s.amp * 4, until: real + s.dur, dur: s.dur }; break;
@@ -311,6 +342,7 @@ function Scene(props: MatchStageProps & { reel: Reel; setBoard: (b: Partial<Boar
       <directionalLight position={[30, 80, -40]} intensity={1.6} castShadow={quality === "high"} />
       <fog attach="fog" args={["#0b1224", 220, 640]} />
       <Figures actors={actors} clock={clock} shadows={quality === "high"} />
+      <Auras actors={actors} clock={clock} />
       <Ball flight={flight} clock={clock} position={ballPos} />
       <Particles api={fx} clock={clock} />
     </>

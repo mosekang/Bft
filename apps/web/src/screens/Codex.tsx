@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { AUGMENTS, ITEMS, STADIUMS, SYNERGIES } from "@dugout/engine";
+import { Suspense, lazy } from "react";
+import { SYNERGY_FX } from "../scene/synergyFx.js";
+
+const FigurePreview = lazy(() => import("../scene/FigurePreview.js"));
 import { STADIUM_IDS, SYNERGY_IDS } from "@dugout/protocol";
 import { Button } from "../components/Button.js";
 import { CardTile } from "../components/CardTile.js";
@@ -12,6 +16,7 @@ type Tab = "cards" | "synergies" | "augments" | "items" | "stadiums" | "achievem
 
 export function Codex({ onClose }: { onClose: () => void }) {
   const [tab, setTab] = useState<Tab>("cards");
+  const [preview, setPreview] = useState<string | null>(null);
   const [seen, setSeen] = useState<Set<string>>(new Set());
   const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -37,7 +42,7 @@ export function Codex({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         )}
-        {tab === "synergies" && SYNERGY_IDS.map((id) => { const s = SYNERGIES[id]; return <div key={id} className="mb-3 rounded-xl panel p-3"><div className="font-bold">{s.nameKo} <span className="text-xs text-[var(--ink-2)]">{s.mode === "EXACT" ? `정확히 ${s.thresholds[0]}` : s.thresholds.join(" / ")}</span></div><ul className="mt-1 text-sm text-[var(--ink-2)]">{s.descriptionsKo.map((d, i) => <li key={i}>{s.thresholds[i]} — {d}</li>)}{s.overflowDescriptionKo && <li className="text-rose-300">초과 — {s.overflowDescriptionKo}</li>}</ul></div>; })}
+        {tab === "synergies" && SYNERGY_IDS.map((id) => { const s = SYNERGIES[id]; return <div key={id} className="mb-3 rounded-xl panel p-3" onClick={() => setPreview(preview === id ? null : id)}>{preview === id && SYNERGY_FX[id] && <Suspense fallback={null}><FigurePreview synergy={id} height={140} /></Suspense>}<div className="font-bold">{s.nameKo} <span className="text-xs text-[var(--ink-2)]">{s.mode === "EXACT" ? `정확히 ${s.thresholds[0]}` : s.thresholds.join(" / ")}</span></div><ul className="mt-1 text-sm text-[var(--ink-2)]">{s.descriptionsKo.map((d, i) => <li key={i}>{s.thresholds[i]} — {d}</li>)}{s.overflowDescriptionKo && <li className="text-rose-300">초과 — {s.overflowDescriptionKo}</li>}</ul></div>; })}
         {tab === "augments" && AUGMENTS.map((a) => <div key={a.id} className="mb-2 rounded-xl panel p-3"><div className="font-bold">{a.nameKo} <span className="text-xs text-[var(--ink-2)]">{a.rarity}</span></div><div className="text-sm text-[var(--ink-2)]">{a.descriptionKo}</div></div>)}
         {tab === "items" && ITEMS.map((i) => <div key={i.id} className="mb-2 rounded-xl panel p-3"><div className="font-bold">{i.nameKo} <span className="text-xs text-[var(--ink-2)]">{i.tier === "COMPONENT" ? "부품" : i.tier === "COMBINED" ? `${ITEMS.find((x) => x.id === i.recipe![0])?.nameKo}+${ITEMS.find((x) => x.id === i.recipe![1])?.nameKo}` : "특수"}</span></div><div className="text-sm text-[var(--ink-2)]">{i.descriptionKo}</div></div>)}
         {tab === "stadiums" && STADIUM_IDS.map((id) => <div key={id} className="mb-2 rounded-xl panel p-3"><div className="font-bold">{STADIUMS[id].nameKo}</div><div className="text-sm text-[var(--ink-2)]">{STADIUMS[id].descriptionKo}</div></div>)}

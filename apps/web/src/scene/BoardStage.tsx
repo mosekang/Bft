@@ -17,6 +17,11 @@ import { defOf } from "../lib/pack.js";
 import { yawTo, type Actor } from "./actor.js";
 import { clipDuration, clipLoops, type AnyClip } from "./clips.js";
 import { Figures } from "./Figures.js";
+import { Auras } from "./Auras.js";
+import { PATCH_COLORS, aurasFor, growthScale, itemLook } from "./synergyFx.js";
+import { SYNERGIES, computeEffects } from "@dugout/engine";
+import type { SynergyId } from "@dugout/protocol";
+import { ctx as packCtx } from "../lib/pack.js";
 import { BOARD_SPOTS, CHEER_STAGE, DUGOUT_SPACING, dugoutSeats } from "./park.js";
 import { TARGET_FPS, type Quality } from "./quality.js";
 import { Stadium } from "./Stadium.js";
@@ -54,7 +59,18 @@ function clubColors(state: GameState, me: PlayerState): [string, string] {
   return [lk.primary, lk.secondary];
 }
 
-function slotActor(state: GameState, player: PlayerState, slot: Slot, now: number): Actor {
+type Tiers = { tiers: Map<SynergyId, number>; max: Map<SynergyId, number> };
+const NO_TIERS: Tiers = { tiers: new Map(), max: new Map() };
+
+function teamTiers(state: GameState, player: PlayerState): Tiers {
+  const stage = Number(state.round.split("-")[0]);
+  const eff = computeEffects(player, state.cards, packCtx, stage);
+  const tiers = new Map<SynergyId, number>(eff.run.synergies.map((x) => [x.id, x.penalised ? 0 : x.tier]));
+  const max = new Map<SynergyId, number>((Object.keys(SYNERGIES) as SynergyId[]).map((id) => [id, SYNERGIES[id].thresholds.length]));
+  return { tiers, max };
+}
+
+function slotActor(state: GameState, player: PlayerState, slot: Slot, now: number, tt: Tiers = NO_TIERS): Actor {
   const id = player.board.slots[slot];
   const card = id ? state.cards[id] : undefined;
   const def = card ? defOf(card.defId) : undefined;
@@ -68,19 +84,30 @@ function slotActor(state: GameState, player: PlayerState, slot: Slot, now: numbe
     clip, clipStart: now - (ap.number % 7) * 0.31, mirror: slot === "DH" ? def?.bats === "L" : ap.lefty,
     headgear: slot === "C" ? "mask" : slot === "DH" ? "helmet" : "cap", prop: slot === "DH" ? "bat" : "glove", role: pitcher ? "P" : "H",
     ...(card ? { star: card.star } : {}),
+    ...(def && card ? { auras: aurasFor(def, tt.tiers, tt.max), look: itemLook(card.items), scale: FIG * growthScale(def, card) } : {}),
+    ...(def && PATCH_COLORS[def.origin] ? { patch: PATCH_COLORS[def.origin]! } : {}),
   };
 }
 
 function buildActors(state: GameState, me: PlayerState, now: number, colors: [string, string]): Actor[] {
-  const out: Actor[] = SLOTS.map((s) => slotActor(state, me, s, now));
+  const tt = teamTiers(state, me);
+  const out: Actor[] = SLOTS.map((s) => slotActor(state, me, s, now, tt));
   const seats = dugoutSeats("home", 6, DUGOUT_SPACING);
   me.bench.forEach((id, i) => {
     const card = id ? state.cards[id] : undefined;
     const seat = seats[i];
     if (!card || !seat) return;
     const def = defOf(card.defId);
-    out.push({ id: `bench:${i}`, ap: appearanceOf(def), pos: [...seat.pos] as [number, number, number], yaw: seat.yaw, scale: BENCH_FIG, clip: "sit", clipStart: now - i * 0.5, mirror: false, headgear: "cap", prop: "none", role: "X", star: card.star });
+    out.push({ id: `bench:${i}`, ap: appearanceOf(def), pos: [...seat.pos] as [number, number, number], yaw: seat.yaw, scale: BENCH_FIG, clip: "sit", clipStart: now - i * 0.5, mirror: false, headgear: "cap", prop: "none", role: "X", star: card.star, look: itemLook(card.items) });
   });
+  // Scouting items put an analyst with a tablet in the dugout; FRONT_OFFICE sends two suits (§18.2).
+  const looks = out.map((a) => a.look).filter(Boolean);
+  const extraSeat = dugoutSeats("home", 8, DUGOUT_SPACING)[6]!;
+  if (looks.some((l) => l?.coach)) out.push({ id: "coach", ap: { ...genericAppearance("coach", "#334155", "#e2e8f0"), hairStyle: 2, beard: 1 }, pos: [...extraSeat.pos] as [number, number, number], yaw: extraSeat.yaw, scale: BENCH_FIG, clip: "idle_pitcher", clipStart: now, mirror: false, headgear: "none", prop: "none", role: "X" });
+  if (looks.some((l) => l?.suits)) {
+    const s2 = dugoutSeats("home", 9, DUGOUT_SPACING)[8]!;
+    for (const k of [0, 1]) out.push({ id: `suit${k}`, ap: { ...genericAppearance(`suit${k}`, "#1f2937", "#111827"), uniform: "plain", sleeve: "#1f2937" }, pos: [s2.pos[0] + k * 2.2, s2.pos[1], s2.pos[2] + k * 2.2], yaw: s2.yaw, scale: BENCH_FIG, clip: "idle_pitcher", clipStart: now + k, mirror: false, headgear: "none", prop: "none", role: "X" });
+  }
   const st = CHEER_STAGE;
   for (let k = 0; k < 3; k++) {
     const side = (k - 1) * 2.8;
@@ -329,6 +356,10 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
     if (pads.stars.instanceColor) pads.stars.instanceColor.needsUpdate = true;
   });
 
+  const banners = useMemo(() => {
+    const st = computeEffects(me, state.cards, packCtx, Number(state.round.split("-")[0])).run.synergies.find((x) => x.id === "FOREIGN");
+    return { flags: st && st.tier > 0 ? 2 : 0, warning: !!st?.penalised };
+  }, [me, state.cards, state.round]);
   const board = useMemo(() => ({
     header: `ROUND ${state.round}`, inning: 1, half: "T" as const, message: me.nickname,
     away: { short: "AWY", color: "#475569", line: [], r: 0, h: 0, e: 0 }, home: { short: "HOM", color: colors[0], line: [], r: 0, h: 0, e: 0 },
@@ -341,7 +372,7 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
       <hemisphereLight args={["#c7d7ff", "#10301c", 1.05]} />
       <directionalLight position={[-30, 80, -40]} intensity={1.6} castShadow={quality === "high"} shadow-mapSize={[1024, 1024]} />
       <fog attach="fog" args={["#0b1224", 220, 640]} />
-      <Stadium stadium={me.stadium} quality={quality} crowd={me.hp / 100} homeColors={colors} board={board} propScale={3} />
+      <Stadium stadium={me.stadium} quality={quality} crowd={me.hp / 100} homeColors={colors} board={board} propScale={3} banners={banners} />
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.01, 40]} onPointerDown={(e) => { par.current = { x0: e.nativeEvent.clientX, yaw0: yaw.current }; }} visible={false}>
         <planeGeometry args={[240, 220]} />
         <meshBasicMaterial />
@@ -350,6 +381,7 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
       <primitive object={pads.stars} />
       <primitive object={pillarMesh} />
       <Figures actors={actors} clock={clock} shadows={quality === "high"} onActorDown={onActorDown} />
+      <Auras actors={actors} clock={clock} />
       {hologram && <Figures actors={ghosts} clock={clock} ghost />}
     </>
   );

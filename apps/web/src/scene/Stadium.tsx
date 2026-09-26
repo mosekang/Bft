@@ -415,9 +415,34 @@ export interface StadiumProps {
   board: BoardData;
   /** Scale of dugouts/stage to match figure scale (prep figures are chess-piece sized). */
   propScale?: number;
+  /** Foreign-player flags in the stands; red warning banner on quota violation (§18.1). */
+  banners?: { flags: number; warning: boolean };
 }
 
-export function Stadium({ stadium, quality, crowd, homeColors, board, propScale = 1 }: StadiumProps) {
+const FLAG_COLORS: [string, string, string][] = [["#b22234", "#ffffff", "#3c3b6e"], ["#002d62", "#ce1126", "#ffffff"], ["#ffcc00", "#00247d", "#cf142b"]];
+
+function Banners({ dims, flags, warning }: { dims: ParkDims; flags: number; warning: boolean }) {
+  return (
+    <group>
+      {Array.from({ length: flags }, (_, i) => {
+        const th = (i === 0 ? -28 : 28) * DEG;
+        const [x, z] = polar(th, fenceDistance(dims, th) + 6);
+        const col = FLAG_COLORS[i % FLAG_COLORS.length]!;
+        return (
+          <group key={i} position={[x, 9, z]} rotation-y={Math.atan2(-x, -z)}>
+            <mesh position={[0, 3, 0]}><cylinderGeometry args={[0.12, 0.12, 12, 6]} /><meshLambertMaterial color="#d1d5db" /></mesh>
+            {col.map((cc, k) => <mesh key={k} position={[3.2, 7.6 - k * 1.2, 0]}><planeGeometry args={[6, 1.2]} /><meshBasicMaterial color={cc} side={THREE.DoubleSide} /></mesh>)}
+          </group>
+        );
+      })}
+      {warning && (
+        <mesh position={[0, dims.fenceH + 3, dims.cf + 2]} rotation-y={Math.PI}><planeGeometry args={[30, 4]} /><meshBasicMaterial color="#dc2626" side={THREE.DoubleSide} /></mesh>
+      )}
+    </group>
+  );
+}
+
+export function Stadium({ stadium, quality, crowd, homeColors, board, propScale = 1, banners }: StadiumProps) {
   const dims = useMemo(() => parkDims(stadium), [stadium]);
   return (
     <group>
@@ -432,6 +457,7 @@ export function Stadium({ stadium, quality, crowd, homeColors, board, propScale 
       <Dugout side="away" color="#475569" scale={propScale} />
       <CheerStage color={homeColors[0]} scale={propScale} />
       {dims.sea && <Sea />}
+      {banners && <Banners dims={dims} flags={banners.flags} warning={banners.warning} />}
     </group>
   );
 }
