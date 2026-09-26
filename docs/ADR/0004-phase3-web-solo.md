@@ -24,5 +24,8 @@
 - **오프라인**: `vite-plugin-pwa`의 precache(13 entries)로 앱 셸·엔진 워커·팩 JSON을 모두 캐시. 솔로는 네트워크 요청이 없다.
 - 번들: 메인 175 KB gzip + 워커 218 KB(비압축) — §14.2 예산(400 KB gzip) 안.
 
-## 실행 기록
-(아래는 커밋 시점에 채운다)
+## 실행 기록 (2026-09-26)
+- `playwright test e2e/solo-run.spec.ts` (Pixel 5, 실제 Chromium): **1판 완주 10.1초**(연출 "즉시"), **새로고침 후 이어하기 0.8초** — 2 passed.
+- `playwright test e2e/room.spec.ts` (Node 방 서버): 2클라이언트 방 생성·입장·시작·경기·재접속 — passed.
+- `lighthouse@11 --only-categories=pwa`: **PWA 1.0** (installable-manifest, splash, themed omnibox, content width, viewport, maskable icon 모두 통과).
+- 번들: `index-*.js` 181 KB gzip, 워커 청크 218 KB(비압축), precache 13 entries.
