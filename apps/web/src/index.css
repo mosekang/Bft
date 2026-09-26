@@ -16,3 +16,21 @@ body,
   min-width: 360px;
   overscroll-behavior: none;
 }
+
+body {
+  padding-top: env(safe-area-inset-top);
+}
+button, input {
+  touch-action: manipulation;
+}
+
+@keyframes sparkle {
+  0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.9); transform: scale(1); }
+  50% { box-shadow: 0 0 18px 6px rgba(251, 191, 36, 0.6); transform: scale(1.06); }
+  100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); transform: scale(1); }
+}
+.sparkle { animation: sparkle 400ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .sparkle { animation: none; }
+  * { transition-duration: 0ms !important; }
+}

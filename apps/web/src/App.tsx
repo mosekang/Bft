@@ -1,25 +1,32 @@
-import { ENGINE_VERSION, buildSchedule } from "@dugout/engine";
+import { useEffect } from "react";
+import { Toast } from "./components/Toast.js";
+import { Lobby } from "./screens/Lobby.js";
+import { Playback } from "./screens/Playback.js";
+import { Result } from "./screens/Result.js";
+import { RoomLobby } from "./screens/RoomLobby.js";
+import { Run } from "./screens/Run.js";
+import { Settle } from "./screens/Settle.js";
+import { StadiumPick } from "./screens/StadiumPick.js";
+import { useRun } from "./store/run.js";
+import { useSession } from "./store/session.js";
 
-/**
- * Phase 0 placeholder shell. Real screens (Lobby, Run, Game, Result) arrive in Phase 3.
- * Kept minimal on purpose: it only proves the web app can import the engine and build as a PWA.
- */
 export function App() {
-  const rounds = buildSchedule().length;
+  const state = useRun((s) => s.state);
+  const room = useRun((s) => s.room);
+  const load = useSession((s) => s.load);
+  useEffect(() => { void load(); }, [load]);
+  let screen: JSX.Element;
+  if (room && !state) screen = <RoomLobby />;
+  else if (!state) screen = <Lobby />;
+  else if (state.phase === "STADIUM") screen = <StadiumPick />;
+  else if (state.phase === "PLAYBACK") screen = <Playback />;
+  else if (state.phase === "SETTLE") screen = <Settle />;
+  else if (state.phase === "GAME_OVER") screen = <Result />;
+  else screen = <Run />;
   return (
-    <main className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center gap-4 p-6 text-center">
-      <h1 className="text-3xl font-bold tracking-tight">덕아웃 택틱스</h1>
-      <p className="text-slate-400">TFT 룰로 하는 야구 오토배틀러</p>
-      <p className="text-sm text-slate-500">
-        engine v{ENGINE_VERSION} · {rounds} rounds / run
-      </p>
-      <button
-        type="button"
-        className="mt-4 min-h-11 rounded-xl bg-emerald-500 px-6 font-semibold text-slate-950 active:bg-emerald-400"
-        disabled
-      >
-        새 게임 (Phase 3)
-      </button>
-    </main>
+    <div className="mx-auto h-full max-w-md bg-slate-950 text-slate-100">
+      {screen}
+      <Toast />
+    </div>
   );
 }

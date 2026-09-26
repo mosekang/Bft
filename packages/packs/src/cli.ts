@@ -4,12 +4,14 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { generatePack } from "./generate.js";
 import { validatePack } from "./validate.js";
+import { buildPackFromCsv } from "./build.js";
 
 const HELP = `dugout packs
 
   generate [--seed <seed>] [--out <file>]   Generate the fictional pack (default seed "fictional-v1")
   validate [<file>]                          Validate a pack JSON (default: fictional-v1.json)
-  build <input.csv> --out <file>             CSV -> private pack (Phase 5)
+  build --hitters h.csv --pitchers p.csv --out my.json [--id my-kbo-2026] [--name "내 팩"]
+                                             CSV -> private pack (never commit the output)
 `;
 
 export function run(argv: readonly string[], out: (s: string) => void = console.log): number {
@@ -46,9 +48,20 @@ export function run(argv: readonly string[], out: (s: string) => void = console.
       for (const e of report.errors) out(`  error: ${e}`);
       return report.ok ? 0 : 1;
     }
-    case "build":
-      out("build: CSV -> pack converter arrives in Phase 5 (§5.6).");
-      return 1;
+    case "build": {
+      const h = flag("--hitters");
+      const p = flag("--pitchers");
+      const file = flag("--out");
+      if (!h || !p || !file) { out(HELP); return 2; }
+      const id = flag("--id") ?? "private-pack";
+      const pack = buildPackFromCsv(readFileSync(resolve(h), "utf8"), readFileSync(resolve(p), "utf8"), { id, name: flag("--name") ?? id });
+      const report = validatePack(pack);
+      writeFileSync(resolve(file), `${JSON.stringify(pack, null, 2)}\n`);
+      out(`wrote ${resolve(file)} (${pack.cards.length} cards) — ${report.ok ? "valid" : "with validation notes:"}`);
+      for (const e of report.errors) out(`  note: ${e}`);
+      out("This pack is private (kind: private). Do not commit it.");
+      return 0;
+    }
     default:
       out(HELP);
       return cmd === undefined || cmd === "help" ? 0 : 2;

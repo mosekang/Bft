@@ -151,6 +151,21 @@ describe("shop, economy and merging", () => {
   });
 });
 
+describe("batting order (§4.3)", () => {
+  it("accepts a permutation or AUTO and rejects duplicates", () => {
+    let s = step(act(step(humanRun("order")), { type: "PICK_STADIUM", id: "DOME" }));
+    const order = ["DH", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"] as const;
+    s = act(s, { type: "SET_ORDER", order: [...order] });
+    expect(s.players.find((p) => p.id === "me")!.board.order).toEqual([...order]);
+    expect(applyAction(s, "me", { type: "SET_ORDER", order: ["DH", "DH", "1B", "2B", "3B", "SS", "LF", "CF", "RF"] }, ctx)).toMatchObject({ ok: false, code: "INVALID_SLOT" });
+    const hitters = pack.cards.filter((c) => c.role === "H").slice(0, 2);
+    for (const h of hitters) s = grantCard(s, "me", h.id, ctx).state;
+    s = act(s, { type: "MOVE", from: { kind: "bench", index: 0 }, to: { kind: "slot", slot: hitters[0]!.pos } });
+    s = act(s, { type: "SET_ORDER", order: "AUTO" });
+    expect(s.players.find((p) => p.id === "me")!.board.order[0]).toBe(hitters[0]!.pos);
+  });
+});
+
 describe("items and synergies", () => {
   it("two components on one card combine, and synergies count the board only", () => {
     let s = step(act(step(humanRun("items")), { type: "PICK_STADIUM", id: "DOME" }));
@@ -200,5 +215,25 @@ describe("full bot runs", () => {
     expect(summary).toMatchSnapshot();
     expect(hash).toMatchSnapshot();
     expect(ARCHETYPES.every((a) => s.players.some((p) => p.archetype === a))).toBe(true);
+  });
+});
+
+describe("ghost boards (§12.6)", () => {
+  it("overlays a snapshot on a bot with fresh ids and no fatigue", async () => {
+    const { applyGhosts } = await import("../src/run/ghosts.js");
+    let s = step(act(step(humanRun("ghost")), { type: "PICK_STADIUM", id: "DOME" }));
+    const bot = s.players.find((p) => p.isBot)!;
+    const def = pack.cards.find((c) => c.role === "H" && c.pos === "SS")!;
+    const ghost = { slots: { SS: "x1" } as const, cards: { x1: { instanceId: "x1", defId: def.id, star: 2 as const, items: [], fatigue: 2, injuredRounds: 0, growth: 3 } }, nickname: "유령" };
+    s = applyGhosts(s, [ghost], ctx);
+    const b = s.players.find((p) => p.id === bot.id)!;
+    const id = b.board.slots.SS!;
+    expect(id.startsWith(`g:${bot.id}:`)).toBe(true);
+    expect(s.cards[id]).toMatchObject({ defId: def.id, star: 2, fatigue: 0, growth: 3 });
+    expect(b.nickname).toBe("유령(고스트)");
+    expect(b.bench.every((x) => x === null)).toBe(true);
+    // The overlaid board plays a normal round without invariant violations.
+    s = step(act(s, { type: "READY" }));
+    expect(s.phase).toBe("PLAYBACK");
   });
 });

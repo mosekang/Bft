@@ -13,3 +13,4 @@ export * from "./events.js";
 export * from "./matchmaking.js";
 export * from "./round.js";
 export * from "./actions.js";
+export * from "./ghosts.js";

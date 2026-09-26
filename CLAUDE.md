@@ -21,7 +21,7 @@ TFT의 룰로 하는 야구 오토배틀러. 모바일 웹(PWA) 우선, 솔로 +
 
 ```
 apps/web            Vite + React 18 + TS + Tailwind 4 + PWA. zustand, Dexie, dnd-kit. (Phase 3)
-apps/server         Cloudflare Workers + Durable Objects + D1. DO 의존 코드는 src/adapter/에 격리. (Phase 4, 아직 없음)
+apps/server         core/(RoomCore·social: 플랫폼 무관) + adapter/(cloudflare: DO·KV·D1, node: ws 개발 서버) + sql/schema.sql
 packages/protocol   zod 스키마 + 타입. 팩(CardDef/Pack), 상태(GameState…), 메시지(Action/ServerMessage). 의존성 없음(zod만).
 packages/engine     순수 TS. config/(사양 수치) · rng · ratings(표시치·OVR) · nicknames · sim/(경기) · run/(런 규칙, applyAction, advance) · bots/ · arena.ts(bot-arena)
 packages/packs      가상 팩 생성기·검증기·(P5) CSV 변환기. fictional-v1.json 커밋본.
@@ -54,8 +54,11 @@ pnpm dev                          # 웹 개발 서버 (--host)
 pnpm pack:generate --seed fictional-v1     # 가상 팩 재생성 (커밋본과 같아야 함; 생성기 변경 시에만)
 pnpm pack:validate [file.json]             # 팩 검증 (§5.3 제약)
 pnpm pack:build input.csv --out my.json    # CSV → 개인 팩 (Phase 5)
-pnpm cli sim-game --seed X                 # 1경기 박스스코어 (Phase 1)
-pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (Phase 2)
+pnpm cli sim-game --seed X                 # 1경기 박스스코어
+pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (§15.1)
+pnpm --filter @dugout/web test:e2e         # Playwright: 솔로 1판 완주 + 친구방 2클라이언트 (Node 서버 자동 기동)
+pnpm --filter @dugout/server dev:node      # 로컬 방 서버 :8787 (VITE_SERVER_URL 기본값)
+pnpm --filter @dugout/server dev:cf        # wrangler dev (Cloudflare)
 ```
 
 ## 5. 코딩 규칙
@@ -70,6 +73,8 @@ pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (Phase 2)
 
 - 사용자가 **전체 Phase를 자동 승인**했다(2026-09-26). 각 Phase는 완료 기준 증거를 ADR에 남기고 커밋한다.
 - Phase 0 완료(ADR-0001). Phase 1 완료(ADR-0002): `engine/sim/*`, `sim-game` CLI. Phase 2 완료(ADR-0003): `engine/run/*`, `bots/`, `arena.ts`, `bot-arena` CLI. 1000판 지표 10/12 OK.
-- 진행 중: Phase 3 (web 솔로: 로비·구장·런·경기·결과·자동 저장·Worker·PWA).
-- 미해결 결정: 무승부 비율(ADR-0002 #6), 5코스트 ★★ 달성률(ADR-0003).
+- Phase 3 완료(ADR-0004): `apps/web` 솔로(Worker·Dexie·PWA·Playwright e2e). Phase 4 완료(ADR-0005): `apps/server` 코어 + Cloudflare/Node 어댑터, 웹 친구방. Phase 5 완료(ADR-0006): 일일 도전·리더보드·고스트·CSV 팩 변환·도감·업적.
+- Phase 6 완료(ADR-0007): 타순 편집(`SET_ORDER`), 해설 톤, 홈런 연출·진동, 코치마크, CI 워크플로, 배포 문서. **배포 URL은 미생성**(Cloudflare 자격 증명 없음 → `docs/DEPLOY.md`).
+- 미해결 결정: 무승부 비율(ADR-0002 #6), 5코스트 ★★ 달성률(ADR-0003), 실기기 검증(§17 Phase 3·4의 실기기 항목은 Playwright로 대체).
+- 후속(범위 밖): Capacitor 패키징, 랭크, 시즌 팩 교체, 관전 모드, 클라이언트 예측(ADR-0005 #10).
 - 런 루프 사용법: `createContext(pack)` → `createRun(ctx, {seed, players})` → 사람 입력은 `applyAction(state, playerId, action, ctx)` → 항상 `advance(state, ctx, bots)`로 봇과 페이즈를 진행 → `waitingOn(state, playerId)`로 UI가 기다릴 것을 안다.

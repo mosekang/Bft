@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm pack:validate
+      - name: bot-arena smoke (100 runs; warns when a §15.1 metric is out of range)
+        run: pnpm --silent cli bot-arena --games 100 --seed ci || echo "::warning::bot-arena reported metrics out of range (see log)"
+      - run: pnpm --filter @dugout/web build
+      - name: bundle size budget (§14.2: ≤ 400 KB gzip for the main bundle)
+        run: |
+          SIZE=$(gzip -c apps/web/dist/assets/index-*.js | wc -c)
+          echo "main bundle gzip bytes: $SIZE"
+          test "$SIZE" -le 409600
+      - name: e2e (Pixel 5 viewport)
+        run: pnpm --filter @dugout/web exec playwright install chromium --with-deps && PW_CHROMIUM= pnpm --filter @dugout/web exec playwright test --timeout 600000
+        env:
+          PW_CHROMIUM: ""

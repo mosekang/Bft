@@ -3,7 +3,7 @@ import { ECONOMY, sellValue } from "../config/economy.js";
 import { LEVELS } from "../config/levels.js";
 import { alive, currentRound, err, getPlayer, ok, roundRng, type Result, type RunContext } from "./context.js";
 import { applyAugmentPick, grantChosenCard, offerAugments } from "./augments.js";
-import { moveCard, pruneBoard } from "./board.js";
+import { autoOrder, moveCard, pruneBoard } from "./board.js";
 import { autoMerge, grantCard, ownedIds, sellCard } from "./cards.js";
 import { advanceWave, buildCarousel, carouselDone, currentWave } from "./carousel.js";
 import { rerollCost, xpCost } from "./economy.js";
@@ -268,6 +268,13 @@ function applyActionInner(state: GameState, playerId: string, action: Action, ct
 
     case "SET_TOGGLE":
       return logged(set(state, playerId, { board: { ...p.board, forcePitch: { ...p.board.forcePitch, [action.slot]: action.forcePitch } } }));
+
+    case "SET_ORDER": {
+      if (phase !== "PREP" && phase !== "EVENT" && phase !== "AUGMENT" && phase !== "CAROUSEL") return err("BAD_PHASE", "cannot reorder now");
+      if (action.order === "AUTO") return logged(set(state, playerId, autoOrder(p, state.cards, ctx)));
+      if (new Set(action.order).size !== 9) return err("INVALID_SLOT", "order must list every hitter slot once");
+      return logged(set(state, playerId, { board: { ...p.board, order: action.order } }));
+    }
 
     case "EQUIP": {
       if (phase !== "PREP" && phase !== "EVENT") return err("BAD_PHASE", "cannot equip now");

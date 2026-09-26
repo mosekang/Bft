@@ -107,9 +107,11 @@ describe("messages", () => {
       { type: "EMOTE", id: 3 },
       { type: "PING" },
       { type: "PICK_CHOICE", idx: 0 },
+      { type: "SET_ORDER", order: "AUTO" },
+      { type: "SET_ORDER", order: ["CF", "SS", "1B", "DH", "LF", "RF", "3B", "2B", "C"] },
     ];
     for (const a of actions) expect(ActionSchema.parse(a)).toEqual(a);
-    expect(actions).toHaveLength(18);
+    expect(actions).toHaveLength(20);
   });
 
   it("rejects unknown actions and wrong protocol versions", () => {

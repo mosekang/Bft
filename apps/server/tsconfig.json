@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "types": ["node", "@cloudflare/workers-types"],
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src", "test", "vitest.config.ts"]
+}

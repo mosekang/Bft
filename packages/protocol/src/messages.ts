@@ -29,6 +29,8 @@ export const ActionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("SKIP_PLAYBACK") }),
   /** Resolve a pending `PlayerState.choice` (item reward, franchise card, special item). */
   z.object({ type: z.literal("PICK_CHOICE"), idx: z.number().int().min(0).max(7) }),
+  /** Batting order: a permutation of the nine hitter slots, or "AUTO" for OVR order (§4.3). */
+  z.object({ type: z.literal("SET_ORDER"), order: z.union([z.array(z.enum(["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"])).length(9), z.literal("AUTO")]) }),
   z.object({ type: z.literal("EMOTE"), id: z.number().int().min(0).max(7) }),
   z.object({ type: z.literal("PING") }),
 ]);

@@ -14,3 +14,10 @@ coverage/
 packages/packs/private/
 packs/private/
 *.private.pack.json
+
+# Playwright artifacts
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/e2e/*.png
+# wrangler
+apps/server/.wrangler/

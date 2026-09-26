@@ -1,0 +1,36 @@
+name: Deploy
+# Manual deploy to Cloudflare Pages (web) + Workers (room server).
+# Required repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID.
+# Required variables: VITE_SERVER_URL (the Workers URL), CF_PAGES_PROJECT.
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Deploy room server (Workers + Durable Objects + D1)
+        working-directory: apps/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm exec wrangler d1 execute dugout --remote --file=sql/schema.sql
+          pnpm exec wrangler deploy
+      - name: Build web against the deployed server
+        env:
+          VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
+        run: pnpm --filter @dugout/web build
+      - name: Deploy web (Pages)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm --filter @dugout/server exec wrangler pages deploy ../web/dist --project-name "${{ vars.CF_PAGES_PROJECT }}"

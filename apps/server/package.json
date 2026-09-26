@@ -1,0 +1,32 @@
+{
+  "name": "@dugout/server",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Dugout Tactics room server: platform-independent room core + Cloudflare Durable Object and Node WebSocket adapters.",
+  "type": "module",
+  "main": "./src/core/index.ts",
+  "exports": {
+    ".": "./src/core/index.ts",
+    "./node": "./src/adapter/node.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "dev:node": "tsx src/adapter/node-main.ts",
+    "dev:cf": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@dugout/engine": "workspace:*",
+    "@dugout/packs": "workspace:*",
+    "@dugout/protocol": "workspace:*",
+    "ws": "^8.18.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250900.0",
+    "@types/ws": "^8.18.0",
+    "tsx": "^4.20.0",
+    "wrangler": "^4.40.0"
+  }
+}

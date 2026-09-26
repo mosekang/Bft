@@ -1,0 +1,24 @@
+name = "dugout-tactics"
+main = "src/adapter/cloudflare.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dugout"
+database_id = "REPLACE_WITH_D1_ID"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_ID"
+
+[vars]
+ALLOWED_ORIGIN = "*"
