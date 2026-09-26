@@ -26,6 +26,15 @@ export const AUGMENTS: readonly AugmentDef[] = [
   { id: "SABERMETRICS", nameKo: "세이버메트릭스", rarity: "PRISM", descriptionKo: "상점 내부치 전부 공개, 상대 시너지 단계 공개", params: { revealInternals: 1, revealSynergies: 1 } },
   { id: "DYNASTY", nameKo: "왕조", rarity: "PRISM", descriptionKo: "레벨 +1 즉시, XP 비용 ×1.25", params: { levelNow: 1, xpCostMult: 1.25 } },
   { id: "MASTER_MANAGER", nameKo: "명장", rarity: "PRISM", descriptionKo: "자동 감독 강화, 마무리 조건 리드 4점까지", params: { closerLeadMax: 4, smartManager: 1 } },
+  // v3 §18.3
+  { id: "DATA_BASEBALL", nameKo: "데이터 야구", rarity: "GOLD", descriptionKo: "상점 내부치 공개, 라운드마다 첫 리롤 비용 −1", params: { revealInternals: 1, firstRerollDiscount: 1 } },
+  { id: "VETERAN_PREFERENCE", nameKo: "노장 우대", rarity: "SILVER", descriptionKo: "베테랑 카드 내부치 +6, S7 페널티 없음", params: { veteranAdd: 6, postseasonImmune: 1 } },
+  { id: "REBUILDING", nameKo: "리빌딩", rarity: "SILVER", descriptionKo: "팬심 60 이상이면 매 라운드 +2골드, 고졸 유망주 성장 +1", params: { goldPerRound: 2, minHp: 60, prospectGrowthAdd: 1 } },
+  { id: "HOME_ADVANTAGE", nameKo: "홈 어드밴티지", rarity: "GOLD", descriptionKo: "홈 경기에서 아군 타자 BABIP +.012", params: { homeBabipAdd: 0.012 } },
+  { id: "CHEER_SQUAD", nameKo: "응원단", rarity: "SILVER", descriptionKo: "홈 경기 승리마다 +1골드, 홈 경기 득점권 컨택·파워 +2", params: { homeWinGold: 1, homeRispAdd: 2 } },
+  { id: "ROOKIE_RACE", nameKo: "신인왕 레이스", rarity: "GOLD", descriptionKo: "보드에서 가장 어린 선수 내부치 +10", params: { youngestAdd: 10 } },
+  { id: "TRADE_MASTER", nameKo: "트레이드 명가", rarity: "GOLD", descriptionKo: "트레이드 마감: 제시 5장, 교환 2회", params: { tradeOptions: 5, tradeSwaps: 2 } },
+  { id: "MASTER_CATCHER", nameKo: "명포수", rarity: "PRISM", descriptionKo: "포수 카드가 포수·백업 포수 시너지에 2명으로 계산, 프레이밍 ×1.5", params: { catcherCountMult: 2, framingScale: 1.5 } },
 ];
 
 export const AUGMENT_BY_ID: ReadonlyMap<AugmentId, AugmentDef> = new Map(AUGMENTS.map((a) => [a.id, a]));

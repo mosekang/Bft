@@ -14,6 +14,7 @@ import { computeEffects, type ComputedEffects } from "./effects.js";
 import { allStarDefs, legendTeam, trainingTeam } from "./events.js";
 import { randomComponent, threeComponents } from "./items.js";
 import { pairPlayers } from "./matchmaking.js";
+import { backupCatcherRecovery, specialRewardOptions, tickPerks } from "./specials.js";
 import { addXp, returnShopToPool } from "./shop.js";
 
 // ---------------------------------------------------------------------------
@@ -182,6 +183,7 @@ function applyResults(state: GameState, records: GameRecord[], round: RoundSpec,
   const results = new Map<string, "W" | "L" | "D">();
   const damage = new Map<string, number>();
   const saveWin = new Set<string>();
+  const homeWins = new Map<string, number>();
   const used = new Map<string, { id: string; outs: number; started: boolean }[]>();
   const rewardItems = new Map<string, string[]>();
   let s = state;
@@ -197,6 +199,7 @@ function applyResults(state: GameState, records: GameRecord[], round: RoundSpec,
       const arr = used.get(team.id) ?? [];
       arr.push(...r.output.pitchersUsed[side].filter((u) => !u.id.startsWith("REPL")));
       used.set(team.id, arr);
+      if (win && side === "home") homeWins.set(team.id, (homeWins.get(team.id) ?? 0) + 1);
       if (win) {
         const box = side === "home" ? r.output.home : r.output.away;
         if ([...box.pitching.values()].some((l) => l.decision === "SV")) saveWin.add(team.id);
@@ -221,7 +224,8 @@ function applyResults(state: GameState, records: GameRecord[], round: RoundSpec,
       else rewardItems.set(pid, [randomComponent(rng.fork(`allstar:${pid}`))]);
     }
     if (round.kind === "LEGEND_MATCH" && won) {
-      s = { ...s, players: s.players.map((x) => (x.id === pid ? { ...x, choice: { kind: "ITEM", options: ["RELOCATION", "FA_CONTRACT", "CALL_UP", "NUMBER_SUCCESSION"] } } : x)) };
+      const options = specialRewardOptions(rng.fork(`legend:${pid}`));
+      s = { ...s, players: s.players.map((x) => (x.id === pid ? { ...x, choice: { kind: "ITEM", options } } : x)) };
     }
   }
 
@@ -262,13 +266,16 @@ function applyResults(state: GameState, records: GameRecord[], round: RoundSpec,
       const growth = growthAdd > 0 ? Math.max(c.growth, Math.min(cap, c.growth + growthAdd)) : c.growth;
       if (fatigue !== c.fatigue || injuredRounds !== c.injuredRounds || growth !== c.growth) cards[id] = { ...c, fatigue, injuredRounds, growth };
     }
+    // BACKUP_CATCHER: a seeded chance that one tired pitcher recovers a round early.
+    if (eff) Object.assign(cards, backupCatcherRecovery(cards, owned, eff, ctx, rng.fork(`backup:${p.id}`)));
 
-    const income = roundIncome({ ...p, winStreak, loseStreak }, round.code, eff ?? { interestCap: 5, saveWinGold: 0 } as never, saveWin.has(p.id));
-    const withXp = addXp({ ...p, gold: p.gold + income.total }, ECONOMY.freeXpPerRound);
+    const homeWinGold = (eff?.homeWinGold ?? 0) * (homeWins.get(p.id) ?? 0);
+    const income = roundIncome({ ...p, hp, winStreak, loseStreak }, round.code, eff ?? { interestCap: 5, saveWinGold: 0 }, saveWin.has(p.id), homeWinGold);
+    const withXp = addXp({ ...tickPerks(p), gold: p.gold + income.total }, ECONOMY.freeXpPerRound);
     const items = rewardItems.get(p.id) ?? [];
     return {
       ...withXp, hp, winStreak, loseStreak, ready: false, itemsUnequipped: [...withXp.itemsUnequipped, ...(items as PlayerState["itemsUnequipped"])],
-      ...(res ? { lastResult: res } : {}), lastIncome: income, scoutingActive: eff?.revealRotation ?? false,
+      ...(res ? { lastResult: res } : {}), lastIncome: income, scoutingActive: (eff?.revealRotation ?? false) || (withXp.perks?.scoutRounds ?? 0) > 0,
       lastOpponent: opponentOf(records, p.id) ?? p.lastOpponent,
     } as PlayerState;
   });

@@ -77,13 +77,17 @@ export function replacementPitcher(role: "SP" | "RP", index: number, id = `REPL:
   };
 }
 
-/** §4.3 position efficiency. */
-export function effectiveDefense(def: CardDef, r: HitterRatings, pos: Pos): number {
+/**
+ * §4.3 position efficiency. `penaltyMult` scales the off-position loss
+ * (UTILITY: 0.5 halves it, 0 removes it); the primary position is unaffected.
+ */
+export function effectiveDefense(def: CardDef, r: HitterRatings, pos: Pos, penaltyMult = 1): number {
   if (pos === "DH") return BOARD.dhOnlyDefenseForOvr;
   const primary = def.pos === "DH" ? BOARD.defaultDef : (r.def[def.pos] ?? BOARD.defaultDef);
+  const eff = (e: number) => 1 - (1 - e) * penaltyMult;
   if (def.pos === pos) return (r.def[pos] ?? primary) * BOARD.positionEfficiency.primary;
-  if (def.pos2.includes(pos)) return (r.def[pos] ?? primary) * BOARD.positionEfficiency.secondary;
-  return primary * BOARD.positionEfficiency.other;
+  if (def.pos2.includes(pos)) return (r.def[pos] ?? primary) * eff(BOARD.positionEfficiency.secondary);
+  return primary * eff(BOARD.positionEfficiency.other);
 }
 
 /** Turn a player's board into a simulator team, filling holes with replacements. */
@@ -100,9 +104,10 @@ export function resolveTeam(input: ResolveInput): SimTeam {
     if (!card || !def || def.role !== "H" || !def.hitter) return replacementHitter(pos, replIdx++);
     const r = boostHitter(def.hitter, starAdd(card) + (effects.ratingAdd.get(card.instanceId) ?? 0), effects.internalAdd.get(card.instanceId) ?? {});
     const display = hitterDisplay(r, def.pos);
+    const mods: HitterMods = { ...defaultHitterMods(), ...(effects.hitterMods.get(card.instanceId) ?? {}) };
     return {
-      id: card.instanceId, name: def.name, bats: def.bats, r, pos, defEff: effectiveDefense(def, r, pos), contactDisplay: display.contact, powerDisplay: display.power,
-      mods: { ...defaultHitterMods(), ...(effects.hitterMods.get(card.instanceId) ?? {}) }, isReplacement: false,
+      id: card.instanceId, name: def.name, bats: def.bats, r, pos, defEff: effectiveDefense(def, r, pos, mods.offPositionPenaltyMult), contactDisplay: display.contact, powerDisplay: display.power,
+      mods, isReplacement: false,
     };
   };
 

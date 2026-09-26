@@ -21,8 +21,9 @@ export function threeComponents(rng: Rng): ComponentItemId[] {
 /**
  * Equip an item from the inventory onto an owned card (§8.1). Two components
  * on the same card combine immediately. Replacement players cannot hold items
- * (they are not cards, so they never appear here). Specials are consumed by
- * the run loop, not equipped.
+ * (they are not cards, so they never appear here). Specials are equipped only
+ * when their `use` is EQUIP (held like an item) or CONSUME_ON_EQUIP (applied
+ * to the card and gone); the others stay in the inventory.
  */
 export function equipItem(state: GameState, playerId: string, itemId: ItemId, instanceId: string, ctx: RunContext): Result<GameState> {
   const p = state.players.find((x) => x.id === playerId)!;
@@ -30,10 +31,17 @@ export function equipItem(state: GameState, playerId: string, itemId: ItemId, in
   if (invIdx < 0) return err("INVALID_ITEM", "item not in inventory");
   const card = state.cards[instanceId];
   if (!card || !ownedIds(p).includes(instanceId)) return err("INVALID_CARD", "card not owned");
-  if (isSpecial(itemId)) return err("INVALID_ITEM", "special items are used from the inventory");
   const def = ctx.defs.get(card.defId);
   const holder = ITEM_BY_ID.get(itemId);
   if (!def || !holder) return err("INVALID_ITEM", "unknown item");
+  if (isSpecial(itemId) && holder.use !== "EQUIP") {
+    if (holder.use !== "CONSUME_ON_EQUIP") return err("INVALID_ITEM", "special items are used from the inventory");
+    // Consumed on the target card (TRAINING_CAMP): permanent growth, no item slot.
+    const inv = [...p.itemsUnequipped];
+    inv.splice(invIdx, 1);
+    const growth = card.growth + (holder.params["growthAdd"] ?? 0);
+    return ok({ ...state, cards: { ...state.cards, [instanceId]: { ...card, growth } }, players: state.players.map((x) => (x.id === playerId ? { ...x, itemsUnequipped: inv } : x)) });
+  }
   let items: ItemId[] = [...card.items];
   if (isComponent(itemId)) {
     const otherIdx = items.findIndex((i) => isComponent(i));

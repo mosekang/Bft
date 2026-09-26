@@ -14,3 +14,6 @@ export * from "./matchmaking.js";
 export * from "./round.js";
 export * from "./actions.js";
 export * from "./ghosts.js";
+export * from "./boardSynergies.js";
+export * from "./specials.js";
+export * from "./effectsExpansion.js";

@@ -26,6 +26,8 @@ export interface PaContext {
   isLeadoff: boolean;
   /** Inning beyond regulation. */
   extraInning: boolean;
+  /** The batting team is the home team (HOME_ADVANTAGE, CHEER_SQUAD). */
+  battingHome?: boolean;
 }
 
 export interface PaProbabilities {
@@ -68,7 +70,7 @@ function situationalPitcher(p: PitcherRatings, ctx: PaContext): PitcherRatings {
 
 /** Batter ratings after clutch adds. */
 function situationalBatter(b: HitterRatings, ctx: PaContext): HitterRatings {
-  const add = ctx.risp ? ctx.batterMods.rispAdd : ctx.batterMods.nonRispAdd;
+  const add = ctx.risp ? ctx.batterMods.rispAdd + (ctx.battingHome ? ctx.battingTeam.homeRispAdd : 0) : ctx.batterMods.nonRispAdd;
   if (add === 0) return b;
   const c = (v: number) => Math.max(1, Math.min(99, v + add));
   return { ...b, kRate: c(b.kRate), contactL: c(b.contactL), contactR: c(b.contactR), hrRate: c(b.hrRate), xbhRate: c(b.xbhRate) };
@@ -79,11 +81,13 @@ export function paProbabilities(ctx: PaContext): PaProbabilities {
   const hand = effectiveHand(ctx.batterHand, ctx.pitcherHand);
   const b = situationalBatter(ctx.batter, ctx);
   const p = situationalPitcher(ctx.pitcher, ctx);
-  const platoon = platoonMultiplier(hand, ctx.pitcherHand, ctx.pitcher.armAngle, ctx.batterMods);
+  const rawPlatoon = platoonMultiplier(hand, ctx.pitcherHand, ctx.pitcher.armAngle, ctx.batterMods);
+  const platoon = ctx.batterMods.noPlatoonPenalty ? Math.max(1, rawPlatoon) : rawPlatoon;
   const fatigue = ctx.fatigueSteps;
 
   let k = LEAGUE.kRate * ratingMult(b.kRate, RATING_K.hitter.kRate, PIVOT.hitter) * ratingMult(p.kRate, RATING_K.pitcher.kRate, PIVOT.pitcher);
   k *= ctx.batterMods.kMult * ctx.pitcherMods.kMult * ctx.battingTeam.kMult * ctx.stadium.kMult * 0.92 ** fatigue;
+  if (hand === ctx.pitcherHand) k *= ctx.pitcherMods.sameHandKMult;
 
   let bb = LEAGUE.bbRate * ratingMult(b.bbRate, RATING_K.hitter.bbRate, PIVOT.hitter) * ratingMult(p.bbRate, RATING_K.pitcher.bbRate, PIVOT.pitcher);
   bb *= ctx.batterMods.bbMult * ctx.pitcherMods.bbMult * 1.15 ** fatigue;
@@ -116,6 +120,7 @@ export function paProbabilities(ctx: PaContext): PaProbabilities {
   let babipAdd = (contact - PIVOT.hitter) * RATING_ADD.hitterContactBabip + (contactVs - PIVOT.pitcher) * RATING_ADD.pitcherContactBabip;
   babipAdd += ctx.batterMods.babipAdd + ctx.fieldingTeam.oppBabipAdd + 0.01 * fatigue;
   if (ctx.isLeadoff) babipAdd += ctx.batterMods.leadoffBabipAdd;
+  if (ctx.battingHome) babipAdd += ctx.battingTeam.homeBabipAdd;
   if (ctx.extraInning) babipAdd += GAME.extraInnings.babipAdd;
 
   let gbShare = LEAGUE.battedBall.GROUND + (b.gbTend - PIVOT.hitter) * RATING_ADD.hitterGbTend + (p.gbRate - PIVOT.pitcher) * RATING_ADD.pitcherGbRate + ctx.pitcherMods.gbAdd;

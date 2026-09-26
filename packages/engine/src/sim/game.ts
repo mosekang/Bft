@@ -218,6 +218,7 @@ export function simulateGame(input: GameInput): GameOutput {
         batter: batter.r, batterHand: batter.bats, batterMods: batter.mods, pitcher: pitcher.r, pitcherHand: pitcher.throws, pitcherMods: pitcher.mods,
         battingTeam: off.team.mods, fieldingTeam: def.team.mods, stadium: input.stadium, fatigueSteps: fatigueSteps(u), risp, meltdownPenalty: meltdown,
         closerActive: pitcher.mods.isCloser && closerSituation(def), isFirstPa: paNo === 1, isLeadoff: off.batterIdx === 0, extraInning: inning > regulation,
+        battingHome: off.side === "home",
       });
 
       pa.pa++;

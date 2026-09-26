@@ -25,7 +25,7 @@ export const ActionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("PICK_STADIUM"), id: StadiumIdSchema }),
   z.object({ type: z.literal("SET_TOGGLE"), slot: PitcherSlotSchema, forcePitch: z.boolean() }),
   z.object({ type: z.literal("EQUIP"), itemId: ItemIdSchema, cardInstanceId: z.string().min(1) }),
-  z.object({ type: z.literal("TRADE"), cardInstanceId: z.string().min(1), offerIdx: z.number().int().min(0).max(2) }),
+  z.object({ type: z.literal("TRADE"), cardInstanceId: z.string().min(1), offerIdx: z.number().int().min(0).max(4) }),
   z.object({ type: z.literal("SKIP_PLAYBACK") }),
   /** Resolve a pending `PlayerState.choice` (item reward, franchise card, special item). */
   z.object({ type: z.literal("PICK_CHOICE"), idx: z.number().int().min(0).max(7) }),

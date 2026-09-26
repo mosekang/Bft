@@ -1,11 +1,14 @@
 import type { CardInstance, ItemId, PlayerState, SynergyId } from "@dugout/protocol";
 import { AUGMENT_BY_ID } from "../config/augments.js";
 import { ITEM_BY_ID } from "../config/items.js";
+import { SCHEDULE } from "../config/schedule.js";
 import { SYNERGIES } from "../config/synergies.js";
 import { cardOvr } from "../ratings.js";
 import { emptyEffects, type TeamEffects } from "../sim/resolve.js";
 import type { HitterMods, PitcherMods, TeamMods } from "../sim/types.js";
+import { boardSynergyMembers, isCatcher } from "./boardSynergies.js";
 import type { RunContext } from "./context.js";
+import { applyBoardSynergy, applyExpansionAugments, augParam, framingScale, type EffectSink } from "./effectsExpansion.js";
 import { boardCards, countSynergies, type SynergyStatus } from "./synergies.js";
 
 /** Non-sim consequences of the active board, consumed by settle / shop / events. */
@@ -30,6 +33,20 @@ export interface RunEffects {
   revealRotation: boolean;
   revealInternals: boolean;
   revealSynergies: boolean;
+  /** SCOUT_REPORT: the next opponent's full board is visible. */
+  revealOpponentBoard: boolean;
+  /** BACKUP_CATCHER: per-round chance that one tired pitcher recovers `fatigueRecover`. */
+  fatigueRecoverChance: number;
+  fatigueRecover: number;
+  /** DATA_BASEBALL: discount on the first reroll of each round. */
+  firstRerollDiscount: number;
+  /** REBUILDING: gold per round while hp ≥ `hpGoldMinHp`. */
+  hpGoldBonus: number;
+  hpGoldMinHp: number;
+  /** CHEER_SQUAD: gold per home win. */
+  homeWinGold: number;
+  /** Trade-deadline offers per card (TRADE_MASTER). */
+  tradeOptions: number;
 }
 
 export interface ComputedEffects {
@@ -53,7 +70,8 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
   const run: RunEffects = {
     synergies: [], starterFatigue: new Map(), relieverFatigue: new Map(), teamFatigueAdd: 0, injuryImmune: new Set(), teamInjuryChance: null,
     growthPerRound: new Map(), growthCap: new Map(), tradeSwaps: 1, carouselSeconds: 6, interestCap: 5, rerollCost: 2, xpCostMult: 1, copiesPerStar: 3, saveWinGold: 0,
-    revealRotation: false, revealInternals: false, revealSynergies: false,
+    revealRotation: false, revealInternals: false, revealSynergies: false, revealOpponentBoard: false,
+    fatigueRecoverChance: 0, fatigueRecover: 0, firstRerollDiscount: 0, hpGoldBonus: 0, hpGoldMinHp: 0, homeWinGold: 0, tradeOptions: SCHEDULE.tradeOptions,
   };
   const has = (a: string) => player.augments.includes(a as never);
   const hmods = (id: string): Partial<HitterMods> => team.hitterMods.get(id) ?? (team.hitterMods.set(id, {}), team.hitterMods.get(id)!);
@@ -105,6 +123,7 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
         case "interestCapAdd": run.interestCap += v; break;
         case "rerollCost": run.rerollCost = Math.min(run.rerollCost, v); break;
         case "revealRotation": run.revealRotation = true; break;
+        case "ratingAdd": addRating(id, v); break; // CONTRACT_EXTENSION
         case "adjacentReplacementDef": break; // cosmetic-scale effect; applied as a team error reduction instead
         default: break;
       }
@@ -122,11 +141,18 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
   if (has("MASTER_MANAGER")) teamMods.closerLeadMax = 4;
   if (has("ABS")) teamMods.framingDisabled = true;
   if (has("LONG_BALL")) { mulTeam("hrMult", 1.25); mulTeam("kMult", 1.15); mulTeam("doubleMult", 0.9); }
+  if (has("MASTER_CATCHER")) {
+    // Every catcher counts as `catcherCountMult` for CATCHER and BACKUP_CATCHER.
+    const extra = onBoard.filter(({ def }) => isCatcher(def)).length * (augParam("MASTER_CATCHER", "catcherCountMult") - 1);
+    if (extra > 0) { extraSynergy.CATCHER = (extraSynergy.CATCHER ?? 0) + extra; extraSynergy.BACKUP_CATCHER = (extraSynergy.BACKUP_CATCHER ?? 0) + extra; }
+  }
 
   // --- synergies -----------------------------------------------------------------
   const statuses = countSynergies(player, cards, ctx, extraSynergy, tierAdd);
   run.synergies = statuses;
   const tierParams = (s: SynergyStatus) => (s.tier > 0 ? SYNERGIES[s.id].tiers[s.tier - 1] ?? {} : {});
+  const members = boardSynergyMembers(player, cards, ctx);
+  const sink: EffectSink = { run, addRating, mulH, addH, mulP, addTeam, hmods };
   const holders = (id: SynergyId) => onBoard.filter(({ def }) => (def.origin as string) === id || (def.classes as string[]).includes(id) || (id === "LEFTY_BAT" && def.role === "H" && def.bats !== "R") || (id === "RIGHTY_BAT" && def.role === "H" && def.bats !== "L"));
   const prospectMult = has("PLAYER_DEVELOPMENT") ? 2 : 1;
   const collegeMult = has("PLAYER_DEVELOPMENT") ? 0 : 1;
@@ -135,7 +161,7 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
     const p = tierParams(s);
     switch (s.id) {
       case "HS_PROSPECT":
-        if (s.tier > 0) for (const { card } of holders(s.id)) { run.growthPerRound.set(card.instanceId, (run.growthPerRound.get(card.instanceId) ?? 0) + p["growthPerRound"]! * prospectMult); run.growthCap.set(card.instanceId, p["growthCap"]!); }
+        if (s.tier > 0) for (const { card } of holders(s.id)) { run.growthPerRound.set(card.instanceId, (run.growthPerRound.get(card.instanceId) ?? 0) + p["growthPerRound"]! * prospectMult + (has("REBUILDING") ? augParam("REBUILDING", "prospectGrowthAdd") : 0)); run.growthCap.set(card.instanceId, p["growthCap"]!); }
         break;
       case "COLLEGE":
         if (s.tier > 0) for (const { card } of holders(s.id)) addRating(card.instanceId, p["ratingAdd"]! * collegeMult);
@@ -155,7 +181,7 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
       case "VETERAN":
         if (s.tier > 0) {
           for (const { card, def } of onBoard) if (def.role === "H") addH(card.instanceId, "rispAdd", p["rispContactPowerAdd"]!);
-          if (stage >= 7) for (const { card } of holders(s.id)) if (!run.injuryImmune.has(`PS:${card.instanceId}`)) { addInternal(card.instanceId, "stamina", -10); addInternal(card.instanceId, "speed", -10); }
+          if (stage >= 7 && !has("VETERAN_PREFERENCE")) for (const { card } of holders(s.id)) if (!run.injuryImmune.has(`PS:${card.instanceId}`)) { addInternal(card.instanceId, "stamina", -10); addInternal(card.instanceId, "speed", -10); }
         }
         break;
       case "MILITARY_DONE":
@@ -187,7 +213,16 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
         if (s.tier > 0) { addTeam("oppBabipAdd", p["oppBabipAdd"]!); mulTeam("errorMult", p["errorMult"]!); }
         break;
       case "CATCHER":
-        if (s.tier > 0 && !has("ABS")) mulTeam("bbMult", p["teamBbMult"]!);
+        // Framing: the walk reduction (1 − teamBbMult) scales with BACKUP_CATCHER / MASTER_CATCHER.
+        if (s.tier > 0 && !has("ABS")) mulTeam("bbMult", Math.max(0, 1 - (1 - p["teamBbMult"]!) * framingScale(player, statuses, tierParams)));
+        break;
+      case "HOMEGROWN":
+      case "UTILITY":
+      case "SIDEARM":
+      case "SWITCH_HITTER":
+      case "LEADOFF":
+      case "BACKUP_CATCHER":
+        if (s.tier > 0) applyBoardSynergy(s.id, p, members[s.id], onBoard, sink);
         break;
       case "FIREBALLER":
         if (s.tier > 0) for (const { card } of holders(s.id)) { mulP(card.instanceId, "kMult", p["kMult"]!); mulP(card.instanceId, "bbMult", p["bbMult"]!); }
@@ -216,6 +251,7 @@ export function computeEffects(player: PlayerState, cards: Record<string, CardIn
   }
   if (has("OPENER")) for (const { card, def } of onBoard) if (def.role === "RP") { pmods(card.instanceId).openerOuts = 6; run.relieverFatigue.set(card.instanceId, 0); }
   if (has("ABS")) for (const { card, def } of onBoard) if (def.role !== "H" && def.pitcher && def.pitcher.bbRate >= 65) mulP(card.instanceId, "bbMult", 0.85);
+  applyExpansionAugments(player, onBoard, sink);
 
   team.team = teamMods;
   return { team, run };

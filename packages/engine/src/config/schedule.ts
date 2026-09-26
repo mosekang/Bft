@@ -44,6 +44,8 @@ export const SCHEDULE = {
   /** Spring camp rewards (§4.1). */
   campRewards: { "1-1": "ITEM", "1-2": "GOLD_3", "1-3": "ITEM" } as Readonly<Record<string, "ITEM" | "GOLD_3">>,
   pveOvr: { camp: 40, legend: 80 },
+  /** Trade-deadline offers per card (§10.2: 3; TRADE_MASTER raises it). */
+  tradeOptions: 3,
 } as const;
 
 export function buildSchedule(): RoundSpec[] {

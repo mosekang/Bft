@@ -133,5 +133,14 @@
   "kind.PVE_CAMP": "스프링캠프", "kind.PVP": "정규시즌", "kind.GHOST": "고스트전", "kind.ALL_STAR": "올스타전", "kind.LEGEND_MATCH": "레전드 매치", "kind.PLAYOFF": "포스트시즌", "kind.FINAL": "한국시리즈",
   "onboard.shop": "상점에서 선수를 사세요. 같은 카드 3장이면 ★★가 됩니다.",
   "onboard.board": "카드를 탭한 뒤 빈 칸을 탭하면 배치됩니다. 레벨만큼만 진짜 선수를 둘 수 있어요.",
-  "onboard.game": "준비가 끝나면 경기가 자동으로 진행됩니다. 하이라이트만 보여드려요."
+  "onboard.game": "준비가 끝나면 경기가 자동으로 진행됩니다. 하이라이트만 보여드려요.",
+  "class.HOMEGROWN": "홈그로운", "class.UTILITY": "유틸리티", "class.SIDEARM": "사이드암", "class.SWITCH_HITTER": "스위치히터", "class.LEADOFF": "리드오프", "class.BACKUP_CATCHER": "백업 포수",
+  "synergy.kind.BOARD": "보드 시너지 (카드 태그 없이 구단·포지션·팔 각도·타순으로 계산)",
+  "perk.freeRerolls": "무료 리롤 {n}회",
+  "perk.cheerRounds": "응원가 {n}경기",
+  "perk.scoutRounds": "스카우트 리포트: 다음 상대 보드 공개",
+  "settle.bonus": "철학 보너스",
+  "item.use.INSTANT": "즉시 사용",
+  "item.use.EQUIP": "선수에게 장착",
+  "item.use.CONSUME_ON_EQUIP": "선수에게 사용(소모)"
 }

@@ -147,10 +147,10 @@ describe("synergies (§7)", () => {
 });
 
 describe("items (§8)", () => {
-  it("has 6 components, 21 combos and 4 specials, all ids covered", () => {
+  it("has 6 components, 21 combos and 10 specials (v2 4 + v3 6), all ids covered", () => {
     expect(ITEMS.filter((i) => i.tier === "COMPONENT")).toHaveLength(6);
     expect(ITEMS.filter((i) => i.tier === "COMBINED")).toHaveLength(21);
-    expect(ITEMS.filter((i) => i.tier === "SPECIAL")).toHaveLength(4);
+    expect(ITEMS.filter((i) => i.tier === "SPECIAL")).toHaveLength(10);
     expect(new Set(ITEMS.map((i) => i.id)).size).toBe(ITEM_IDS.length);
   });
   it("every pair of components combines into a distinct item, order-insensitive", () => {
@@ -168,10 +168,13 @@ describe("items (§8)", () => {
 });
 
 describe("augments (§9) and bots (§11)", () => {
-  it("16 augments, rarity odds sum to 100", () => {
+  it("24 augments (v2 16 + v3 8), rarity odds sum to 100", () => {
     expect(AUGMENTS).toHaveLength(AUGMENT_IDS.length);
     expect(Object.values(AUGMENT_RARITY_ODDS).reduce((a, b) => a + b, 0)).toBe(100);
-    expect(AUGMENTS.filter((a) => a.rarity === "PRISM")).toHaveLength(5);
+    expect(AUGMENTS).toHaveLength(24);
+    expect(AUGMENTS.filter((a) => a.rarity === "PRISM")).toHaveLength(6);
+    expect(AUGMENTS.filter((a) => a.rarity === "GOLD")).toHaveLength(12);
+    expect(AUGMENTS.filter((a) => a.rarity === "SILVER")).toHaveLength(6);
   });
   it("8 archetypes", () => {
     expect(Object.keys(ARCHETYPE_DEFS)).toHaveLength(8);

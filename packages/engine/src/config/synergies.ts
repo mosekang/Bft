@@ -1,6 +1,7 @@
 import type { SynergyId } from "@dugout/protocol";
 
-export type SynergyKind = "ORIGIN" | "CLASS";
+/** BOARD synergies (v3 §18.3) are counted from card facts and the lineup, never from tags. */
+export type SynergyKind = "ORIGIN" | "CLASS" | "BOARD";
 export type ThresholdMode = "AT_LEAST" | "EXACT";
 
 export interface SynergyDef {
@@ -134,7 +135,57 @@ export const SYNERGIES: Readonly<Record<SynergyId, SynergyDef>> = {
     descriptionsKo: ["득점권 컨택·파워 +6, 그 외 −2", "득점권 +12, 그 외 −3"],
     minPackCards: 6,
   },
+
+  // --- board synergies (v3 §18.3): counted from card facts, no pack minimum ---
+  HOMEGROWN: {
+    id: "HOMEGROWN", kind: "BOARD", nameKo: "홈그로운", mode: "AT_LEAST", thresholds: [3, 5],
+    tiers: [{ ratingAdd: 3 }, { ratingAdd: 6 }],
+    descriptionsKo: ["같은 구단 출신 3명: 보드 전원 내부치 +3", "같은 구단 출신 5명: 보드 전원 내부치 +6"],
+    minPackCards: 0,
+  },
+  UTILITY: {
+    id: "UTILITY", kind: "BOARD", nameKo: "유틸리티", mode: "AT_LEAST", thresholds: [2, 4],
+    tiers: [{ offPositionPenaltyMult: 0.5 }, { offPositionPenaltyMult: 0 }],
+    descriptionsKo: ["부포지션 2개 이상 선수: 주포지션 밖 수비 감소 절반", "주포지션 밖 수비 감소 없음"],
+    minPackCards: 0,
+  },
+  SIDEARM: {
+    id: "SIDEARM", kind: "BOARD", nameKo: "사이드암", mode: "AT_LEAST", thresholds: [1],
+    tiers: [{ sameHandKMult: 1.2 }],
+    descriptionsKo: ["팔 각도 30 이하 투수: 같은 손 타자 상대 삼진 ×1.20"],
+    minPackCards: 0,
+  },
+  SWITCH_HITTER: {
+    id: "SWITCH_HITTER", kind: "BOARD", nameKo: "스위치히터", mode: "AT_LEAST", thresholds: [2],
+    tiers: [{ babipAdd: 0.01, noPlatoonPenalty: 1 }],
+    descriptionsKo: ["양타 타자: 플래툰 불리 없음, BABIP +.010"],
+    minPackCards: 0,
+  },
+  LEADOFF: {
+    id: "LEADOFF", kind: "BOARD", nameKo: "리드오프", mode: "AT_LEAST", thresholds: [1],
+    tiers: [{ bbMult: 1.1, sbSuccessAdd: 0.03 }],
+    descriptionsKo: ["1·2번 타순의 선구 70+ 타자: 볼넷 ×1.10, 도루 성공 +.03"],
+    minPackCards: 0,
+  },
+  BACKUP_CATCHER: {
+    id: "BACKUP_CATCHER", kind: "BOARD", nameKo: "백업 포수", mode: "AT_LEAST", thresholds: [2],
+    tiers: [{ framingScale: 2, fatigueRecoverChance: 0.3, fatigueRecover: 1 }],
+    descriptionsKo: ["포수 2명(DH 포함): 프레이밍 효과 ×2, 매 라운드 30% 확률로 피로한 투수 1명 피로 −1"],
+    minPackCards: 0,
+  },
 };
+
+/** Counting rules for BOARD synergies (v3 §18.3). */
+export const BOARD_SYNERGY_RULES = {
+  /** UTILITY: a hitter with at least this many secondary positions. */
+  utilityMinPos2: 2,
+  /** SIDEARM: a pitcher whose arm angle is at most this. */
+  sidearmMaxArmAngle: 30,
+  /** LEADOFF: batting-order spots counted (1-based: 1 and 2). */
+  leadoffSpots: 2,
+  /** LEADOFF: display eye (with star bonus and growth) at least this. */
+  leadoffMinEye: 70,
+} as const;
 
 /** Tier index (1-based) for a count; 0 = inactive. `penalised` for EXACT overflow. */
 export function synergyTier(def: SynergyDef, count: number): { tier: number; penalised: boolean } {

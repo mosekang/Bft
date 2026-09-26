@@ -1,5 +1,5 @@
 import type { AugmentId, Archetype, GameState, StadiumId, SynergyId } from "@dugout/protocol";
-import { ARCHETYPES } from "@dugout/protocol";
+import { ARCHETYPES, SYNERGY_IDS } from "@dugout/protocol";
 import { bots } from "./bots/index.js";
 import { cardOvr } from "./ratings.js";
 import { advance } from "./run/actions.js";
@@ -159,7 +159,7 @@ export function botArena(opts: ArenaOptions): ArenaReport {
     synergyShare[id] = Number(share.toFixed(3));
     if (share < minShare) { minShare = share; minId = id; }
   }
-  const allIds: SynergyId[] = ["HS_PROSPECT", "COLLEGE", "FOREIGN", "VETERAN", "MILITARY_DONE", "JOURNEYMAN", "LEFTY_BAT", "RIGHTY_BAT", "SLUGGER", "CONTACT_HITTER", "SPEEDSTER", "GOLD_GLOVE", "CATCHER", "FIREBALLER", "FINESSE", "INNING_EATER", "CLOSER", "CLUTCH"];
+  const allIds: readonly SynergyId[] = SYNERGY_IDS;
   for (const id of allIds) if (!(id in synergyShare)) { synergyShare[id] = 0; if (0 < minShare) { minShare = 0; minId = id; } }
   push("minSynergyShareInWinners", minShare, ">= 0.03", minShare >= 0.03, (v) => `${v.toFixed(3)} (${minId})`, [`SYNERGIES.${minId}`, "pack tag counts"]);
 

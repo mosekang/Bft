@@ -8,11 +8,18 @@ export interface ItemDef {
   readonly recipe?: readonly [ComponentItemId, ComponentItemId];
   /** Numeric parameters consumed by the run loop / sim (Phase 2). */
   readonly params: Readonly<Record<string, number>>;
+  /**
+   * How a special item is used (v3 §18.3). INSTANT: applied the moment it is
+   * picked, never enters the inventory. EQUIP: sits on a card like any item.
+   * CONSUME_ON_EQUIP: targeted through EQUIP, applied to the card, then gone.
+   * Absent: kept in the inventory (v2 specials).
+   */
+  readonly use?: "INSTANT" | "EQUIP" | "CONSUME_ON_EQUIP";
 }
 
 const component = (id: ComponentItemId, nameKo: string, descriptionKo: string, params: Record<string, number>): ItemDef => ({ id, tier: "COMPONENT", nameKo, descriptionKo, params });
 const combined = (id: CombinedItemId, recipe: readonly [ComponentItemId, ComponentItemId], nameKo: string, descriptionKo: string, params: Record<string, number>): ItemDef => ({ id, tier: "COMBINED", recipe, nameKo, descriptionKo, params });
-const special = (id: SpecialItemId, nameKo: string, descriptionKo: string): ItemDef => ({ id, tier: "SPECIAL", nameKo, descriptionKo, params: {} });
+const special = (id: SpecialItemId, nameKo: string, descriptionKo: string, params: Record<string, number> = {}, use?: ItemDef["use"]): ItemDef => ({ id, tier: "SPECIAL", nameKo, descriptionKo, params, ...(use ? { use } : {}) });
 
 /** Items (§8). */
 export const ITEMS: readonly ItemDef[] = [
@@ -49,7 +56,17 @@ export const ITEMS: readonly ItemDef[] = [
   special("FA_CONTRACT", "FA 계약서", "상점에서 원하는 코스트 카드 1장을 골드 없이 1회 구매"),
   special("CALL_UP", "콜업권", "벤치 칸 +2"),
   special("NUMBER_SUCCESSION", "등번호 계승", "장착 카드 ★ 1단계 상승 (★★★ 불가)"),
+  // v3 §18.3 specials. INSTANT ones apply on pick; the others go through EQUIP.
+  special("SCOUT_REPORT", "스카우트 리포트", "즉시: 다음 라운드 상대 보드 전체 공개 + 상대 로테이션 공개", { scoutRounds: 1 }, "INSTANT"),
+  special("SUPPLEMENT", "체력 보충제", "즉시: 보유 투수 전원 라운드 피로 0", { clearFatigue: 1 }, "INSTANT"),
+  special("CONTRACT_EXTENSION", "계약 연장", "장착: 내부치 전부 +3, 부상 면역 (아이템 칸 차지)", { ratingAdd: 3, injuryImmune: 1 }, "EQUIP"),
+  special("CHEER_SONG", "응원가", "즉시: 3경기 동안 팀 득점권 컨택·파워 +4", { cheerRounds: 3, rispAdd: 4 }, "INSTANT"),
+  special("TRAINING_CAMP", "트레이닝 캠프", "장착 시 소모: 그 선수 성장 +6 (영구)", { growthAdd: 6 }, "CONSUME_ON_EQUIP"),
+  special("AGENT", "에이전트", "즉시: 다음 리롤 5회 무료", { freeRerolls: 5 }, "INSTANT"),
 ];
+
+/** Special items offered by the Legend match reward (v3 §18.3): this many, drawn from every special. */
+export const SPECIAL_REWARD_OPTIONS = 4;
 
 export const ITEM_BY_ID: ReadonlyMap<ItemId, ItemDef> = new Map(ITEMS.map((i) => [i.id, i]));
 

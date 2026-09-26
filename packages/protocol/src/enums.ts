@@ -62,8 +62,15 @@ export type ClassTag = z.infer<typeof ClassTagSchema>;
 export const DERIVED_CLASS_TAGS = ["LEFTY_BAT", "RIGHTY_BAT"] as const;
 export type DerivedClassTag = (typeof DERIVED_CLASS_TAGS)[number];
 
+/**
+ * Board-derived synergies (v3 §18.3). Never stored on a card: counted from
+ * card facts (`team`, `pos2`, `armAngle`, `bats`, batting order) at count time.
+ */
+export const BOARD_SYNERGY_IDS = ["HOMEGROWN", "UTILITY", "SIDEARM", "SWITCH_HITTER", "LEADOFF", "BACKUP_CATCHER"] as const;
+export type BoardSynergyId = (typeof BOARD_SYNERGY_IDS)[number];
+
 /** Every synergy id the engine can count. */
-export const SYNERGY_IDS = [...ORIGIN_TAGS, ...CLASS_TAGS, ...DERIVED_CLASS_TAGS] as const;
+export const SYNERGY_IDS = [...ORIGIN_TAGS, ...CLASS_TAGS, ...DERIVED_CLASS_TAGS, ...BOARD_SYNERGY_IDS] as const;
 export const SynergyIdSchema = z.enum(SYNERGY_IDS);
 export type SynergyId = z.infer<typeof SynergyIdSchema>;
 
@@ -101,7 +108,18 @@ export const COMBINED_ITEM_IDS = [
 export const CombinedItemIdSchema = z.enum(COMBINED_ITEM_IDS);
 export type CombinedItemId = z.infer<typeof CombinedItemIdSchema>;
 
-export const SPECIAL_ITEM_IDS = ["RELOCATION", "FA_CONTRACT", "CALL_UP", "NUMBER_SUCCESSION"] as const;
+export const SPECIAL_ITEM_IDS = [
+  "RELOCATION",
+  "FA_CONTRACT",
+  "CALL_UP",
+  "NUMBER_SUCCESSION",
+  "SCOUT_REPORT", // 스카우트 리포트 (instant)
+  "SUPPLEMENT", // 체력 보충제 (instant)
+  "CONTRACT_EXTENSION", // 계약 연장 (equipped)
+  "CHEER_SONG", // 응원가 (instant)
+  "TRAINING_CAMP", // 트레이닝 캠프 (consumed on EQUIP)
+  "AGENT", // 에이전트 (instant)
+] as const;
 export const SpecialItemIdSchema = z.enum(SPECIAL_ITEM_IDS);
 export type SpecialItemId = z.infer<typeof SpecialItemIdSchema>;
 
@@ -126,6 +144,14 @@ export const AUGMENT_IDS = [
   "SABERMETRICS",
   "DYNASTY",
   "MASTER_MANAGER",
+  "DATA_BASEBALL", // 데이터 야구
+  "VETERAN_PREFERENCE", // 노장 우대
+  "REBUILDING", // 리빌딩
+  "HOME_ADVANTAGE", // 홈 어드밴티지
+  "CHEER_SQUAD", // 응원단
+  "ROOKIE_RACE", // 신인왕 레이스
+  "TRADE_MASTER", // 트레이드 명가
+  "MASTER_CATCHER", // 명포수
 ] as const;
 export const AugmentIdSchema = z.enum(AUGMENT_IDS);
 export type AugmentId = z.infer<typeof AugmentIdSchema>;

@@ -29,6 +29,10 @@ export interface HitterMods {
   leadoffBabipAdd: number;
   /** Automatic bunt when contact display ≤ this (SMALL_BALL); 0 = never. */
   buntContactMax: number;
+  /** Share of the off-position defence penalty that applies (UTILITY): 1 full, 0.5 halved, 0 none. */
+  offPositionPenaltyMult: number;
+  /** Platoon multiplier never drops below 1 (SWITCH_HITTER). */
+  noPlatoonPenalty: boolean;
 }
 
 export interface PitcherMods {
@@ -42,6 +46,8 @@ export interface PitcherMods {
   isCloser: boolean;
   /** If > 0 this reliever may start and is pulled after this many outs (OPENER). */
   openerOuts: number;
+  /** Strikeout multiplier against same-hand batters (SIDEARM). */
+  sameHandKMult: number;
 }
 
 export interface TeamMods {
@@ -64,6 +70,10 @@ export interface TeamMods {
   framingDisabled: boolean;
   /** Tired-pitcher penalty override (CONDITIONING_COACH). */
   tiredPenalty: number;
+  /** BABIP add for this team's hitters when it bats as the home team (HOME_ADVANTAGE). */
+  homeBabipAdd: number;
+  /** RISP contact/power add for this team's hitters at home (CHEER_SQUAD). */
+  homeRispAdd: number;
 }
 
 export interface SimHitter {
@@ -186,13 +196,15 @@ export const defaultHitterMods = (): HitterMods => ({
   hrMult: 1, kMult: 1, bbMult: 1, babipAdd: 0, infieldHitAdd: 0, doubleMult: 1, tripleMult: 1,
   platoonFavorAdd: 0, platoonAgainstAdd: 0, rispAdd: 0, nonRispAdd: 0, sbSuccessAdd: 0, advanceAdd: 0,
   stealsEnabled: false, ignoreCatcherArm: false, firstPaHrMult: 1, leadoffBabipAdd: 0, buntContactMax: 0,
+  offPositionPenaltyMult: 1, noPlatoonPenalty: false,
 });
 
 export const defaultPitcherMods = (): PitcherMods => ({
-  kMult: 1, bbMult: 1, hrMult: 1, gbAdd: 0, pitchLimitAdd: 0, lateLeadRatingAdd: 0, isCloser: false, openerOuts: 0,
+  kMult: 1, bbMult: 1, hrMult: 1, gbAdd: 0, pitchLimitAdd: 0, lateLeadRatingAdd: 0, isCloser: false, openerOuts: 0, sameHandKMult: 1,
 });
 
 export const defaultTeamMods = (): TeamMods => ({
   oppBabipAdd: 0, oppGroundBabipAdd: 0, errorMult: 1, bbMult: 1, hrMult: 1, kMult: 1, doubleMult: 1,
   stealsEnabled: false, buntEnabled: false, buntSuccess: 0.7, buntContactMax: 50, closerLeadMax: 3, framingDisabled: false, tiredPenalty: 0.3,
+  homeBabipAdd: 0, homeRispAdd: 0,
 });

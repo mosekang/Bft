@@ -1,6 +1,7 @@
 import type { CardDef, CardInstance, PlayerState, SynergyId } from "@dugout/protocol";
 import { SYNERGY_IDS } from "@dugout/protocol";
 import { SYNERGIES, synergyTier } from "../config/synergies.js";
+import { boardSynergyMembers } from "./boardSynergies.js";
 import type { RunContext } from "./context.js";
 
 export interface SynergyStatus {
@@ -38,6 +39,7 @@ export function boardCards(player: PlayerState, cards: Record<string, CardInstan
 export function countSynergies(player: PlayerState, cards: Record<string, CardInstance>, ctx: RunContext, extra: Partial<Record<SynergyId, number>> = {}, tierAdd: Partial<Record<SynergyId, number>> = {}): SynergyStatus[] {
   const counts = new Map<SynergyId, number>();
   for (const { def } of boardCards(player, cards, ctx)) for (const t of tagsOf(def)) counts.set(t, (counts.get(t) ?? 0) + 1);
+  for (const [id, members] of Object.entries(boardSynergyMembers(player, cards, ctx)) as [SynergyId, string[]][]) if (members.length) counts.set(id, members.length);
   for (const [k, v] of Object.entries(extra) as [SynergyId, number][]) counts.set(k, (counts.get(k) ?? 0) + v);
   return SYNERGY_IDS.map((id) => {
     const count = counts.get(id) ?? 0;

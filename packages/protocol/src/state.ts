@@ -45,9 +45,20 @@ export type Board = z.infer<typeof BoardSchema>;
 export const PlayerChoiceSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("ITEM"), options: z.array(ItemIdSchema).min(1).max(8) }),
   z.object({ kind: z.literal("CARD"), options: z.array(z.string().min(1)).min(1).max(8), star: z.union([z.literal(1), z.literal(2)]) }),
-  z.object({ kind: z.literal("TRADE"), cardInstanceId: z.string().min(1), options: z.array(z.string().min(1)).length(3) }),
+  z.object({ kind: z.literal("TRADE"), cardInstanceId: z.string().min(1), options: z.array(z.string().min(1)).min(1).max(5) }),
 ]);
 export type PlayerChoice = z.infer<typeof PlayerChoiceSchema>;
+
+/** Counted / timed effects granted by instant special items (v3 §18.3). Absent keys = none. */
+export const PlayerPerksSchema = z.object({
+  /** Rerolls left that cost 0 gold (AGENT). */
+  freeRerolls: z.number().int().min(0).optional(),
+  /** Game rounds of team clutch left (CHEER_SONG). */
+  cheerRounds: z.number().int().min(0).optional(),
+  /** Rounds in which the next opponent's full board is revealed (SCOUT_REPORT). */
+  scoutRounds: z.number().int().min(0).optional(),
+});
+export type PlayerPerks = z.infer<typeof PlayerPerksSchema>;
 
 export const PlayerStateSchema = z.object({
   id: z.string().min(1),
@@ -93,7 +104,9 @@ export const PlayerStateSchema = z.object({
   /** Round-end bookkeeping: result of the last game for streak/damage display. */
   lastResult: z.enum(["W", "L", "D"]).optional(),
   /** Income credited at the last settle, for the SETTLE animation. */
-  lastIncome: z.object({ base: z.number(), interest: z.number(), streak: z.number(), saveBonus: z.number(), total: z.number() }).optional(),
+  lastIncome: z.object({ base: z.number(), interest: z.number(), streak: z.number(), saveBonus: z.number(), bonus: z.number().optional(), total: z.number() }).optional(),
+  /** Instant special-item effects still running. */
+  perks: PlayerPerksSchema.optional(),
 });
 export type PlayerState = z.infer<typeof PlayerStateSchema>;
 

@@ -1,18 +1,20 @@
-import type { Action, CardDef, GameState, Location, PlayerState, Pos, StadiumId, SynergyId } from "@dugout/protocol";
+import type { Action, AugmentId, CardDef, GameState, Location, PlayerState, Pos, StadiumId, SynergyId } from "@dugout/protocol";
 import { POS } from "@dugout/protocol";
 import { AUGMENT_BY_ID } from "../config/augments.js";
-import { ARCHETYPE_DEFS, BOT_SHOP_SCORE, type ArchetypeDef } from "../config/bots.js";
+import { ARCHETYPE_DEFS, BOT_AUGMENT_PREFS, BOT_ITEM_PREFS, BOT_SHOP_SCORE, type ArchetypeDef } from "../config/bots.js";
+import { ITEM_BY_ID } from "../config/items.js";
+import { boardSynergyFit } from "./boardFit.js";
 import { ECONOMY } from "../config/economy.js";
 import { LEVELS, xpToNext } from "../config/levels.js";
 import { cardOvr, hitterDisplay } from "../ratings.js";
 import { boardCount } from "../run/board.js";
 import { benchOf, ownedIds } from "../run/cards.js";
 import { alive, currentRound, roundRng, type RunContext } from "../run/context.js";
-import { rerollCost, xpCost } from "../run/economy.js";
+import { rerollCostFor, xpCost } from "../run/economy.js";
 import { computeEffects } from "../run/effects.js";
 import { applyAction, tradeOffersFor, type BotController } from "../run/actions.js";
 import { tagsOf } from "../run/synergies.js";
-import { isComponent } from "../run/items.js";
+import { isComponent, isSpecial } from "../run/items.js";
 
 // ---------------------------------------------------------------------------
 // Utilities
@@ -75,7 +77,8 @@ function shopScore(def: CardDef, p: PlayerState, state: GameState, ctx: RunConte
   const boardTags = boardTagCounts(p, state, ctx);
   const w = BOT_SHOP_SCORE;
   const progress = starProgress(p, state, def.id);
-  let score = cardOvr(def) * w.ovr + tagFit(def, arch, boardTags) * w.tagFit + progress * w.starProgress - def.cost * w.costPenalty;
+  const fit = tagFit(def, arch, boardTags) + boardSynergyFit(def, p, state, ctx, arch.id);
+  let score = cardOvr(def) * w.ovr + fit * w.tagFit + progress * w.starProgress - def.cost * w.costPenalty;
   if (arch.id === "REROLL" && def.cost > 2) score -= 20;
   if (def.cost === 5 && progress >= 1 && p.level >= LEVELS.max - 1) score += 12;
   return score;
@@ -182,7 +185,8 @@ function equipAll(state: GameState, playerId: string, ctx: RunContext): GameStat
   let s = state;
   for (let guard = 0; guard < 12; guard++) {
     const p = P(s, playerId);
-    const item = p.itemsUnequipped.find((i) => isComponent(i) || !["RELOCATION", "FA_CONTRACT", "CALL_UP", "NUMBER_SUCCESSION"].includes(i));
+    // Specials without an EQUIP use (v2 inventory specials) are never equipped.
+    const item = p.itemsUnequipped.find((i) => !isSpecial(i) || ITEM_BY_ID.get(i)?.use === "EQUIP" || ITEM_BY_ID.get(i)?.use === "CONSUME_ON_EQUIP");
     if (!item) break;
     const boardIds = Object.values(p.board.slots).filter((x): x is string => !!x);
     const forPitcher = item === "ROSIN" || item === "ICING";
@@ -214,13 +218,8 @@ export const bots: BotController = {
     const p = P(state, playerId);
     if (!p.augmentOffer) return state;
     const arch = archetypeOf(p, state, ctx);
-    const pref: Record<string, string[]> = {
-      LONG_BALL: ["LONG_BALL", "CLEANUP_CARRY", "BIG_SPENDER"], SMALL_BALL: ["SMALL_BALL", "ABS", "MONEYBALL"], FOREIGN_RELIANT: ["FOREIGN_FARMING", "BIG_SPENDER", "DYNASTY"],
-      PROSPECTS: ["PLAYER_DEVELOPMENT", "FARM_SYSTEM", "REROLL_HOUSE"], DEFENSE_FIRST: ["ABS", "MASTER_MANAGER", "OPENER"], ECON: ["STINGY_BALL", "BIG_SPENDER", "DYNASTY"],
-      COPYCAT: ["SABERMETRICS", "FRANCHISE", "DYNASTY"], REROLL: ["REROLL_HOUSE", "FARM_SYSTEM", "MONEYBALL"],
-    };
-    const wants = pref[arch.id] ?? [];
-    const rank = (id: string) => (wants.includes(id) ? 100 - wants.indexOf(id) : 0) + (AUGMENT_BY_ID.get(id as never)?.rarity === "PRISM" ? 3 : AUGMENT_BY_ID.get(id as never)?.rarity === "GOLD" ? 2 : 1);
+    const wants = BOT_AUGMENT_PREFS[arch.id] ?? [];
+    const rank = (id: AugmentId) => (wants.includes(id) ? 100 - wants.indexOf(id) : 0) + (AUGMENT_BY_ID.get(id)?.rarity === "PRISM" ? 3 : AUGMENT_BY_ID.get(id)?.rarity === "GOLD" ? 2 : 1);
     let best = 0;
     p.augmentOffer.forEach((id, i) => { if (rank(id) > rank(p.augmentOffer![best]!)) best = i; });
     return act(state, playerId, { type: "PICK_AUGMENT", idx: best }, ctx);
@@ -252,7 +251,7 @@ export const bots: BotController = {
       return act(state, playerId, { type: "PICK_CHOICE", idx: best }, ctx);
     }
     if (p.choice.kind === "ITEM") {
-      const prefer = ["NUMBER_SUCCESSION", "FA_CONTRACT", "CALL_UP", "RELOCATION", "BAT", "GLOVE", "ROSIN", "SPIKES", "ICING", "SCOUTING"];
+      const prefer: readonly string[] = BOT_ITEM_PREFS;
       let best = 0;
       p.choice.options.forEach((id, i) => { if (prefer.indexOf(id) >= 0 && prefer.indexOf(id) < (prefer.indexOf(p.choice!.options[best]!) < 0 ? 99 : prefer.indexOf(p.choice!.options[best]!))) best = i; });
       return act(state, playerId, { type: "PICK_CHOICE", idx: best }, ctx);
@@ -342,7 +341,7 @@ export const bots: BotController = {
     for (let r = 0; r < 20; r++) {
       const p = P(s, playerId);
       const eff = computeEffects(p, s.cards, ctx, round.stage).run;
-      const cost = rerollCost(eff);
+      const cost = rerollCostFor(p, eff);
       if (r >= 12 && !(round.stage >= 6 && p.level >= LEVELS.max - 1)) break;
       const line = arch.id === "REROLL" ? 10 : arch.id === "PROSPECTS" ? 30 : arch.id === "ECON" ? 50 : reserve(arch, p);
       const lateGame = round.stage >= 6 && p.level >= LEVELS.max - 1;

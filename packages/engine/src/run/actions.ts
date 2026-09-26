@@ -6,7 +6,9 @@ import { applyAugmentPick, grantChosenCard, offerAugments } from "./augments.js"
 import { autoOrder, moveCard, pruneBoard } from "./board.js";
 import { autoMerge, grantCard, ownedIds, sellCard } from "./cards.js";
 import { advanceWave, buildCarousel, carouselDone, currentWave } from "./carousel.js";
-import { rerollCost, xpCost } from "./economy.js";
+import { SCHEDULE } from "../config/schedule.js";
+import { hpGold, rerollCostFor, xpCost } from "./economy.js";
+import { applyInstantSpecial, isInstantSpecial, spendFreeReroll } from "./specials.js";
 import { computeEffects } from "./effects.js";
 import { tradeOffers } from "./events.js";
 import { equipItem, giveItems } from "./items.js";
@@ -89,7 +91,8 @@ function settleNoGame(state: GameState, ctx: RunContext): GameState {
     const eff = runEffects(state, p, ctx);
     const base = round.kind === "RAIN_OUT" ? 0 : 5; // rain-out already paid +3 flat (§10.2)
     const interest = Math.min(eff.interestCap, Math.floor(p.gold / ECONOMY.interestPer));
-    const income = { base, interest, streak: 0, saveBonus: 0, total: base + interest };
+    const bonus = hpGold(p.hp, eff);
+    const income = { base, interest, streak: 0, saveBonus: 0, bonus, total: base + interest + bonus };
     return { ...addXp({ ...p, gold: p.gold + income.total }, ECONOMY.freeXpPerRound), lastIncome: income, ready: false, tradesLeft: undefined, choice: undefined };
   });
   return nextRound(s, ctx);
@@ -176,6 +179,7 @@ function applyActionInner(state: GameState, playerId: string, action: Action, ct
       if (choice.kind === "ITEM") {
         const item = choice.options[action.idx];
         if (!item) return err("INVALID_SLOT", "bad option");
+        if (isInstantSpecial(item)) return logged(set(applyInstantSpecial(state, playerId, item, ctx), playerId, { choice: undefined }));
         return logged(set(state, playerId, { itemsUnequipped: [...p.itemsUnequipped, item], choice: undefined }));
       }
       if (choice.kind === "CARD") {
@@ -247,9 +251,9 @@ function applyActionInner(state: GameState, playerId: string, action: Action, ct
 
     case "REROLL": {
       if (phase !== "PREP") return err("BAD_PHASE", "shop is closed");
-      const cost = rerollCost(runEffects(state, p, ctx));
+      const cost = rerollCostFor(p, runEffects(state, p, ctx));
       if (p.gold < cost) return err("NOT_ENOUGH_GOLD", "not enough gold");
-      let s = set(state, playerId, { gold: p.gold - cost, shopLocked: false, rerollCount: p.rerollCount + 1 });
+      let s = set(state, playerId, { ...spendFreeReroll(p), gold: p.gold - cost, shopLocked: false, rerollCount: p.rerollCount + 1 });
       s = dealShop(s, s.players.find((x) => x.id === playerId)!, ctx, `reroll${p.rerollCount + 1}`);
       return logged(s);
     }
@@ -318,7 +322,9 @@ function makeBenchRoom(state: GameState, playerId: string, ctx: RunContext): Gam
 export function tradeOffersFor(state: GameState, playerId: string, instanceId: string, ctx: RunContext): string[] {
   const card = state.cards[instanceId];
   if (!card) return [];
-  return tradeOffers(state, card.defId, ctx, roundRng(state, `trade:${playerId}:${instanceId}`));
+  const p = state.players.find((x) => x.id === playerId);
+  const n = p ? runEffects(state, p, ctx).tradeOptions : SCHEDULE.tradeOptions;
+  return tradeOffers(state, card.defId, ctx, roundRng(state, `trade:${playerId}:${instanceId}`), n);
 }
 
 // ---------------------------------------------------------------------------

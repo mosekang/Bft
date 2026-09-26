@@ -154,8 +154,9 @@ describe("GameStateSchema", () => {
     expect(GameStateSchema.parse(state)).toEqual(state);
   });
 
-  it("exposes every synergy id including derived handedness", () => {
+  it("exposes every synergy id including derived handedness and board synergies", () => {
     expect(SYNERGY_IDS).toContain("LEFTY_BAT");
-    expect(SYNERGY_IDS).toHaveLength(18);
+    expect(SYNERGY_IDS).toContain("BACKUP_CATCHER");
+    expect(SYNERGY_IDS).toHaveLength(24);
   });
 });

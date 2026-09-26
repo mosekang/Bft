@@ -67,10 +67,10 @@ export function allStarDefs(state: GameState, player: PlayerState, ctx: RunConte
   return { slots };
 }
 
-/** Three same-cost alternatives from the pool for a trade (§10.2). */
-export function tradeOffers(state: GameState, defId: string, ctx: RunContext, rng: Rng): string[] {
+/** `count` (§10.2: 3; TRADE_MASTER: 5) same-cost alternatives from the pool for a trade. */
+export function tradeOffers(state: GameState, defId: string, ctx: RunContext, rng: Rng, count: number = SCHEDULE.tradeOptions): string[] {
   const def = ctx.defs.get(defId);
   if (!def) return [];
   const candidates = ctx.pack.cards.filter((c) => c.cost === def.cost && c.id !== def.id && (state.pool[c.id] ?? 0) > 0);
-  return rng.shuffle(candidates).slice(0, 3).map((c) => c.id);
+  return rng.shuffle(candidates).slice(0, count).map((c) => c.id);
 }
