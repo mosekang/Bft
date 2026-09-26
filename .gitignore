@@ -21,3 +21,4 @@ apps/web/playwright-report/
 apps/web/e2e/*.png
 # wrangler
 apps/server/.wrangler/
+apps/web/dist-artifact/
