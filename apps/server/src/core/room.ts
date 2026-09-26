@@ -177,15 +177,16 @@ export class RoomCore {
         else this.broadcastRoom();
         return void this.ports.save(this.snap);
       }
-      if (action.type === "EMOTE") return this.broadcastRoom();
+      if (action.type === "EMOTE") return this.broadcast({ type: "EMOTE", playerId, id: action.id });
       return this.error(playerId, "BAD_PHASE", "game not started");
     }
 
+    // Emotes never touch game state: relay them to everyone (sender included).
+    if (action.type === "EMOTE") return this.broadcast({ type: "EMOTE", playerId, id: action.id });
     const before = this.snap.state;
     const r = applyAction(before, playerId, action, this.ctx);
     if (!r.ok) return this.error(playerId, r.code, r.msg);
     this.setState(advance(r.value, this.ctx, bots));
-    if (action.type === "EMOTE") this.broadcast({ type: "PHASE", phase: this.snap.state!.phase, round: this.snap.state!.round, endsAt: this.snap.timer?.endsAt });
   }
 
   private join(playerId: string, nickname: string): void {

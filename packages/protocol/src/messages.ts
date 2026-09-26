@@ -101,6 +101,8 @@ export const ServerMessageSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("GAME_OVER"), placements: z.array(z.object({ playerId: z.string(), placement: z.number().int().min(1).max(8) })) }),
   z.object({ type: z.literal("ERROR"), code: ErrorCodeSchema, msg: z.string() }),
   z.object({ type: z.literal("PONG") }),
+  /** Someone in the room sent one of the 8 emotes (§12.1: no chat, emotes only). */
+  z.object({ type: z.literal("EMOTE"), playerId: z.string(), id: z.number().int().min(0).max(7) }),
 ]);
 export type ServerMessage = z.infer<typeof ServerMessageSchema>;
 

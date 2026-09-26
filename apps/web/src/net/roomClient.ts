@@ -15,6 +15,7 @@ export interface RoomEvents {
   phase: (phase: string, endsAt: number | undefined, round: string) => void;
   error: (code: string, msg: string) => void;
   connection: (connected: boolean) => void;
+  emote: (playerId: string, id: number) => void;
 }
 
 export async function createRoom(): Promise<string> {
@@ -92,6 +93,7 @@ export class RoomClient {
         break;
       case "PHASE": this.handlers.phase?.(m.phase, m.endsAt, m.round); break;
       case "ERROR": this.handlers.error?.(m.code, m.msg); break;
+      case "EMOTE": this.handlers.emote?.(m.playerId, m.id); break;
       default: break;
     }
   }

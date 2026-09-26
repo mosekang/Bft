@@ -1,0 +1,474 @@
+{
+  "formatVersion": 1,
+  "policy": "Every model, animation, texture and sound ships as source code generated at runtime. No third-party art, no motion capture, no photos or likenesses of real players, no club emblems, no broadcast or cheering-song audio.",
+  "models": [
+    {
+      "id": "player",
+      "kind": "procedural-mesh",
+      "source": "apps/web/src/scene/figureParts.ts",
+      "license": "project",
+      "notes": "Low-poly humanoid from primitives; ~2.4k triangles; 3 builds, 6 skin tones, 8 hair styles, 4 beards, cap/helmet/catcher gear, bat x4, glove x4."
+    },
+    {
+      "id": "stadium",
+      "kind": "procedural-mesh",
+      "source": "apps/web/src/scene/Stadium.tsx",
+      "license": "project",
+      "notes": "Field canvas texture, fence, three-tier bowl, crowd, towers, scoreboard, dugouts, bullpen, cheer stage; 5 stadium variants."
+    },
+    {
+      "id": "portrait",
+      "kind": "procedural-svg",
+      "source": "apps/web/src/lib/avatar.tsx",
+      "license": "project"
+    }
+  ],
+  "clips": [
+    {
+      "id": "idle_field",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "idle_batter",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "idle_pitcher",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "idle_catcher",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "pitch_windup",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "pitch_stretch",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "swing_contact",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "swing_miss",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "swing_check",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "bunt",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "run",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "run_slide",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "run_trot",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "field_ground",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "catch_fly",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "catch_dive",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "throw",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "umpire_strike",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "umpire_out",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "umpire_safe",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "react_strikeout",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "react_hr",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "celebrate",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "dugout_cheer",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "dugout_sad",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "pickup",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "drop",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": false,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    },
+    {
+      "id": "walk_to_slot",
+      "source": "apps/web/src/scene/clips.ts",
+      "loop": true,
+      "license": "project",
+      "method": "keyframed joint rotations"
+    }
+  ],
+  "sounds": [
+    {
+      "id": "bat_crack_weak",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "bat_crack_mid",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "bat_crack_strong",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "glove_pop_soft",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "glove_pop_hard",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "ump_strike",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "ump_out",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "ump_safe",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "ump_ball",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "crowd_ambience",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": true
+    },
+    {
+      "id": "crowd_hr_roar",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "crowd_boo",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "cheer_drum",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": true
+    },
+    {
+      "id": "fireworks",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "coin",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "interest_tick",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "reroll_shuffle",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "card_drop",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "fanfare",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "damage_drum",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "win_sting",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "lose_sting",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "level_up",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "synergy_tone_1",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "synergy_tone_2",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "synergy_tone_3",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "button",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "error",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "slide",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "dust",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    },
+    {
+      "id": "equip",
+      "source": "apps/web/src/audio/recipes.ts",
+      "license": "project",
+      "method": "Web Audio synthesis (oscillators, seeded noise, envelopes)",
+      "loop": false
+    }
+  ],
+  "music": [
+    {
+      "id": "lobby_bgm",
+      "source": "apps/web/src/audio/bgm.ts",
+      "license": "project",
+      "method": "scheduled oscillators, 16 s loop"
+    }
+  ],
+  "fonts": [
+    {
+      "id": "Black Han Sans",
+      "license": "OFL-1.1",
+      "source": "Google Fonts"
+    },
+    {
+      "id": "Bebas Neue",
+      "license": "OFL-1.1",
+      "source": "Google Fonts"
+    },
+    {
+      "id": "Noto Sans KR",
+      "license": "OFL-1.1",
+      "source": "Google Fonts"
+    }
+  ],
+  "budgets": {
+    "draw_calls_per_30_figures": 60,
+    "figure_triangles": 3000,
+    "bundle_gzip_kb": 600,
+    "assets_mb": 6
+  }
+}

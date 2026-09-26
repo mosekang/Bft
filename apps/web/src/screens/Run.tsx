@@ -112,7 +112,7 @@ export function Run() {
 
   return (
     <div className="flex h-full flex-col">
-      <TopBar state={state} me={me} endsAt={room?.phaseEndsAt} />
+      <TopBar state={state} me={me} endsAt={room?.phaseEndsAt} {...(room ? { onEmote: (id: number) => room.client.send({ type: "EMOTE", id }) } : {})} />
       <OpponentsBar state={state} onPick={(id) => { if (quality !== "low" && holo !== id) setHolo(id); else { setHolo(null); setPeek(id); } }} />
       <SynergyPanel statuses={effects.run.synergies} />
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>

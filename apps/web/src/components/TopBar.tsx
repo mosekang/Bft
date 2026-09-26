@@ -2,6 +2,7 @@ import type { GameState, PlayerState } from "@dugout/protocol";
 import { useEffect, useRef, useState } from "react";
 import { isMuted, setMuted, juice } from "../audio/index.js";
 import { CoinBurst } from "./Juice.js";
+import { EmoteBubble, EmotePicker } from "./Emotes.js";
 import { t } from "../i18n/index.js";
 import { LEVELS, xpToNext } from "@dugout/engine";
 
@@ -14,7 +15,7 @@ export function Countdown({ endsAt }: { endsAt: number | undefined }) {
 }
 
 /** Scoreboard-style HUD (§14.1-4 top bar). */
-export function TopBar({ state, me, endsAt }: { state: GameState; me: PlayerState; endsAt?: number | undefined }) {
+export function TopBar({ state, me, endsAt, onEmote }: { state: GameState; me: PlayerState; endsAt?: number | undefined; onEmote?: (id: number) => void }) {
   const xpNeed = xpToNext(me.level);
   const [muted, setMutedState] = useState(isMuted());
   const [burst, setBurst] = useState<{ id: number; amount: number } | null>(null);
@@ -51,6 +52,7 @@ export function TopBar({ state, me, endsAt }: { state: GameState; me: PlayerStat
       {(me.winStreak >= 2 || me.loseStreak >= 2) && (
         <span className={`chip ${me.winStreak >= 2 ? "text-[var(--ok)]" : "text-[var(--bad)]"}`}>{me.winStreak >= 2 ? `${me.winStreak}${t("run.streakW")}` : `${me.loseStreak}${t("run.streakL")}`}</span>
       )}
+      {onEmote && <div className="relative"><EmoteBubble playerId={me.id} /><EmotePicker onSend={onEmote} /></div>}
       <button type="button" className="grid h-9 w-9 place-items-center rounded-lg bg-black/30 text-[16px]" aria-label={muted ? "소리 켜기" : "소리 끄기"} onClick={() => { const next = !muted; setMuted(next); setMutedState(next); if (!next) juice("button"); }}>{muted ? "🔇" : "🔊"}</button>
     </header>
   );

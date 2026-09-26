@@ -12,7 +12,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     launchOptions: { executablePath: process.env["PW_CHROMIUM"] ?? "/opt/pw-browsers/chromium" },
   },
-  projects: [{ name: "pixel5", use: { ...devices["Pixel 5"], launchOptions: { executablePath: process.env["PW_CHROMIUM"] ?? "/opt/pw-browsers/chromium" } } }],
+  projects: [{ name: "pixel5", use: { ...devices["Pixel 5"], launchOptions: { executablePath: process.env["PW_CHROMIUM"] ?? "/opt/pw-browsers/chromium", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] } } }],
   webServer: [
     {
       command: "pnpm exec vite preview --port 4173 --strictPort",

@@ -169,7 +169,8 @@ export const useRun = create<RunStore>((set, get) => ({
       .on("state", (state) => set({ state }))
       .on("phase", (_phase, endsAt) => set((s) => (s.room ? { room: { ...s.room, phaseEndsAt: endsAt } } : {})))
       .on("error", (code, msg) => useUi.getState().toast(`toast.${code}` in {} ? msg : `toast.${code}`))
-      .on("connection", (connected) => set((s) => (s.room ? { room: { ...s.room, connected } } : {})));
+      .on("connection", (connected) => set((s) => (s.room ? { room: { ...s.room, connected } } : {})))
+      .on("emote", (pid, id) => useUi.getState().showEmote(pid, id));
     set({ room: session, state: null });
     client.connect();
     return true;

@@ -1,0 +1,26 @@
+{
+  "name": "@dugout/assets",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Asset manifest, licences and validator for Dugout Tactics (all assets are procedural).",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./sources.json": "./sources.json"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "validate": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@dugout/protocol": "workspace:*"
+  },
+  "devDependencies": {}
+}

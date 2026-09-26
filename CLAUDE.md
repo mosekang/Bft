@@ -1,7 +1,7 @@
 # CLAUDE.md — 덕아웃 택틱스 (Dugout Tactics)
 
 TFT의 룰로 하는 야구 오토배틀러. 모바일 웹(PWA) 우선, 솔로 + 친구방 실시간 8인 + 일일 도전 + 고스트전.
-**게임 설계의 단일 진실 원천은 `docs/DESIGN.md`(완전 사양서 v2)다.** 이 파일은 작업 규범·아키텍처·명령어만 다룬다.
+**게임 설계의 단일 진실 원천은 `docs/DESIGN.md`(통합 사양서 v3)다.** 이 파일은 작업 규범·아키텍처·명령어만 다룬다.
 사양서에 없는 결정은 `docs/ADR/`에 기록한다.
 
 ## 1. 작업 규범
@@ -26,10 +26,14 @@ packages/protocol   zod 스키마 + 타입. 팩(CardDef/Pack), 상태(GameState�
 packages/engine     순수 TS. config/(사양 수치) · rng · ratings(표시치·OVR) · nicknames · sim/(경기) · run/(런 규칙, applyAction, advance) · bots/ · arena.ts(bot-arena)
 packages/packs      가상 팩 생성기·검증기·(P5) CSV 변환기. fictional-v1.json 커밋본.
 packages/cli        sim-game · bot-arena · replay
-docs/DESIGN.md      사양서 v2 원문. docs/ADR/ 결정 기록.
+packages/cinematic  엔진 이벤트 → 연출 타임라인 DSL·릴 빌더·검증기 (순수 TS, three/React 없음)
+packages/assets     에셋 매니페스트(sources.json)·LICENSES.md·검증기 — 에셋은 전부 코드 생성
+apps/web/src/scene  R3F: 구장·절차 캐릭터·클립·오라·BoardStage(준비)·MatchStage(중계)·품질 등급
+apps/web/src/audio  Web Audio 합성 효과음 31종·BGM·햅틱·juice()
+docs/DESIGN.md      사양서 v3 원문. docs/ADR/ 결정 기록.
 ```
 
-의존 방향: `protocol ← engine ← packs`, `protocol/engine ← cli`, `protocol/engine/packs ← web`, `protocol/engine ← server`. 역방향 금지.
+의존 방향: `protocol ← engine ← packs`, `protocol ← cinematic`, `protocol ← assets`, `protocol/engine ← cli`, `protocol/engine/packs/cinematic ← web`, `protocol/engine ← server`. 역방향 금지.
 
 ## 3. 아키텍처 규약
 
@@ -56,7 +60,8 @@ pnpm pack:validate [file.json]             # 팩 검증 (§5.3 제약)
 pnpm pack:build input.csv --out my.json    # CSV → 개인 팩 (Phase 5)
 pnpm cli sim-game --seed X                 # 1경기 박스스코어
 pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (§15.1)
-pnpm --filter @dugout/web test:e2e         # Playwright: 솔로 1판 완주 + 친구방 2클라이언트 (Node 서버 자동 기동)
+pnpm --filter @dugout/web test:e2e         # Playwright: 솔로 1판 완주 + 친구방 2클라이언트 + v3(3D 보드·중계·CSV 팩)
+pnpm --filter @dugout/assets validate      # 에셋 매니페스트 검증 (클립·효과음·라이선스)
 pnpm --filter @dugout/server dev:node      # 로컬 방 서버 :8787 (VITE_SERVER_URL 기본값)
 pnpm --filter @dugout/server dev:cf        # wrangler dev (Cloudflare)
 ```
@@ -75,10 +80,15 @@ pnpm --filter @dugout/server dev:cf        # wrangler dev (Cloudflare)
 - Phase 0 완료(ADR-0001). Phase 1 완료(ADR-0002): `engine/sim/*`, `sim-game` CLI. Phase 2 완료(ADR-0003): `engine/run/*`, `bots/`, `arena.ts`, `bot-arena` CLI. 1000판 지표 10/12 OK.
 - Phase 3 완료(ADR-0004): `apps/web` 솔로(Worker·Dexie·PWA·Playwright e2e). Phase 4 완료(ADR-0005): `apps/server` 코어 + Cloudflare/Node 어댑터, 웹 친구방. Phase 5 완료(ADR-0006): 일일 도전·리더보드·고스트·CSV 팩 변환·도감·업적.
 - Phase 6 완료(ADR-0007): 타순 편집(`SET_ORDER`), 해설 톤, 홈런 연출·진동, 코치마크, CI 워크플로, 배포 문서. **배포 URL은 미생성**(Cloudflare 자격 증명 없음 → `docs/DEPLOY.md`).
-- 미해결 결정: 무승부 비율(ADR-0002 #6), 5코스트 ★★ 달성률(ADR-0003), 실기기 검증(§17 Phase 3·4의 실기기 항목은 Playwright로 대체).
+- v3 표현층 완료(ADR-0009): 절차 3D 캐릭터·구장, 중계 연출, 주스·사운드·햅틱, 시너지/아이템 비주얼, 결과 화면 MVP·명장면·이미지 공유, 이모트, 기기 내 CSV 팩. 콘텐츠 확장·밸런스 재검증은 ADR-0010.
+- 미해결: 실기기 fps·로딩 예산 측정(샌드박스에 실기기 없음).
 - 후속(범위 밖): Capacitor 패키징, 랭크, 시즌 팩 교체, 관전 모드, 클라이언트 예측(ADR-0005 #10).
 - 런 루프 사용법: `createContext(pack)` → `createRun(ctx, {seed, players})` → 사람 입력은 `applyAction(state, playerId, action, ctx)` → 항상 `advance(state, ctx, bots)`로 봇과 페이즈를 진행 → `waitingOn(state, playerId)`로 UI가 기다릴 것을 안다.
 
-## 3D 보드 / 캐릭터 (ADR 0008)
-- 보드: `apps/web/src/components/Board3D.tsx` (three + @react-three/fiber@8 + drei@9, lazy 로드). 슬롯마다 `button[data-slot]` HTML 라벨이 있어 e2e는 `[aria-label='라인업'] button[data-slot]`로 조작한다.
-- 초상: `apps/web/src/lib/avatar.tsx` — 카드 id 해시 기반 SVG. 외부 이미지 자산 금지.
+## 7. 표현층 (v3, ADR 0008·0009)
+- 준비 단계: `scene/BoardStage.tsx`. 캔버스 `frameloop="demand"` + 등급별 fps 캡, 카메라는 세로 화면에 맞춰 자동 거리. 슬롯 라벨은 DOM 레이어 하나(`[aria-label='라인업'] button[data-slot]`, e2e 핸들).
+- 중계: `scene/MatchStage.tsx`가 `@dugout/cinematic`의 `buildReel()` 타임라인을 실행. 스텝 시각은 실시간, 애니·공·이동은 씬 시계(히트스톱·슬로모 반영).
+- 좌표: 엔진/cinematic은 사양 좌표(3루 −x). 렌더는 `specToWorld`로 x 반전(3루 +x).
+- 캐릭터 외형은 `lib/appearance.ts` 하나에서 결정론 생성 → SVG 초상(`lib/avatar.tsx`)과 3D가 같은 얼굴. 외부 이미지·모델·음원 금지(`packages/assets/LICENSES.md`).
+- 품질: `?q=high|mid|low`로 강제. 자동화 브라우저(webdriver)는 low(2D)로 시작하므로 기존 e2e는 2D 경로를 탄다. 3D는 `e2e/v3.spec.ts`가 `?q=mid`로 검증.
+- 연출 난수는 엔진의 별도 `presentation` 스트림 → 연출 필드를 바꿔도 경기 결과·골든 불변.

@@ -14,6 +14,9 @@ interface UiStore {
   openCard: (instanceId: string | null) => void;
   openShop: (slot: number | null) => void;
   toast: (keyOrText: string) => void;
+  /** Latest emote per player id (§12.1), shown as a bubble for ~2.5 s. */
+  emotes: Record<string, { id: number; at: number }>;
+  showEmote: (playerId: string, id: number) => void;
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
@@ -23,6 +26,8 @@ export const useUi = create<UiStore>((set) => ({
   sheetCard: null,
   sheetShop: null,
   toastMsg: null,
+  emotes: {},
+  showEmote: (playerId, id) => set((s) => ({ emotes: { ...s.emotes, [playerId]: { id, at: Date.now() } } })),
   select: (loc) => set({ selected: loc }),
   openCard: (instanceId) => set({ sheetCard: instanceId, sheetShop: null }),
   openShop: (slot) => set({ sheetShop: slot, sheetCard: null }),

@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../components/Button.js";
 import { t } from "../i18n/index.js";
 import { describe, reel } from "../lib/commentary.js";
+import { rememberMatch } from "../lib/memories.js";
 import { currentQuality, initialQuality } from "../scene/quality.js";
 import type { ScreenFx } from "../scene/MatchStage.js";
 
@@ -34,6 +35,7 @@ function Playback2D() {
   const m: Matchup | undefined = mine[gameIdx];
   const homeName = m ? nameOf(state, m.home) : "";
   const awayName = m ? nameOf(state, m.away) : "";
+  useEffect(() => { if (m) rememberMatch(state, m, homeName, awayName, ME); }, [m, state, homeName, awayName]);
   const lines = useMemo(() => (m ? reel(m, homeName, awayName) : []), [m, homeName, awayName]);
   const [shown, setShown] = useState(speed === 0 ? lines.length : 0);
   useEffect(() => { setShown(speed === 0 ? lines.length : 0); }, [lines, speed]);
@@ -114,6 +116,7 @@ function Playback3D() {
   const m: Matchup | undefined = mine[gameIdx];
   const homeName = m ? nameOf(state, m.home) : "";
   const awayName = m ? nameOf(state, m.away) : "";
+  useEffect(() => { if (m) rememberMatch(state, m, homeName, awayName, ME); }, [m, state, homeName, awayName]);
   const [rate, setRate] = useState<1 | 2>(speed === 2 ? 2 : 1);
   const [captions, setCaptions] = useState<{ key: number; text: string; big: boolean }[]>([]);
   const [score, setScore] = useState<[number, number]>([0, 0]);

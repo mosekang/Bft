@@ -142,3 +142,20 @@ describe("room game flow", () => {
     expect(h.core.snap.state?.phase).toBe("PLAYBACK");
   });
 });
+
+describe("emotes (§12.1)", () => {
+  it("relays emotes to everyone without touching game state", () => {
+    const h = harness();
+    const a = h.join("p1");
+    const b = h.join("p2");
+    h.msg("p1", { type: "EMOTE", id: 3 });
+    expect(b.last("EMOTE")).toEqual({ type: "EMOTE", playerId: "p1", id: 3 });
+    expect(a.last("EMOTE")).toEqual({ type: "EMOTE", playerId: "p1", id: 3 });
+    h.msg("p2", { type: "READY" });
+    h.msg("p1", { type: "READY" });
+    const version = h.core.snap.state!.version;
+    h.msg("p2", { type: "EMOTE", id: 7 });
+    expect(a.last("EMOTE")).toEqual({ type: "EMOTE", playerId: "p2", id: 7 });
+    expect(h.core.snap.state!.version).toBe(version);
+  });
+});
