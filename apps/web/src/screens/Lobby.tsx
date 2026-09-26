@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { startBgm, stopBgm } from "../audio/index.js";
 import { Button } from "../components/Button.js";
 import { t } from "../i18n/index.js";
 import { useRun } from "../store/run.js";
@@ -21,6 +22,7 @@ function Lights() {
 }
 
 export function Lobby() {
+  useEffect(() => { startBgm(); return () => stopBgm(0.6); }, []);
   const { hasSave, checkSave, newRun, resume, abandon, busy, hostRoom, joinRoom, startDaily } = useRun();
   const [panel, setPanel] = useState<"codex" | "records" | "settings" | null>(null);
   const settings = useSession((s) => s.settings);

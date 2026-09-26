@@ -13,10 +13,12 @@ interface Props {
   onXp: () => void;
   onLock: () => void;
   disabled: boolean;
+  /** Bumps on every reroll so the new cards flip in with a 40 ms stagger. */
+  rerollNonce?: number;
 }
 
 /** Scouting tray: five cards with ticket-style prices and chunky dugout buttons. */
-export function Shop({ me, rerollCost, xpCost, onBuy, onInfo, onReroll, onXp, onLock, disabled }: Props) {
+export function Shop({ me, rerollCost, xpCost, onBuy, onInfo, onReroll, onXp, onLock, disabled, rerollNonce = 0 }: Props) {
   return (
     <div className="tray flex gap-2 px-2 pb-1 pt-1.5" aria-label={t("run.shop")}>
       <div className="flex w-[64px] shrink-0 flex-col gap-1">
@@ -26,7 +28,7 @@ export function Shop({ me, rerollCost, xpCost, onBuy, onInfo, onReroll, onXp, on
         <button type="button" className="btn btn-secondary !min-h-0 h-[44px] !px-0 flex-col !gap-0 text-[12px] leading-none" disabled={disabled || me.gold < xpCost || me.level >= 10} onClick={onXp}>
           <span>{t("run.buyXp")}</span><span className="led text-[14px]">{xpCost}G</span>
         </button>
-        <button type="button" className={`btn !min-h-0 h-[22px] !px-0 text-[11px] ${me.shopLocked ? "btn-gold" : "btn-ghost"}`} disabled={disabled} onClick={onLock}>{me.shopLocked ? "🔒 " + t("run.unlock") : "🔓 " + t("run.lock")}</button>
+        <button type="button" className={`btn !min-h-0 h-[22px] !px-0 text-[11px] ${me.shopLocked ? "btn-gold" : "btn-ghost"}`} disabled={disabled} onClick={onLock}><span key={String(me.shopLocked)} className="lock-spin inline-block">{me.shopLocked ? "🔒" : "🔓"}</span>&nbsp;{me.shopLocked ? t("run.unlock") : t("run.lock")}</button>
       </div>
       <div className="grid flex-1 grid-cols-5 gap-1.5">
         {me.shop.map((defId, i) => {
@@ -34,7 +36,7 @@ export function Shop({ me, rerollCost, xpCost, onBuy, onInfo, onReroll, onXp, on
           const def = defOf(defId);
           const canBuy = !disabled && me.gold >= def.cost;
           return (
-            <div key={`${defId}-${i}`} className="pop flex h-[94px] flex-col gap-1">
+            <div key={`${defId}-${i}-${rerollNonce}`} className="flip-in flex h-[94px] flex-col gap-1" style={{ animationDelay: `${i * 40}ms` }}>
               <CardTile def={def} dim={!canBuy} onClick={() => onBuy(i)} onLongPress={() => onInfo(i)} />
               <button type="button" onClick={() => onInfo(i)} className="led rounded-md bg-black/50 text-center text-[13px] leading-[18px] ring-1 ring-white/10">{def.cost}G</button>
             </div>

@@ -5,7 +5,9 @@ import { useMemo, useState } from "react";
 import { Bench } from "../components/Bench.js";
 import { Suspense, lazy, useEffect } from "react";
 import { Board } from "../components/Board.js";
-import { haptic } from "../audio/index.js";
+import { haptic, juice } from "../audio/index.js";
+import { useJuiceWatcher } from "../components/Juice.js";
+import type { Action } from "@dugout/protocol";
 import { initialQuality, qualityForced, setCurrentQuality, tierFromFps, type Quality } from "../scene/quality.js";
 const BoardStage = lazy(() => import("../scene/BoardStage.js"));
 import { Button } from "../components/Button.js";
@@ -30,7 +32,16 @@ function parseLoc(id: string): Location {
 
 export function Run() {
   const state = useRun((s) => s.state)!;
-  const dispatch = useRun((s) => s.dispatch);
+  const rawDispatch = useRun((s) => s.dispatch);
+  const [rerollNonce, setRerollNonce] = useState(0);
+  // Every HUD action gets its §17.1 feedback; rejected actions buzz.
+  const dispatch = async (a: Action): Promise<boolean> => {
+    const cue = a.type === "BUY" ? "buy" : a.type === "SELL" ? "sell" : a.type === "REROLL" ? "reroll" : a.type === "BUY_XP" ? "xp" : a.type === "LOCK_SHOP" ? "lock" : a.type === "EQUIP" ? "equip" : a.type === "READY" ? "button" : null;
+    if (a.type === "REROLL") setRerollNonce((n) => n + 1);
+    const ok = await rawDispatch(a);
+    if (!ok) juice("error"); else if (cue) juice(cue);
+    return ok;
+  };
   const busy = useRun((s) => s.busy);
   const room = useRun((s) => s.room);
   const { selected, select, sheetCard, sheetShop, openCard, openShop } = useUi();
@@ -43,6 +54,7 @@ export function Run() {
   const stage = Number(state.round.split("-")[0]);
   const effects = useMemo(() => computeEffects(me, state.cards, ctx, stage), [me, state.cards, stage]);
   const interactive = state.phase === "PREP" && !me.ready && !busy;
+  const banner = useJuiceWatcher(state, me, effects.run.synergies);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }));
 
   const qualitySetting = useSession((s) => s.settings.quality);
@@ -134,12 +146,14 @@ export function Run() {
           onReroll={() => void dispatch({ type: "REROLL" })}
           onXp={() => void dispatch({ type: "BUY_XP" })}
           onLock={() => void dispatch({ type: "LOCK_SHOP", locked: !me.shopLocked })}
+          rerollNonce={rerollNonce}
         />
         <div className="tray px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-1 !border-t-0">
           <Button className="w-full !min-h-[46px] display text-[18px]" disabled={!interactive} onClick={() => void dispatch({ type: "READY" })}>{busy ? "…" : `⚾ ${t("run.ready")}`}</Button>
         </div>
       </div>
 
+      {banner && <div key={banner.id} className={`juice-banner pointer-events-none fixed inset-x-0 top-[38%] z-30 text-center display text-[34px] ${banner.tone === "gold" ? "text-[var(--gold)]" : "text-[var(--ok)]"}`}>{banner.text}</div>}
       {sheetDef && (
         <CardSheet
           def={sheetDef}

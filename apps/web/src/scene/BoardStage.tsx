@@ -102,6 +102,16 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
   const ghosts = useRef<Actor[]>([]);
   const baseClip = useRef(new Map<string, AnyClip>());
   const prevInstance = useRef(new Map<string, string | undefined>());
+  const prevStar = useRef(new Map<string, number>());
+  const pillars = useRef<{ x: number; z: number; start: number; gold: boolean }[]>([]);
+  const pillarMesh = useMemo(() => {
+    const g = new THREE.CylinderGeometry(2.2, 2.2, 40, 20, 1, true);
+    g.translate(0, 20, 0);
+    const m = new THREE.InstancedMesh(g, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }), 6);
+    m.frustumCulled = false;
+    m.count = 0;
+    return m;
+  }, []);
   const drag = useRef<DragState | null>(null);
   const yaw = useRef(0);
   const [hot, setHot] = useState<Slot | null>(null);
@@ -117,6 +127,11 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
       const inst = loc?.kind === "slot" ? me.board.slots[loc.slot] : loc?.kind === "bench" ? me.bench[loc.index] ?? undefined : undefined;
       const before = prevInstance.current.get(a.id);
       if (prevInstance.current.size > 0 && inst && inst !== before) { a.clip = "drop"; a.clipStart = now; }
+      // Star up (§17.1): light pillar 0.4 s + celebrate.
+      const star = a.star ?? 1;
+      const was = inst ? prevStar.current.get(inst) : undefined;
+      if (inst && was !== undefined && star > was) { pillars.current.push({ x: a.pos[0], z: a.pos[2], start: now, gold: star === 3 }); a.clip = "celebrate"; a.clipStart = now; window.setTimeout(() => { if (a.clip === "celebrate") { a.clip = baseClip.current.get(a.id) ?? "idle_field"; a.clipStart = clock.current; } }, 1200); }
+      if (inst) prevStar.current.set(inst, star);
       prevInstance.current.set(a.id, inst);
     }
     actors.current = list;
@@ -299,6 +314,17 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
       n++;
     }
     pads.stars.count = n;
+    const now2 = clock.current;
+    pillars.current = pillars.current.filter((p) => now2 - p.start < 0.6);
+    pillars.current.forEach((p, i) => {
+      const u = (now2 - p.start) / 0.6;
+      mat.makeScale(1 + u * 0.6, 1 - u * 0.3, 1 + u * 0.6).setPosition(p.x, 0, p.z);
+      pillarMesh.setMatrixAt(i, mat);
+      pillarMesh.setColorAt(i, c.set(p.gold ? "#fbbf24" : "#e0f2fe").multiplyScalar(1 - u));
+    });
+    pillarMesh.count = pillars.current.length;
+    pillarMesh.instanceMatrix.needsUpdate = true;
+    if (pillarMesh.instanceColor) pillarMesh.instanceColor.needsUpdate = true;
     pads.stars.instanceMatrix.needsUpdate = true;
     if (pads.stars.instanceColor) pads.stars.instanceColor.needsUpdate = true;
   });
@@ -322,6 +348,7 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
       </mesh>
       <primitive object={pads.m} />
       <primitive object={pads.stars} />
+      <primitive object={pillarMesh} />
       <Figures actors={actors} clock={clock} shadows={quality === "high"} onActorDown={onActorDown} />
       {hologram && <Figures actors={ghosts} clock={clock} ghost />}
     </>
