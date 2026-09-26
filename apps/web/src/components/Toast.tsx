@@ -5,7 +5,7 @@ export function Toast() {
   if (!msg) return null;
   return (
     <div role="status" className="pointer-events-none fixed inset-x-0 top-16 z-50 flex justify-center px-4">
-      <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 shadow-lg">{msg}</div>
+      <div className="scoreboard rise rounded-full px-4 py-2 text-sm font-medium text-[var(--led)]">{msg}</div>
     </div>
   );
 }

@@ -14,12 +14,12 @@ export function OpponentPeek({ state, playerId, onClose }: { state: GameState; p
   const slots = [...POS, "P1", "P2", "P3"] as const;
   return (
     <div className="fixed inset-0 z-40 flex items-end bg-black/60" onClick={onClose}>
-      <div className="w-full rounded-t-2xl bg-slate-900 p-4 pb-8" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full rounded-t-2xl panel p-4 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-baseline justify-between">
-          <div className="text-lg font-bold">{p.nickname} <span className="text-sm font-normal text-slate-400">Lv{p.level} · {t("run.fans")} {p.hp} · {STADIUMS[p.stadium].nameKo}</span></div>
+          <div className="text-lg font-bold">{p.nickname} <span className="text-sm font-normal text-[var(--ink-2)]">Lv{p.level} · {t("run.fans")} {p.hp} · {STADIUMS[p.stadium].nameKo}</span></div>
           <Button variant="ghost" onClick={onClose}>{t("card.close")}</Button>
         </div>
-        <div className="mt-1 flex flex-wrap gap-1">{syn.map((s) => <span key={s.id} className={`rounded px-1.5 py-0.5 text-[11px] ${s.penalised ? "bg-rose-900 text-rose-200" : "bg-slate-800 text-slate-200"}`}>{SYNERGIES[s.id].nameKo} {s.count}</span>)}</div>
+        <div className="mt-1 flex flex-wrap gap-1">{syn.map((s) => <span key={s.id} className={`rounded px-1.5 py-0.5 text-[11px] ${s.penalised ? "bg-rose-900 text-rose-200" : "bg-white/10 text-slate-200"}`}>{SYNERGIES[s.id].nameKo} {s.count}</span>)}</div>
         <div className="mt-2 grid grid-cols-6 gap-1">
           {slots.map((slot) => {
             const id = p.board.slots[slot];

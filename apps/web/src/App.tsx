@@ -24,7 +24,7 @@ export function App() {
   else if (state.phase === "GAME_OVER") screen = <Result />;
   else screen = <Run />;
   return (
-    <div className="mx-auto h-full max-w-md bg-slate-950 text-slate-100">
+    <div className="mx-auto h-full max-w-md">
       {screen}
       <Toast />
     </div>

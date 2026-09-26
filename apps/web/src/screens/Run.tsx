@@ -72,23 +72,18 @@ export function Run() {
     <div className="flex h-full flex-col">
       <TopBar state={state} me={me} endsAt={room?.phaseEndsAt} />
       <OpponentsBar state={state} onPick={setPeek} />
+      <SynergyPanel statuses={effects.run.synergies} />
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-        <div className="flex min-h-0 flex-1">
-          <SynergyPanel statuses={effects.run.synergies} />
-          <div className="flex min-w-0 flex-1 flex-col justify-between overflow-y-auto py-1">
-            <Board state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} />
-            <div className="mt-1 flex items-center justify-between px-2 text-[11px] text-slate-500">
-              <span>{t("run.bench")} · {t("run.inventory")}: {me.itemsUnequipped.length}</span>
-              <span className="flex gap-3">
-                <button type="button" className="text-slate-400 underline" onClick={() => setOrderOpen(true)}>타순 편집</button>
-                <button type="button" className="text-slate-400 underline" onClick={autoSort} disabled={!interactive}>{t("run.autoSort")}</button>
-              </span>
-            </div>
-            <Bench state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} />
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pb-1">
+          <Board state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} />
+          <div className="flex items-center justify-end gap-3 px-3 text-[10px] leading-none text-[var(--ink-3)]">
+            <button type="button" className="underline" onClick={() => setOrderOpen(true)}>타순 편집</button>
+            <button type="button" className="underline" onClick={autoSort} disabled={!interactive}>{t("run.autoSort")}</button>
           </div>
+          <Bench state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} />
         </div>
       </DndContext>
-      <div className="border-t border-slate-800 pt-2">
+      <div>
         <Shop
           me={me}
           rerollCost={rerollCostOf(effects.run)}
@@ -100,8 +95,8 @@ export function Run() {
           onXp={() => void dispatch({ type: "BUY_XP" })}
           onLock={() => void dispatch({ type: "LOCK_SHOP", locked: !me.shopLocked })}
         />
-        <div className="px-2 pb-[max(env(safe-area-inset-bottom),8px)]">
-          <Button className="w-full" disabled={!interactive} onClick={() => void dispatch({ type: "READY" })}>{busy ? "…" : t("run.ready")}</Button>
+        <div className="tray px-2 pb-[max(env(safe-area-inset-bottom),8px)] pt-1 !border-t-0">
+          <Button className="w-full !min-h-[46px] display text-[18px]" disabled={!interactive} onClick={() => void dispatch({ type: "READY" })}>{busy ? "…" : `⚾ ${t("run.ready")}`}</Button>
         </div>
       </div>
 
@@ -126,12 +121,12 @@ export function Run() {
       {orderOpen && <OrderSheet state={state} me={me} interactive={interactive} onClose={() => setOrderOpen(false)} />}
       {showCoach && (
         <div className="fixed inset-x-0 bottom-[200px] z-20 px-4">
-          <div className="rounded-2xl border border-emerald-500/60 bg-slate-900/95 p-3 text-sm text-emerald-100 shadow-xl">
-            <div className="text-[11px] text-emerald-400">{coach + 1}/3</div>
+          <div className="panel rise rounded-2xl p-3 text-sm text-[var(--ink)] shadow-xl ring-1 ring-[var(--ok)]/50">
+            <div className="led text-[12px]">COACH {coach + 1}/3</div>
             <div>{coachTexts[coach]}</div>
             <div className="mt-2 flex justify-end gap-2">
-              <button type="button" className="text-xs text-slate-400 underline" onClick={() => void updateSettings({ coachmarks: false })}>다시 보지 않기</button>
-              <button type="button" className="min-h-9 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-slate-950" onClick={() => setCoach(coach + 1)}>{coach === 2 ? "시작" : "다음"}</button>
+              <button type="button" className="text-xs text-[var(--ink-3)] underline" onClick={() => void updateSettings({ coachmarks: false })}>다시 보지 않기</button>
+              <button type="button" className="btn btn-primary !min-h-9 text-xs" onClick={() => setCoach(coach + 1)}>{coach === 2 ? "시작" : "다음"}</button>
             </div>
           </div>
         </div>

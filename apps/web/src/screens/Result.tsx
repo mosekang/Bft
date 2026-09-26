@@ -27,13 +27,16 @@ export function Result() {
   };
   return (
     <main className="flex h-full flex-col overflow-y-auto p-4">
-      <h1 className="mt-6 text-center text-3xl font-black">{me.placement}{t("result.place")}</h1>
-      <p className="text-center text-slate-400">{t("result.title")} · S{state.round}</p>
-      {daily && <p className="text-center text-sm text-emerald-300">{daily.submitted ? `일일 도전 ${daily.submitted.score}점 · ${daily.submitted.rank ?? "-"}위 / ${daily.submitted.total}` : `일일 도전 ${daily.date}`}</p>}
-      <div className="mt-4 rounded-2xl bg-slate-900 p-3 text-sm">
-        {ranked.map((p) => <div key={p.id} className={`flex justify-between py-0.5 ${p.id === ME ? "text-emerald-300 font-bold" : "text-slate-300"}`}><span>{p.placement}. {p.nickname}</span><span className="font-mono">Lv{p.level}</span></div>)}
+      <div className="scoreboard pop mt-6 rounded-3xl p-5 text-center">
+        <div className="led text-[13px] tracking-[0.4em]">FINAL</div>
+        <h1 className="display mt-1 text-[56px] leading-none">{me.placement}<span className="text-[26px]">{t("result.place")}</span></h1>
+        <p className="mt-1 text-[13px] text-[var(--ink-2)]">{t("result.title")} · S{state.round} · ♥ {me.hp}</p>
       </div>
-      <div className="mt-4 text-sm font-semibold text-slate-300">{t("result.finalBoard")}</div>
+      {daily && <p className="text-center text-sm text-emerald-300">{daily.submitted ? `일일 도전 ${daily.submitted.score}점 · ${daily.submitted.rank ?? "-"}위 / ${daily.submitted.total}` : `일일 도전 ${daily.date}`}</p>}
+      <div className="panel mt-3 rounded-2xl p-3 text-sm">
+        {ranked.map((p) => <div key={p.id} className={`flex justify-between py-0.5 ${p.id === ME ? "text-[var(--ok)] font-bold" : "text-[var(--ink-2)]"}`}><span><span className="num mr-2 text-[15px]">{p.placement}</span>{p.nickname}</span><span className="num text-[13px]">Lv{p.level}</span></div>)}
+      </div>
+      <div className="mt-4 text-[10px] tracking-widest text-[var(--ink-3)]">{t("result.finalBoard")}</div>
       <div className="mt-1 grid grid-cols-6 gap-1">
         {slots.map((slot) => { const id = me.board.slots[slot]; const c = id ? state.cards[id] : undefined; return c ? <CardTile key={slot} def={defOf(c.defId)} card={c} size="sm" /> : <EmptyTile key={slot} label={slot} size="sm" muted />; })}
       </div>
