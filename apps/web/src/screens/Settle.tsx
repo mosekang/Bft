@@ -33,6 +33,7 @@ export function Settle() {
           <div className="flex justify-between text-[var(--ink-2)]"><span>{t("settle.base")}</span><span className="led text-[16px]">+{inc.base}</span></div>
           <div className="flex justify-between text-[var(--ink-2)]"><span>{t("settle.interest")}</span><span className="led text-[16px]">+{inc.interest}</span></div>
           <div className="flex justify-between text-[var(--ink-2)]"><span>{t("settle.streak")}</span><span className="led text-[16px]">+{inc.streak}</span></div>
+          {(inc.bonus ?? 0) > 0 && <div className="flex justify-between text-[var(--ink-2)]"><span>{t("settle.bonus")}</span><span className="led text-[16px]">+{inc.bonus}</span></div>}
           {inc.saveBonus > 0 && <div className="flex justify-between text-[var(--ink-2)]"><span>{t("settle.save")}</span><span className="led text-[16px]">+{inc.saveBonus}</span></div>}
           <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-2"><span className="display text-[16px]">{t("settle.income")}</span><span className="flex items-center gap-2"><i className="coin" /><span className="relative"><span className="led text-[24px]">+{Math.min(shown, inc.total)}</span>{shown >= inc.total && inc.total > 0 && <CoinBurst id={1} amount={inc.total} />}</span><span className="text-[var(--ink-3)]">→ {me.gold}G</span></span></div>
         </div>

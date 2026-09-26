@@ -46,6 +46,8 @@ export const PlayerChoiceSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("ITEM"), options: z.array(ItemIdSchema).min(1).max(8) }),
   z.object({ kind: z.literal("CARD"), options: z.array(z.string().min(1)).min(1).max(8), star: z.union([z.literal(1), z.literal(2)]) }),
   z.object({ kind: z.literal("TRADE"), cardInstanceId: z.string().min(1), options: z.array(z.string().min(1)).min(1).max(5) }),
+  /** RELOCATION (§8.3): pick a new home stadium. */
+  z.object({ kind: z.literal("STADIUM"), options: z.array(StadiumIdSchema).min(1).max(5) }),
 ]);
 export type PlayerChoice = z.infer<typeof PlayerChoiceSchema>;
 
@@ -57,6 +59,8 @@ export const PlayerPerksSchema = z.object({
   cheerRounds: z.number().int().min(0).optional(),
   /** Rounds in which the next opponent's full board is revealed (SCOUT_REPORT). */
   scoutRounds: z.number().int().min(0).optional(),
+  /** FA_CONTRACT (§8.3): shop purchases that cost 0 gold. */
+  freeBuys: z.number().int().min(0).optional(),
 });
 export type PlayerPerks = z.infer<typeof PlayerPerksSchema>;
 

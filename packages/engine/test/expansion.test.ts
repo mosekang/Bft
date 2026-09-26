@@ -246,6 +246,43 @@ describe("special items (v3 §18.3)", () => {
     expect(effects(after).run.revealOpponentBoard).toBe(false);
   });
 
+  it("RELOCATION opens a stadium choice and PICK_CHOICE moves the home park (§8.3)", () => {
+    let s = choose(withBoard([hitters[0]!]), "RELOCATION");
+    const ch = me(s).choice;
+    expect(ch?.kind).toBe("STADIUM");
+    expect(ch && ch.kind === "STADIUM" ? ch.options : []).not.toContain(me(s).stadium);
+    const target = ch && ch.kind === "STADIUM" ? ch.options[1]! : "DOME";
+    s = act(s, { type: "PICK_CHOICE", idx: 1 });
+    expect(me(s).stadium).toBe(target);
+    expect(me(s).choice).toBeUndefined();
+    expect(me(s).itemsUnequipped).toEqual([]);
+  });
+
+  it("FA_CONTRACT makes the next purchase free, then prices return (§8.3)", () => {
+    let s = choose(withBoard([hitters[0]!]), "FA_CONTRACT");
+    s = { ...s, players: s.players.map((p) => (p.id === "me" ? { ...p, gold: 0, shop: [pack.cards.find((c) => c.cost === 5)!.id, pack.cards.find((c) => c.cost === 1)!.id, null, null, null] } : p)) };
+    s = act(s, { type: "BUY", slot: 0 });
+    expect(me(s).gold).toBe(0);
+    expect(me(s).perks?.freeBuys).toBe(0);
+    expect(applyAction(s, "me", { type: "BUY", slot: 1 }, ctx).ok).toBe(false);
+  });
+
+  it("CALL_UP adds two bench slots (§8.3)", () => {
+    const before = withBoard([hitters[0]!]);
+    const s = choose(before, "CALL_UP");
+    expect(me(s).benchBonus).toBe(me(before).benchBonus + 2);
+    expect(me(s).bench.length).toBe(me(before).bench.length + 2);
+  });
+
+  it("NUMBER_SUCCESSION raises a card one star and is consumed; not on ★★★ (§8.3)", () => {
+    let s = act(give(withBoard([hitters[0]!]), ["NUMBER_SUCCESSION", "NUMBER_SUCCESSION", "NUMBER_SUCCESSION"]), { type: "EQUIP", itemId: "NUMBER_SUCCESSION", cardInstanceId: "x0" });
+    expect(s.cards["x0"]!.star).toBe(2);
+    expect(s.cards["x0"]!.items).toEqual([]);
+    s = act(s, { type: "EQUIP", itemId: "NUMBER_SUCCESSION", cardInstanceId: "x0" });
+    expect(s.cards["x0"]!.star).toBe(3);
+    expect(applyAction(s, "me", { type: "EQUIP", itemId: "NUMBER_SUCCESSION", cardInstanceId: "x0" }, ctx).ok).toBe(false);
+  });
+
   it("TRAINING_CAMP is consumed through EQUIP for +6 permanent growth", () => {
     const s = act(give(withBoard([hitters[0]!]), ["TRAINING_CAMP"]), { type: "EQUIP", itemId: "TRAINING_CAMP", cardInstanceId: "x0" });
     expect(s.cards["x0"]!.growth).toBe(6);

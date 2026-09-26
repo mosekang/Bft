@@ -9,6 +9,7 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "retain-on-failure",
+    actionTimeout: 5_000,
     screenshot: "only-on-failure",
     launchOptions: { executablePath: process.env["PW_CHROMIUM"] ?? "/opt/pw-browsers/chromium" },
   },

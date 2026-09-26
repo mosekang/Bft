@@ -52,10 +52,10 @@ export const ITEMS: readonly ItemDef[] = [
   combined("CONDITIONING_COACH", ["ICING", "SCOUTING"], "컨디셔닝 코치", "팀: 부상 확률 0, 피로 페널티 −15%", { teamInjuryChance: 0, tiredPenalty: 0.15 }),
   combined("FRONT_OFFICE", ["SCOUTING", "SCOUTING"], "프런트 오피스", "팀: 이자 상한 +2, 리롤 1골드", { interestCapAdd: 2, rerollCost: 1 }),
 
-  special("RELOCATION", "구장 이전", "구장을 다시 선택한다"),
-  special("FA_CONTRACT", "FA 계약서", "상점에서 원하는 코스트 카드 1장을 골드 없이 1회 구매"),
-  special("CALL_UP", "콜업권", "벤치 칸 +2"),
-  special("NUMBER_SUCCESSION", "등번호 계승", "장착 카드 ★ 1단계 상승 (★★★ 불가)"),
+  special("RELOCATION", "구장 이전", "즉시: 구장을 다시 선택한다", {}, "INSTANT"),
+  special("FA_CONTRACT", "FA 계약서", "즉시: 다음 상점 구매 1회 골드 없이", { freeBuys: 1 }, "INSTANT"),
+  special("CALL_UP", "콜업권", "즉시: 벤치 칸 +2", { benchAdd: 2 }, "INSTANT"),
+  special("NUMBER_SUCCESSION", "등번호 계승", "장착 시 소모: 그 선수 ★ 1단계 상승 (★★★ 불가)", { starUp: 1 }, "CONSUME_ON_EQUIP"),
   // v3 §18.3 specials. INSTANT ones apply on pick; the others go through EQUIP.
   special("SCOUT_REPORT", "스카우트 리포트", "즉시: 다음 라운드 상대 보드 전체 공개 + 상대 로테이션 공개", { scoutRounds: 1 }, "INSTANT"),
   special("SUPPLEMENT", "체력 보충제", "즉시: 보유 투수 전원 라운드 피로 0", { clearFatigue: 1 }, "INSTANT"),

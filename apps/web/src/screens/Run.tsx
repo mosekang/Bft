@@ -8,6 +8,8 @@ import { Board } from "../components/Board.js";
 import { haptic, juice } from "../audio/index.js";
 import { useJuiceWatcher } from "../components/Juice.js";
 import type { Action } from "@dugout/protocol";
+import { SPECIAL_ITEM_IDS } from "@dugout/protocol";
+import { ITEM_BY_ID } from "@dugout/engine";
 import { initialQuality, qualityForced, setCurrentQuality, tierFromFps, type Quality } from "../scene/quality.js";
 const BoardStage = lazy(() => import("../scene/BoardStage.js"));
 import { Button } from "../components/Button.js";
@@ -115,6 +117,14 @@ export function Run() {
       <TopBar state={state} me={me} endsAt={room?.phaseEndsAt} {...(room ? { onEmote: (id: number) => room.client.send({ type: "EMOTE", id }) } : {})} />
       <OpponentsBar state={state} onPick={(id) => { if (quality !== "low" && holo !== id) setHolo(id); else { setHolo(null); setPeek(id); } }} />
       <SynergyPanel statuses={effects.run.synergies} />
+      {me.perks && (me.perks.freeRerolls || me.perks.cheerRounds || me.perks.scoutRounds || me.perks.freeBuys) ? (
+        <div className="flex flex-wrap gap-1 px-3 pb-1 text-[11px]">
+          {me.perks.freeRerolls ? <span className="chip text-[var(--ok)]">{t("perk.freeRerolls").replace("{n}", String(me.perks.freeRerolls))}</span> : null}
+          {me.perks.cheerRounds ? <span className="chip text-[var(--gold)]">{t("perk.cheerRounds").replace("{n}", String(me.perks.cheerRounds))}</span> : null}
+          {me.perks.scoutRounds ? <button type="button" className="chip text-sky-300" onClick={() => { const opp = state.players.find((x) => x.id === me.lastOpponent) ?? state.players.find((x) => x.id !== me.id && !x.eliminatedAt); if (opp) setPeek(opp.id); }}>{t("perk.scoutRounds")}</button> : null}
+          {me.perks.freeBuys ? <span className="chip text-[var(--gold)]">{t("perk.freeBuys").replace("{n}", String(me.perks.freeBuys))}</span> : null}
+        </div>
+      ) : null}
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>
         <div className="flex min-h-0 flex-1 flex-col gap-1 pb-1">
           <div className="min-h-[300px] flex-1">
@@ -138,7 +148,8 @@ export function Run() {
       <div>
         <Shop
           me={me}
-          rerollCost={rerollCostOf(effects.run)}
+          rerollCost={me.perks?.freeRerolls ? 0 : rerollCostOf(effects.run)}
+          freeBuy={(me.perks?.freeBuys ?? 0) > 0}
           xpCost={xpCostOf(effects.run)}
           disabled={!interactive}
           onBuy={(slot) => void dispatch({ type: "BUY", slot })}
@@ -158,7 +169,7 @@ export function Run() {
         <CardSheet
           def={sheetDef}
           card={sheetInstance}
-          inventory={sheetInstance ? me.itemsUnequipped.filter((i) => !["RELOCATION", "FA_CONTRACT", "CALL_UP", "NUMBER_SUCCESSION"].includes(i)) : []}
+          inventory={sheetInstance ? me.itemsUnequipped.filter((i) => { const use = ITEM_BY_ID.get(i)?.use; return !(SPECIAL_ITEM_IDS as readonly string[]).includes(i) || use === "EQUIP" || use === "CONSUME_ON_EQUIP"; }) : []}
           sellValue={sheetInstance ? sellValue(sheetDef.cost, sheetInstance.star) : undefined}
           onSell={sheetInstance && interactive ? () => { void dispatch({ type: "SELL", cardInstanceId: sheetInstance.instanceId }); openCard(null); } : undefined}
           onEquip={sheetInstance && interactive ? (item) => void dispatch({ type: "EQUIP", itemId: item, cardInstanceId: sheetInstance.instanceId }) : undefined}

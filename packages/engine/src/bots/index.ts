@@ -255,8 +255,11 @@ export const bots: BotController = {
       const prefer: readonly string[] = BOT_ITEM_PREFS;
       let best = 0;
       p.choice.options.forEach((id, i) => { if (prefer.indexOf(id) >= 0 && prefer.indexOf(id) < (prefer.indexOf(p.choice!.options[best]!) < 0 ? 99 : prefer.indexOf(p.choice!.options[best]!))) best = i; });
-      return act(state, playerId, { type: "PICK_CHOICE", idx: best }, ctx);
+      const next = act(state, playerId, { type: "PICK_CHOICE", idx: best }, ctx);
+      // An instant special can open a follow-up choice (RELOCATION → STADIUM).
+      return P(next, playerId).choice?.kind === "STADIUM" ? this.resolveChoice(next, playerId, ctx) : next;
     }
+    if (p.choice.kind === "STADIUM") return act(state, playerId, { type: "PICK_CHOICE", idx: 0 }, ctx);
     return state;
   },
 

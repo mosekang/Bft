@@ -25,8 +25,10 @@ test("3D board and broadcast playback", async ({ page }) => {
   await expect(page.getByLabel("score")).toBeVisible();
   await page.waitForTimeout(2500);
   await page.getByRole("button", { name: "스킵" }).click();
-  await expect(page.getByText(/승리|패배|무승부/).first()).toBeVisible({ timeout: 60_000 });
-  await page.getByRole("button", { name: "다음" }).first().click();
+  const next = page.getByRole("button", { name: "다음", exact: true });
+  await expect(next).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/승리|패배|무승부/).first()).toBeVisible();
+  await next.click();
   await expect(page.getByRole("button", { name: "다음 라운드" })).toBeVisible({ timeout: 30_000 });
   expect(errors).toEqual([]);
 });

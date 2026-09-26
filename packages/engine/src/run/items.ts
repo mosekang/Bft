@@ -39,8 +39,11 @@ export function equipItem(state: GameState, playerId: string, itemId: ItemId, in
     // Consumed on the target card (TRAINING_CAMP): permanent growth, no item slot.
     const inv = [...p.itemsUnequipped];
     inv.splice(invIdx, 1);
+    const starUp = holder.params["starUp"] ?? 0;
+    if (starUp > 0 && card.star >= 3) return err("INVALID_CARD", "already three stars");
     const growth = card.growth + (holder.params["growthAdd"] ?? 0);
-    return ok({ ...state, cards: { ...state.cards, [instanceId]: { ...card, growth } }, players: state.players.map((x) => (x.id === playerId ? { ...x, itemsUnequipped: inv } : x)) });
+    const star = Math.min(3, card.star + starUp) as 1 | 2 | 3;
+    return ok({ ...state, cards: { ...state.cards, [instanceId]: { ...card, growth, star } }, players: state.players.map((x) => (x.id === playerId ? { ...x, itemsUnequipped: inv } : x)) });
   }
   let items: ItemId[] = [...card.items];
   if (isComponent(itemId)) {

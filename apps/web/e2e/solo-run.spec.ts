@@ -24,20 +24,23 @@ async function stepInner(page: Page): Promise<"done" | "progress"> {
     return false;
   };
   // Pending choice / augment / event overlays first.
-  if (await page.getByText("감독 철학을 고르세요").isVisible().catch(() => false)) { await page.locator("div.fixed.inset-0").last().locator("button").first().click({ force: true, ...T }); return "progress"; }
+  const overlayWith = (text: string | RegExp) => page.locator("div.fixed.inset-0").filter({ has: page.getByText(text) }).last();
+  if (await page.getByText("감독 철학을 고르세요").isVisible().catch(() => false)) { await overlayWith("감독 철학을 고르세요").locator("button").first().click({ force: true, ...T }); return "progress"; }
   if (await page.getByText("당신 차례입니다").isVisible().catch(() => false)) {
-    const overlay = page.locator("div.fixed.inset-0").last();
+    const overlay = overlayWith("당신 차례입니다");
     const cards = overlay.locator("button[aria-label]");
     const n = await cards.count();
     for (let i = 0; i < n; i++) {
       const b = cards.nth(i);
-      if (!(await b.evaluate((el) => el.className.includes("opacity-50")))) { await b.click({ force: true, ...T }); return "progress"; }
+      if (!(await b.evaluate((el) => (el.className.includes("opacity-50") || el.className.includes("bcard--dim")), undefined, { timeout: 1000 }))) { await b.click({ force: true, ...T }); return "progress"; }
     }
     await page.waitForTimeout(200);
     return "progress";
   }
   if (await page.getByText("다른 팀이 고르는 중").isVisible().catch(() => false)) { await page.waitForTimeout(200); return "progress"; }
-  if (await page.getByText(/보상을 고르세요|프랜차이즈 스타를 고르세요|특수 아이템을 고르세요/).isVisible().catch(() => false)) { await page.locator("div.fixed.inset-0").last().locator("button").first().click({ force: true, ...T }); return "progress"; }
+  if (await page.getByText(/보상을 고르세요|프랜차이즈 스타를 고르세요|특수 아이템을 고르세요/).isVisible().catch(() => false)) { await overlayWith(/보상을 고르세요|프랜차이즈 스타를 고르세요|특수 아이템을 고르세요/).locator("button").first().click({ force: true, ...T }); return "progress"; }
+  // Coachmarks cover the bench on a phone; dismiss them for good.
+  if (await click("다시 보지 않기")) return "progress";
   if (await click("다음으로")) return "progress";
   if (await click("다음 라운드")) return "progress";
   if (await click("스킵")) return "progress";
@@ -51,7 +54,7 @@ async function stepInner(page: Page): Promise<"done" | "progress"> {
     const n = await shopButtons.count();
     for (let i = 0; i < n; i++) {
       const b = shopButtons.nth(i);
-      const dim = await b.evaluate((el) => el.className.includes("opacity-50"));
+      const dim = await b.evaluate((el) => (el.className.includes("opacity-50") || el.className.includes("bcard--dim")), undefined, { timeout: 1000 });
       if (!dim) { await b.click(T); break; }
     }
     // Tap-tap: first bench card → first empty hitter slot ("대체").
@@ -61,7 +64,7 @@ async function stepInner(page: Page): Promise<"done" | "progress"> {
       const empty = page.locator("[aria-label='라인업'] [data-slot]").filter({ hasText: "대체" }).first();
       if (await empty.isVisible().catch(() => false)) await empty.click(T);
     }
-    if (await ready.isEnabled()) await ready.click(T);
+    if (await ready.isEnabled({ timeout: 1000 }).catch(() => false)) await ready.click(T);
     return "progress";
   }
   await page.waitForTimeout(150);

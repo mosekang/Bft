@@ -1,5 +1,5 @@
 import type { CardInstance, GameState, ItemId, PlayerState, SpecialItemId } from "@dugout/protocol";
-import { SPECIAL_ITEM_IDS } from "@dugout/protocol";
+import { SPECIAL_ITEM_IDS, STADIUM_IDS } from "@dugout/protocol";
 import { ITEM_BY_ID, SPECIAL_REWARD_OPTIONS } from "../config/items.js";
 import type { Rng } from "../rng.js";
 import { ownedIds } from "./cards.js";
@@ -18,7 +18,21 @@ export function applyInstantSpecial(state: GameState, playerId: string, id: Item
   const perks = { ...(p.perks ?? {}) };
   let cards = state.cards;
   let scoutingActive = p.scoutingActive;
+  let extra: Partial<PlayerState> = {};
   switch (id) {
+    case "RELOCATION": {
+      const options = STADIUM_IDS.filter((x) => x !== p.stadium);
+      extra = { choice: { kind: "STADIUM", options } };
+      break;
+    }
+    case "FA_CONTRACT":
+      perks.freeBuys = (perks.freeBuys ?? 0) + param("FA_CONTRACT", "freeBuys");
+      break;
+    case "CALL_UP": {
+      const add = param("CALL_UP", "benchAdd");
+      extra = { benchBonus: p.benchBonus + add, bench: [...p.bench, ...Array.from({ length: add }, () => null)] };
+      break;
+    }
     case "SCOUT_REPORT":
       perks.scoutRounds = Math.max(perks.scoutRounds ?? 0, param("SCOUT_REPORT", "scoutRounds"));
       scoutingActive = true;
@@ -42,7 +56,7 @@ export function applyInstantSpecial(state: GameState, playerId: string, id: Item
     default:
       return state;
   }
-  return { ...state, cards, players: state.players.map((x) => (x.id === playerId ? { ...x, perks, scoutingActive } : x)) };
+  return { ...state, cards, players: state.players.map((x) => (x.id === playerId ? { ...x, perks, scoutingActive, ...extra } : x)) };
 }
 
 /** Count down per-game perks after a round with games (CHEER_SONG, SCOUT_REPORT). */
@@ -52,6 +66,12 @@ export function tickPerks(p: PlayerState): PlayerState {
   if (perks.cheerRounds) perks.cheerRounds--;
   if (perks.scoutRounds) perks.scoutRounds--;
   return { ...p, perks };
+}
+
+/** Spend one FA_CONTRACT free purchase, if any; returns the player and whether it was free. */
+export function spendFreeBuy(p: PlayerState): { p: PlayerState; free: boolean } {
+  const n = p.perks?.freeBuys ?? 0;
+  return n > 0 ? { p: { ...p, perks: { ...p.perks, freeBuys: n - 1 } }, free: true } : { p, free: false };
 }
 
 /** Spend one AGENT free reroll, if any. */

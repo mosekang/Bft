@@ -1,5 +1,6 @@
-import type { GameState, PlayerState } from "@dugout/protocol";
-import { AUGMENT_BY_ID, ITEM_BY_ID, currentWave, tradeOffersFor, ownedIds } from "@dugout/engine";
+import type { GameState, PlayerState, StadiumId } from "@dugout/protocol";
+import { SPECIAL_ITEM_IDS } from "@dugout/protocol";
+import { AUGMENT_BY_ID, ITEM_BY_ID, STADIUMS, currentWave, tradeOffersFor, ownedIds } from "@dugout/engine";
 import { useState } from "react";
 import { Button } from "../components/Button.js";
 import { CardTile } from "../components/CardTile.js";
@@ -67,14 +68,16 @@ export function ChoiceOverlay({ me }: { me: PlayerState }) {
   const busy = useRun((s) => s.busy);
   const ch = me.choice;
   if (!ch || ch.kind === "TRADE") return null;
-  const title = ch.kind === "CARD" ? t("choice.card") : ch.options.every((o) => ["RELOCATION", "FA_CONTRACT", "CALL_UP", "NUMBER_SUCCESSION"].includes(o)) ? t("choice.special") : t("choice.item");
+  const title = ch.kind === "CARD" ? t("choice.card") : ch.kind === "STADIUM" ? t("stadium.title") : ch.options.every((o) => (SPECIAL_ITEM_IDS as readonly string[]).includes(o)) ? t("choice.special") : t("choice.item");
   return (
     <div className="fixed inset-0 z-30 flex flex-col bg-[var(--night)]/95 p-4">
       <h2 className="display mt-6 text-[28px]">{title}</h2>
       <div className="mt-4 flex flex-col gap-3">
         {ch.options.map((opt, idx) => (
           <button key={`${opt}${idx}`} type="button" disabled={busy} onClick={() => void dispatch({ type: "PICK_CHOICE", idx })} className="flex items-center gap-3 panel rise rounded-2xl p-4 text-left active:bg-white/10">
-            {ch.kind === "CARD" ? (
+            {ch.kind === "STADIUM" ? (
+              <div><div className="display text-[19px]">{STADIUMS[opt as StadiumId].nameKo}</div><div className="text-sm text-[var(--ink-2)]">{STADIUMS[opt as StadiumId].descriptionKo}</div></div>
+            ) : ch.kind === "CARD" ? (
               <><div className="w-20"><CardTile def={defOf(opt)} /></div><div><div className="font-bold">{defOf(opt).name} ★★</div><div className="text-sm text-[var(--ink-2)]">{defOf(opt).nickname}</div></div></>
             ) : (
               <div><div className="font-bold">{ITEM_BY_ID.get(opt as never)?.nameKo ?? opt}</div><div className="text-sm text-[var(--ink-2)]">{ITEM_BY_ID.get(opt as never)?.descriptionKo}</div></div>

@@ -14,7 +14,7 @@ export function RoomLobby() {
       <h1 className="display mt-4 text-[28px]">{t("room.title")}</h1>
       <div className="rounded-2xl panel p-4 text-center">
         <div className="text-xs text-[var(--ink-2)]">{t("room.code")}</div>
-        <div className="led text-[44px] tracking-[0.3em]">{room.code}</div>
+        <div className="led text-[44px] tracking-[0.3em]" data-testid="room-code">{room.code}</div>
         <div className={`mt-1 text-xs ${room.connected ? "text-emerald-300" : "text-amber-300"}`}>{room.connected ? "" : room.info ? t("room.offline") : t("room.connecting")}</div>
       </div>
       <div className="rounded-2xl panel p-4">

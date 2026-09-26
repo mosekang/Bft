@@ -8,7 +8,7 @@ import { autoMerge, grantCard, ownedIds, sellCard } from "./cards.js";
 import { advanceWave, buildCarousel, carouselDone, currentWave } from "./carousel.js";
 import { SCHEDULE } from "../config/schedule.js";
 import { hpGold, rerollCostFor, xpCost } from "./economy.js";
-import { applyInstantSpecial, isInstantSpecial, spendFreeReroll } from "./specials.js";
+import { applyInstantSpecial, isInstantSpecial, spendFreeBuy, spendFreeReroll } from "./specials.js";
 import { computeEffects } from "./effects.js";
 import { tradeOffers } from "./events.js";
 import { equipItem, giveItems } from "./items.js";
@@ -179,13 +179,19 @@ function applyActionInner(state: GameState, playerId: string, action: Action, ct
       if (choice.kind === "ITEM") {
         const item = choice.options[action.idx];
         if (!item) return err("INVALID_SLOT", "bad option");
-        if (isInstantSpecial(item)) return logged(set(applyInstantSpecial(state, playerId, item, ctx), playerId, { choice: undefined }));
+        // Clear the reward choice first: an instant special may open a follow-up choice (RELOCATION).
+        if (isInstantSpecial(item)) return logged(applyInstantSpecial(set(state, playerId, { choice: undefined }), playerId, item, ctx));
         return logged(set(state, playerId, { itemsUnequipped: [...p.itemsUnequipped, item], choice: undefined }));
       }
       if (choice.kind === "CARD") {
         const defId = choice.options[action.idx];
         if (!defId) return err("INVALID_SLOT", "bad option");
         return logged(grantChosenCard(makeBenchRoom(state, playerId, ctx), playerId, defId, choice.star, ctx, eff.copiesPerStar));
+      }
+      if (choice.kind === "STADIUM") {
+        const stadium = choice.options[action.idx];
+        if (!stadium) return err("INVALID_SLOT", "bad option");
+        return logged(set(state, playerId, { stadium, choice: undefined }));
       }
       return err("BAD_PHASE", "use TRADE");
     }
@@ -225,13 +231,15 @@ function applyActionInner(state: GameState, playerId: string, action: Action, ct
       if (!defId) return err("INVALID_SLOT", "empty shop slot");
       const def = ctx.defs.get(defId);
       if (!def) return err("INVALID_CARD", "unknown card");
-      if (p.gold < def.cost) return err("NOT_ENOUGH_GOLD", "not enough gold");
+      const freeBuy = (p.perks?.freeBuys ?? 0) > 0;
+      if (!freeBuy && p.gold < def.cost) return err("NOT_ENOUGH_GOLD", "not enough gold");
       const eff = runEffects(state, p, ctx);
       const g = grantCard(state, playerId, defId, ctx, { fromPool: false, copiesPerStar: eff.copiesPerStar });
       if (!g.ok) return err("BENCH_FULL", "bench is full");
       let s = g.state;
-      const np = s.players.find((x) => x.id === playerId)!;
-      s = set(s, playerId, { gold: np.gold - def.cost, shop: np.shop.map((x, i) => (i === action.slot ? null : x)) });
+      const spent = spendFreeBuy(s.players.find((x) => x.id === playerId)!);
+      const np = spent.p;
+      s = set(s, playerId, { gold: np.gold - (spent.free ? 0 : def.cost), shop: np.shop.map((x, i) => (i === action.slot ? null : x)), ...(np.perks ? { perks: np.perks } : {}) });
       s = set(s, playerId, addXp(s.players.find((x) => x.id === playerId)!, 0));
       return logged(s);
     }

@@ -19,10 +19,10 @@ test("two devices play a friend room and reconnect after reload", async ({ brows
   const guest = await newDevice(browser, "손님");
   await host.getByRole("button", { name: "친구방 만들기" }).click();
   await expect(host.getByText("방 코드")).toBeVisible();
-  const code = (await host.locator("div.font-mono.text-4xl").innerText()).trim();
+  const code = (await host.getByTestId("room-code").innerText()).trim();
   expect(code).toMatch(/^[A-Z0-9]{6}$/);
 
-  await guest.getByPlaceholder("방 코드 6자").fill(code);
+  await guest.getByLabel("방 코드 6자").fill(code);
   await guest.getByRole("button", { name: "코드로 입장" }).click();
   await expect(guest.getByText("방 코드")).toBeVisible();
   await expect(host.getByText("손님")).toBeVisible();
@@ -45,7 +45,7 @@ test("two devices play a friend room and reconnect after reload", async ({ brows
 
   // Reconnect: reload the guest mid-run; it must land back in the same run.
   await guest.reload();
-  await guest.getByPlaceholder("방 코드 6자").fill(code);
+  await guest.getByLabel("방 코드 6자").fill(code);
   await guest.getByRole("button", { name: "코드로 입장" }).click();
   await expect(guest.getByText(/S1-[12]/)).toBeVisible({ timeout: 20_000 });
 });

@@ -138,6 +138,7 @@
   "synergy.kind.BOARD": "보드 시너지 (카드 태그 없이 구단·포지션·팔 각도·타순으로 계산)",
   "perk.freeRerolls": "무료 리롤 {n}회",
   "perk.cheerRounds": "응원가 {n}경기",
+  "perk.freeBuys": "FA 계약서: 무료 구매 {n}회",
   "perk.scoutRounds": "스카우트 리포트: 다음 상대 보드 공개",
   "settle.bonus": "철학 보너스",
   "item.use.INSTANT": "즉시 사용",

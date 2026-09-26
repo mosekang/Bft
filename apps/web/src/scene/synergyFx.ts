@@ -22,6 +22,11 @@ export const SYNERGY_FX: Partial<Record<SynergyId, { color: string; kind: AuraKi
   LEFTY_BAT: { color: "#22d3ee", kind: "ring" },
   RIGHTY_BAT: { color: "#f472b6", kind: "ring" },
   HS_PROSPECT: { color: "#86efac", kind: "ring" },
+  // v3 §18.3 board synergies (derived from card facts, not tags).
+  UTILITY: { color: "#cbd5e1", kind: "ring" },
+  SIDEARM: { color: "#38bdf8", kind: "spin" },
+  SWITCH_HITTER: { color: "#e879f9", kind: "ring" },
+  BACKUP_CATCHER: { color: "#bae6fd", kind: "glow" },
 };
 
 /** Sleeve patches for the quieter origins (§18.1). */
@@ -64,7 +69,10 @@ export function visualTags(def: CardDef): SynergyId[] {
   if (def.role === "H") {
     if (def.bats === "L" || def.bats === "S") tags.push("LEFTY_BAT");
     if (def.bats === "R" || def.bats === "S") tags.push("RIGHTY_BAT");
-  }
+    if (def.bats === "S") tags.push("SWITCH_HITTER");
+    if (def.pos2.length >= 2) tags.push("UTILITY");
+    if (def.classes.includes("CATCHER")) tags.push("BACKUP_CATCHER");
+  } else if (def.pitcher && def.pitcher.armAngle <= 30) tags.push("SIDEARM");
   return tags;
 }
 

@@ -110,3 +110,15 @@ v3 사양 §18.3의 콘텐츠(보드 시너지 6, 특수 아이템 6, 감독 철
 - `pnpm typecheck`: 7개 워크스페이스 통과.
 - `pnpm test`(vitest): 20 파일 / 245 테스트 통과. 새 `packages/engine/test/expansion.test.ts` 26개(시너지 문턱·효과 방향, 특수 아이템 사용 방식, 철학 효과, 새 콘텐츠를 모두 켠 봇 런의 결정론).
 - 골든 스냅샷(`run.test.ts`, 시드 12345)은 두 번 의도적으로 갱신했다: 콘텐츠 커밋(철학 풀이 늘어 시드 오퍼가 바뀜), 밸런스 커밋(위 수치 변경).
+
+## Addendum — v2 special items implemented (after merge)
+
+The four v2 specials now work (§8.3): RELOCATION opens a `STADIUM` choice
+(bots pick the first), FA_CONTRACT grants one free shop purchase
+(`perks.freeBuys`), CALL_UP adds two bench slots, NUMBER_SUCCESSION raises
+the target card one star on EQUIP (not on ★★★) and is consumed. The web
+shows perk chips, FREE prices, the stadium re-pick and the income bonus.
+Re-run `pnpm cli bot-arena --games 1000 --seed adr10`: **12/12 OK**
+(avgRounds 25.99, strongTeamWinRate 0.679, drawRate 0.046, runs 4.80,
+top5 0.241, min synergy share 0.049, archetype spread 1.27, stadium spread
+0.65, 5-cost ★★ 0.42, eliminated before S3 0.000, replacement slots 3.84).
