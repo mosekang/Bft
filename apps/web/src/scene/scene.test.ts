@@ -66,3 +66,15 @@ describe("park layout (§15.2)", () => {
     for (const s of SLOTS) expect(BOARD_SPOTS[s]).toBeDefined();
   });
 });
+
+describe("scoreboard text", () => {
+  it("localises cinematic board codes", async () => {
+    const { boardText } = await import("./MatchStage.js");
+    expect(boardText("HOME RUN")).toBe("홈런!");
+    expect(boardText("INNING 5T")).toBe("5회초");
+    expect(boardText("INNING 9B")).toBe("9회말");
+    expect(boardText("INN 3-5 NO RUNS")).toBe("3~5회 무득점");
+    expect(boardText("INN 4 AWAY 1 HOME 0")).toBe("4회 1 : 0");
+    expect(boardText("DRAW")).toBe("무승부");
+  });
+});

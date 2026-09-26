@@ -86,9 +86,10 @@ export function decalMaterial(opts: { ghost?: boolean } = {}): THREE.MeshBasicMa
     sh.vertexShader = sh.vertexShader
       .replace("#include <common>", "#include <common>\nattribute float aCell;\nvarying vec2 vCellUv;")
       .replace("#include <uv_vertex>", "#include <uv_vertex>\nvCellUv = (uv + vec2(mod(aCell, 10.0), 9.0 - floor(aCell / 10.0))) / 10.0;");
+    // Includes are expanded after onBeforeCompile, so replace the whole chunk.
     sh.fragmentShader = sh.fragmentShader
       .replace("#include <common>", "#include <common>\nvarying vec2 vCellUv;")
-      .replace("vec4 sampledDiffuseColor = texture2D( map, vMapUv );", "vec4 sampledDiffuseColor = texture2D( map, vCellUv );");
+      .replace("#include <map_fragment>", "#ifdef USE_MAP\n  diffuseColor *= texture2D( map, vCellUv );\n#endif");
   };
   return m;
 }

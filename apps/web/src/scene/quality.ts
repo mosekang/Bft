@@ -43,3 +43,8 @@ export function tierFromFps(avg: number, current: Quality): Quality {
 
 export const PARTICLE_SCALE: Record<Quality, number> = { high: 1, mid: 0.5, low: 0.25 };
 export const TARGET_FPS: Record<Quality, number> = { high: 60, mid: 60, low: 30 };
+
+/** Tier chosen on the run screen, reused by the playback stage. */
+let current: Quality | null = null;
+export const setCurrentQuality = (q: Quality): void => { current = q; };
+export const currentQuality = (): Quality | null => current;

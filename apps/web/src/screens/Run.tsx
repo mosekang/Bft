@@ -6,7 +6,7 @@ import { Bench } from "../components/Bench.js";
 import { Suspense, lazy, useEffect } from "react";
 import { Board } from "../components/Board.js";
 import { haptic } from "../audio/index.js";
-import { initialQuality, qualityForced, tierFromFps, type Quality } from "../scene/quality.js";
+import { initialQuality, qualityForced, setCurrentQuality, tierFromFps, type Quality } from "../scene/quality.js";
 const BoardStage = lazy(() => import("../scene/BoardStage.js"));
 import { Button } from "../components/Button.js";
 import { CardSheet } from "../components/CardSheet.js";
@@ -48,6 +48,7 @@ export function Run() {
   const qualitySetting = useSession((s) => s.settings.quality);
   const [quality, setQuality] = useState<Quality>(() => initialQuality(qualitySetting));
   useEffect(() => { setQuality(initialQuality(qualitySetting)); }, [qualitySetting]);
+  useEffect(() => { setCurrentQuality(quality); }, [quality]);
   const onFps = qualitySetting === "auto" && !qualityForced() ? (fps: number) => setQuality((q) => tierFromFps(fps, q)) : undefined;
   const [holo, setHolo] = useState<string | null>(null);
   useEffect(() => { if (!holo) return; const id = window.setTimeout(() => setHolo(null), 3000); return () => window.clearTimeout(id); }, [holo]);

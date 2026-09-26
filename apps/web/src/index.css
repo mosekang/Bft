@@ -132,3 +132,12 @@ button, input { touch-action: manipulation; font-family: inherit; }
 }
 
 canvas { touch-action: none; display: block; }
+
+/* Screen effects for playback (§17.1): flash 100 ms, damage vignette, boo tint. */
+.screenfx { z-index: 30; }
+.screenfx--flash { background: #fff; animation: fx-flash 160ms ease-out forwards; }
+.screenfx--vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(220, 38, 38, 0.55) 100%); animation: fx-fade 420ms ease-out forwards; }
+.screenfx--boo { background: rgba(185, 28, 28, 0.22); animation: fx-fade 320ms ease-out forwards; }
+@keyframes fx-flash { from { opacity: 0.85; } to { opacity: 0; } }
+@keyframes fx-fade { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .screenfx--flash { display: none; } }

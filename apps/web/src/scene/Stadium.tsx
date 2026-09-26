@@ -6,6 +6,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { StadiumId } from "@dugout/protocol";
 import { hashSeed } from "@dugout/engine";
 import { BOARD_H, BOARD_W, drawScoreboard, type BoardData } from "./scoreboard.js";
@@ -221,8 +222,12 @@ function Crowd({ dims, density, quality, colors }: { dims: ParkDims; density: nu
   const max = quality === "high" ? 2200 : 1300;
   const spots = useMemo(() => seatSpots(dims, max), [dims, max]);
   const meshes = useMemo(() => {
-    const body = quality === "high" ? new THREE.CapsuleGeometry(0.22, 0.4, 2, 6) : new THREE.PlaneGeometry(0.55, 0.95);
-    body.translate(0, 0.45, 0);
+    // A seated fan: capsule torso + head (one merged geometry, one draw call).
+    const torso = new THREE.CapsuleGeometry(0.24, 0.32, 2, quality === "high" ? 8 : 5);
+    torso.translate(0, 0.42, 0);
+    const head = new THREE.SphereGeometry(0.17, quality === "high" ? 8 : 6, 5);
+    head.translate(0, 0.98, 0);
+    const body = mergeGeometries([torso.toNonIndexed(), head.toNonIndexed()])!;
     const people = new THREE.InstancedMesh(body, crowdMaterial(), max);
     const stickGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.75, 5);
     stickGeo.rotateZ(0.35);
