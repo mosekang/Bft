@@ -1,0 +1,31 @@
+{
+  "name": "dugout-tactics",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Dugout Tactics — a baseball auto-battler (TFT rules, baseball sim). Mobile web PWA, offline, no server.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @dugout/web dev",
+    "build": "pnpm -r --filter './packages/**' build && pnpm --filter @dugout/web build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "cli": "pnpm --filter @dugout/cli start",
+    "clean": "pnpm -r exec rm -rf dist coverage node_modules/.vite"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "typescript": "~5.9.0",
+    "vitest": "^4.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@dugout/cli",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CLI for Dugout Tactics: single-game simulation and bot-arena balance reports.",
+  "type": "module",
+  "bin": {
+    "dugout": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dugout/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0"
+  }
+}

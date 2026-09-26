@@ -1,0 +1,62 @@
+export type Command = "sim-game" | "bot-arena" | "help";
+
+export interface CliOptions {
+  readonly command: Command;
+  readonly seed: string;
+  readonly games: number;
+  readonly json: boolean;
+}
+
+export const DEFAULT_OPTIONS: CliOptions = {
+  command: "help",
+  seed: "dev",
+  games: 1000,
+  json: false,
+};
+
+/** Tiny argv parser: `dugout <command> [--seed X] [--games N] [--json]`. */
+export function parseArgs(argv: readonly string[]): CliOptions {
+  let opts: CliOptions = DEFAULT_OPTIONS;
+  const rest = [...argv];
+  const first = rest.shift();
+  if (first === "sim-game" || first === "bot-arena" || first === "help") {
+    opts = { ...opts, command: first };
+  } else if (first !== undefined && !first.startsWith("--")) {
+    throw new Error(`Unknown command: ${first}`);
+  } else if (first !== undefined) {
+    rest.unshift(first);
+  }
+
+  while (rest.length > 0) {
+    const flag = rest.shift() as string;
+    if (flag === "--") continue; // pnpm/npm pass-through separator
+    switch (flag) {
+      case "--seed": {
+        const v = rest.shift();
+        if (v === undefined) throw new Error("--seed requires a value");
+        opts = { ...opts, seed: v };
+        break;
+      }
+      case "--games": {
+        const v = Number(rest.shift());
+        if (!Number.isInteger(v) || v <= 0) throw new Error("--games requires a positive integer");
+        opts = { ...opts, games: v };
+        break;
+      }
+      case "--json":
+        opts = { ...opts, json: true };
+        break;
+      default:
+        throw new Error(`Unknown flag: ${flag}`);
+    }
+  }
+  return opts;
+}
+
+export const HELP = `dugout — Dugout Tactics CLI
+
+Usage:
+  dugout sim-game  --seed <seed> [--json]      Simulate one game and print the box score (Phase 1)
+  dugout bot-arena --games <n> --seed <seed>   Run n bot-vs-bot tournaments and print the balance report (Phase 2)
+  dugout help
+`;
