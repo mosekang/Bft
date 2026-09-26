@@ -130,3 +130,5 @@ button, input { touch-action: manipulation; font-family: inherit; }
   .pop, .sparkle, .rise, .lights, .hp--low > i { animation: none !important; }
   * { transition-duration: 0ms !important; }
 }
+
+canvas { touch-action: none; display: block; }

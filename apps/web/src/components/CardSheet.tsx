@@ -1,7 +1,7 @@
 import type { CardDef, CardInstance, ItemId } from "@dugout/protocol";
 import { ITEM_BY_ID, STAR_BONUS, nicknameAtStar, createRng } from "@dugout/engine";
 import { Button } from "./Button.js";
-import { CardTile } from "./CardTile.js";
+import { Avatar } from "../lib/avatar.js";
 import { displayBars, handLabel, stars, tagLabels } from "../lib/format.js";
 import { ovrOf, teamName } from "../lib/pack.js";
 import { t } from "../i18n/index.js";
@@ -28,7 +28,7 @@ export function CardSheet({ def, card, inventory = [], sellValue, onSell, onEqui
       <div className="panel rise max-h-[82vh] w-full overflow-y-auto rounded-t-3xl p-4 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
         <div className="flex items-start justify-between gap-3">
-          <div className="w-[76px] shrink-0"><CardTile def={def} card={card} /></div>
+          <div className="shrink-0 rounded-2xl bg-gradient-to-b from-[#f7f3e8] to-[#e9e2d0] p-1 shadow-lg"><Avatar def={def} size={88} /></div>
           <div className="min-w-0 flex-1">
             <div className="display text-[22px] leading-tight">{def.name} {card && card.star > 1 && <span className="text-[var(--gold)]">{stars(card.star)}</span>}</div>
             <div className="text-sm text-[var(--ink-2)]">“{nick}”</div>

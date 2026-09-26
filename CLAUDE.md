@@ -78,3 +78,7 @@ pnpm --filter @dugout/server dev:cf        # wrangler dev (Cloudflare)
 - 미해결 결정: 무승부 비율(ADR-0002 #6), 5코스트 ★★ 달성률(ADR-0003), 실기기 검증(§17 Phase 3·4의 실기기 항목은 Playwright로 대체).
 - 후속(범위 밖): Capacitor 패키징, 랭크, 시즌 팩 교체, 관전 모드, 클라이언트 예측(ADR-0005 #10).
 - 런 루프 사용법: `createContext(pack)` → `createRun(ctx, {seed, players})` → 사람 입력은 `applyAction(state, playerId, action, ctx)` → 항상 `advance(state, ctx, bots)`로 봇과 페이즈를 진행 → `waitingOn(state, playerId)`로 UI가 기다릴 것을 안다.
+
+## 3D 보드 / 캐릭터 (ADR 0008)
+- 보드: `apps/web/src/components/Board3D.tsx` (three + @react-three/fiber@8 + drei@9, lazy 로드). 슬롯마다 `button[data-slot]` HTML 라벨이 있어 e2e는 `[aria-label='라인업'] button[data-slot]`로 조작한다.
+- 초상: `apps/web/src/lib/avatar.tsx` — 카드 id 해시 기반 SVG. 외부 이미지 자산 금지.

@@ -3,7 +3,8 @@ import type { Location, PlayerState, Slot } from "@dugout/protocol";
 import { computeEffects, rerollCost as rerollCostOf, xpCost as xpCostOf, sellValue, ownedIds } from "@dugout/engine";
 import { useMemo, useState } from "react";
 import { Bench } from "../components/Bench.js";
-import { Board } from "../components/Board.js";
+import { Suspense, lazy } from "react";
+const Board3D = lazy(() => import("../components/Board3D.js").then((m) => ({ default: m.Board3D })));
 import { Button } from "../components/Button.js";
 import { CardSheet } from "../components/CardSheet.js";
 import { OpponentsBar } from "../components/OpponentsBar.js";
@@ -41,8 +42,10 @@ export function Run() {
   const interactive = state.phase === "PREP" && !me.ready && !busy;
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }));
 
+  const buzz = (ms: number) => { if (useSession.getState().settings.vibration && typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(ms); };
   const onTap = (loc: Location) => {
     if (!interactive && !(state.phase === "EVENT" || state.phase === "AUGMENT" || state.phase === "CAROUSEL")) return;
+    buzz(10);
     // Force-pitch toggle when tapping an occupied pitcher slot twice.
     if (selected && selected.kind === "slot" && loc.kind === "slot" && selected.slot === loc.slot) {
       if (loc.slot.startsWith("P") && me.board.slots[loc.slot]) void dispatch({ type: "SET_TOGGLE", slot: loc.slot as "P1", forcePitch: !me.board.forcePitch[loc.slot as "P1"] });
@@ -58,8 +61,25 @@ export function Run() {
     select(null);
   };
   const onDragEnd = (e: DragEndEvent) => {
-    if (!e.over || e.over.id === e.active.id) return;
-    void dispatch({ type: "MOVE", from: parseLoc(String(e.active.id)), to: parseLoc(String(e.over.id)) });
+    const from = parseLoc(String(e.active.id));
+    let to: Location | null = e.over && e.over.id !== e.active.id ? parseLoc(String(e.over.id)) : null;
+    if (!to) {
+      // Dropped over the 3D board: hit-test the pointer against the slot labels.
+      const rect = e.active.rect.current.translated;
+      if (rect) {
+        const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+        let best: { slot: Slot; d: number } | null = null;
+        document.querySelectorAll<HTMLElement>("[aria-label='" + t("run.board") + "'] button[data-slot]").forEach((el) => {
+          const r = el.getBoundingClientRect();
+          const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy);
+          if (d < 56 && (!best || d < best.d)) best = { slot: el.dataset.slot as Slot, d };
+        });
+        if (best) to = { kind: "slot", slot: (best as { slot: Slot }).slot };
+      }
+    }
+    if (!to) return;
+    buzz(12);
+    void dispatch({ type: "MOVE", from, to });
     select(null);
   };
   const sheetInstance = sheetCard ? state.cards[sheetCard] : undefined;
@@ -74,8 +94,12 @@ export function Run() {
       <OpponentsBar state={state} onPick={setPeek} />
       <SynergyPanel statuses={effects.run.synergies} />
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pb-1">
-          <Board state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} />
+        <div className="flex min-h-0 flex-1 flex-col gap-1 pb-1">
+          <div className="min-h-[300px] flex-1">
+            <Suspense fallback={<div className="field mx-2 h-full min-h-[300px] animate-pulse rounded-2xl" />}>
+              <Board3D state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} onMove={(from, to) => { void dispatch({ type: "MOVE", from, to }); select(null); }} />
+            </Suspense>
+          </div>
           <div className="flex items-center justify-end gap-3 px-3 text-[10px] leading-none text-[var(--ink-3)]">
             <button type="button" className="underline" onClick={() => setOrderOpen(true)}>타순 편집</button>
             <button type="button" className="underline" onClick={autoSort} disabled={!interactive}>{t("run.autoSort")}</button>

@@ -2,6 +2,7 @@ import type { CardDef, CardInstance } from "@dugout/protocol";
 import { cardOvrWithStar, shortName } from "../lib/format.js";
 import { teamColor } from "../lib/pack.js";
 import { t } from "../i18n/index.js";
+import { Avatar } from "../lib/avatar.js";
 
 interface Props {
   def: CardDef;
@@ -35,12 +36,9 @@ export function CardTile({ def, card, size = "md", selected, dim, badge, onClick
         <span>{def.role === "H" ? def.pos : def.role}</span>
         <span className="num text-[11px] opacity-90">#{number}</span>
       </div>
-      <svg viewBox="0 0 60 40" className="absolute left-1/2 top-[15px] h-[calc(100%-31px)] w-full -translate-x-1/2" aria-hidden>
-        <ellipse cx="30" cy="42" rx="26" ry="4" fill="rgba(0,0,0,0.08)" />
-        <circle cx="30" cy="11" r="7" fill={color} opacity="0.85" />
-        <path d="M14 40c1-11 8-17 16-17s15 6 16 17z" fill={color} opacity="0.85" />
-        <text x="30" y="36" textAnchor="middle" fontSize="10" fontFamily="Bebas Neue, sans-serif" fill="rgba(255,255,255,0.85)">{number}</text>
-      </svg>
+      <div className="absolute inset-x-0 top-[15px] flex justify-center" style={{ height: "calc(100% - 31px)" }}>
+        <Avatar def={def} size={size === "sm" ? 40 : 52} className="h-full w-auto" />
+      </div>
       <div className="bcard__ovr">{cardOvrWithStar(def, card)}</div>
       {card && card.star > 1 && <div className="bcard__stars">{"★".repeat(card.star)}</div>}
       {card && card.items.length > 0 && <div className="bcard__items">{card.items.map((_, i) => <i key={i} className="bcard__item" />)}</div>}
