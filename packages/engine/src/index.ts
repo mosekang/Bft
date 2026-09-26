@@ -3,4 +3,7 @@ export * from "./rng.js";
 export * from "./ratings.js";
 export * from "./nicknames.js";
 export * from "./sim/index.js";
+export * from "./run/index.js";
+export * from "./bots/index.js";
+export * from "./arena.js";
 export * from "./version.js";

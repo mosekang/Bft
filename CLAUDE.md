@@ -23,7 +23,7 @@ TFT의 룰로 하는 야구 오토배틀러. 모바일 웹(PWA) 우선, 솔로 +
 apps/web            Vite + React 18 + TS + Tailwind 4 + PWA. zustand, Dexie, dnd-kit. (Phase 3)
 apps/server         Cloudflare Workers + Durable Objects + D1. DO 의존 코드는 src/adapter/에 격리. (Phase 4, 아직 없음)
 packages/protocol   zod 스키마 + 타입. 팩(CardDef/Pack), 상태(GameState…), 메시지(Action/ServerMessage). 의존성 없음(zod만).
-packages/engine     순수 TS. config/(사양 수치) · rng · ratings(표시치·OVR) · nicknames · (P1) sim/ · (P2) run/, bots/, replay/
+packages/engine     순수 TS. config/(사양 수치) · rng · ratings(표시치·OVR) · nicknames · sim/(경기) · run/(런 규칙, applyAction, advance) · bots/ · arena.ts(bot-arena)
 packages/packs      가상 팩 생성기·검증기·(P5) CSV 변환기. fictional-v1.json 커밋본.
 packages/cli        sim-game · bot-arena · replay
 docs/DESIGN.md      사양서 v2 원문. docs/ADR/ 결정 기록.
@@ -69,6 +69,7 @@ pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (Phase 2)
 ## 6. 현재 상태
 
 - 사용자가 **전체 Phase를 자동 승인**했다(2026-09-26). 각 Phase는 완료 기준 증거를 ADR에 남기고 커밋한다.
-- Phase 0 완료(ADR-0001). Phase 1 완료(ADR-0002): `engine/sim/*`, `sim-game` CLI.
-- 진행 중: Phase 2 (런 규칙·시너지·아이템·철학·봇·`applyAction`·`bot-arena`).
-- 미해결 결정: 무승부 비율(ADR-0002 #6).
+- Phase 0 완료(ADR-0001). Phase 1 완료(ADR-0002): `engine/sim/*`, `sim-game` CLI. Phase 2 완료(ADR-0003): `engine/run/*`, `bots/`, `arena.ts`, `bot-arena` CLI. 1000판 지표 10/12 OK.
+- 진행 중: Phase 3 (web 솔로: 로비·구장·런·경기·결과·자동 저장·Worker·PWA).
+- 미해결 결정: 무승부 비율(ADR-0002 #6), 5코스트 ★★ 달성률(ADR-0003).
+- 런 루프 사용법: `createContext(pack)` → `createRun(ctx, {seed, players})` → 사람 입력은 `applyAction(state, playerId, action, ctx)` → 항상 `advance(state, ctx, bots)`로 봇과 페이즈를 진행 → `waitingOn(state, playerId)`로 UI가 기다릴 것을 안다.

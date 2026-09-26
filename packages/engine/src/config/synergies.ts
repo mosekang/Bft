@@ -25,8 +25,9 @@ export interface SynergyDef {
 export const SYNERGIES: Readonly<Record<SynergyId, SynergyDef>> = {
   HS_PROSPECT: {
     id: "HS_PROSPECT", kind: "ORIGIN", nameKo: "고졸 유망주", mode: "AT_LEAST", thresholds: [2, 4, 6],
-    tiers: [{ growthPerRound: 1, growthCap: 20 }, { growthPerRound: 2, growthCap: 20 }, { growthPerRound: 3, growthCap: 20 }],
-    descriptionsKo: ["매 라운드 종료 시 내부치 +1 (상한 +20)", "매 라운드 종료 시 내부치 +2 (상한 +20)", "매 라운드 종료 시 내부치 +3 (상한 +20)"],
+    /** Caps tuned by bot-arena (ADR-0003): a flat +20 at tier 1 made the prospect bot dominant. */
+    tiers: [{ growthPerRound: 1, growthCap: 6 }, { growthPerRound: 1, growthCap: 12 }, { growthPerRound: 2, growthCap: 20 }],
+    descriptionsKo: ["매 라운드 종료 시 내부치 +1 (상한 +6)", "매 라운드 종료 시 내부치 +1 (상한 +12)", "매 라운드 종료 시 내부치 +2 (상한 +20)"],
     minPackCards: 6,
   },
   COLLEGE: {

@@ -146,7 +146,7 @@ export const ARCHETYPES = [
 export const ArchetypeSchema = z.enum(ARCHETYPES);
 export type Archetype = z.infer<typeof ArchetypeSchema>;
 
-export const PhaseSchema = z.enum(["LOBBY", "PREP", "CAROUSEL", "AUGMENT", "EVENT", "PLAYBACK", "SETTLE", "GAME_OVER"]);
+export const PhaseSchema = z.enum(["LOBBY", "STADIUM", "PREP", "CAROUSEL", "AUGMENT", "EVENT", "PLAYBACK", "SETTLE", "GAME_OVER"]);
 export type Phase = z.infer<typeof PhaseSchema>;
 
 /** Game log event types (§6.5). */

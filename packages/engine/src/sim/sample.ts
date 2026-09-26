@@ -41,9 +41,10 @@ export function sampleRoster(pack: Pack, rng: Rng, level: number, opts: { star?:
     if (remaining <= 0) break;
     let idx = hitters.findIndex((c) => c.pos === pos);
     if (idx < 0) idx = hitters.findIndex((c) => c.pos2.includes(pos));
-    if (idx < 0 && pos === "DH") idx = 0;
+    if (idx < 0 && pos === "DH" && hitters.length > 0) idx = 0;
     if (idx < 0) continue;
-    const def = hitters.splice(idx, 1)[0]!;
+    const def = hitters.splice(idx, 1)[0];
+    if (!def) continue;
     add(def, pos);
     remaining--;
   }

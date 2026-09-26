@@ -24,7 +24,7 @@ export const LEAGUE = {
  * mid-run matchup lands on the §6.1 league rates. Mutable on purpose so the
  * calibration CLI can sweep it; production code never writes to it.
  */
-export const PIVOT = { hitter: 50, pitcher: 55 };
+export const PIVOT = { hitter: 57, pitcher: 55 };
 /** Kept for formulas that are neutral between the two populations. */
 export const RATING_PIVOT = 55;
 

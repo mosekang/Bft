@@ -175,7 +175,7 @@ describe("augments (§9) and bots (§11)", () => {
   });
   it("8 archetypes", () => {
     expect(Object.keys(ARCHETYPE_DEFS)).toHaveLength(8);
-    expect(ARCHETYPE_DEFS.REROLL.fixedLevel).toBe(6);
+    expect(ARCHETYPE_DEFS.REROLL.fixedLevel).toBe(7);
   });
 });
 

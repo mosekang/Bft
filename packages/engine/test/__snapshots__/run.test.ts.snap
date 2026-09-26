@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 1`] = `"LONG_BALL:2:9|SMALL_BALL:6:8|FOREIGN_RELIANT:7:9|PROSPECTS:3:9|DEFENSE_FIRST:5:9|ECON:1:9|COPYCAT:4:9|REROLL:8:8"`;
+
+exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 2`] = `"3002868852-3268001726-2863734258-3666118200"`;

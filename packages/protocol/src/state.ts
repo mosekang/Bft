@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   ArchetypeSchema,
   AugmentIdSchema,
+  ComponentItemIdSchema,
   EventTypeSchema,
   ItemIdSchema,
   PhaseSchema,
@@ -41,6 +42,13 @@ export const BoardSchema = z
   });
 export type Board = z.infer<typeof BoardSchema>;
 
+export const PlayerChoiceSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("ITEM"), options: z.array(ItemIdSchema).min(1).max(8) }),
+  z.object({ kind: z.literal("CARD"), options: z.array(z.string().min(1)).min(1).max(8), star: z.union([z.literal(1), z.literal(2)]) }),
+  z.object({ kind: z.literal("TRADE"), cardInstanceId: z.string().min(1), options: z.array(z.string().min(1)).length(3) }),
+]);
+export type PlayerChoice = z.infer<typeof PlayerChoiceSchema>;
+
 export const PlayerStateSchema = z.object({
   id: z.string().min(1),
   nickname: z.string().min(1).max(10),
@@ -64,6 +72,28 @@ export const PlayerStateSchema = z.object({
   lastOpponent: z.string().optional(),
   eliminatedAt: RoundCodeSchema.optional(),
   placement: z.number().int().min(1).max(8).optional(),
+  /** Three augments offered this round (AUGMENT phase), until picked. */
+  augmentOffer: z.array(AugmentIdSchema).length(3).optional(),
+  /** A pending pick: reward item, franchise card, special item, or trade offers. */
+  choice: PlayerChoiceSchema.optional(),
+  /** Trade-deadline swaps remaining during the 4-4 event. */
+  tradesLeft: z.number().int().min(0).optional(),
+  /** Whether this player has finished the current phase (READY). */
+  ready: z.boolean(),
+  /** Rerolls this round; seeds the shop stream deterministically. */
+  rerollCount: z.number().int().min(0),
+  /** Ordinal of the human's stadium pick etc. — true once picked. */
+  stadiumPicked: z.boolean(),
+  /** Rounds the player has taken no action (bot takeover after 2). */
+  idleRounds: z.number().int().min(0),
+  /** Extra bench capacity granted by CALL_UP. */
+  benchBonus: z.number().int().min(0),
+  /** Scouting: rotations of opponents revealed for the current round. */
+  scoutingActive: z.boolean(),
+  /** Round-end bookkeeping: result of the last game for streak/damage display. */
+  lastResult: z.enum(["W", "L", "D"]).optional(),
+  /** Income credited at the last settle, for the SETTLE animation. */
+  lastIncome: z.object({ base: z.number(), interest: z.number(), streak: z.number(), saveBonus: z.number(), total: z.number() }).optional(),
 });
 export type PlayerState = z.infer<typeof PlayerStateSchema>;
 
@@ -95,8 +125,28 @@ export const MatchupSchema = z.object({
   damage: z.record(z.string(), z.number().int().min(0)),
   /** Indices into `events`. */
   highlights: z.array(z.number().int().min(0)),
+  /** Display names for card instance / replacement ids in `events`. */
+  names: z.record(z.string(), z.string()).optional(),
+  /** "PVP" | "PVE_CAMP" | "ALL_STAR" | "LEGEND" | "GHOST" | "PLAYOFF" */
+  kind: z.string(),
+  /** Winner player id, or null for a draw. */
+  winner: z.string().nullable(),
+  /** For a best-of-3 final, the game number 1..3. */
+  game: z.number().int().min(1).optional(),
 });
 export type Matchup = z.infer<typeof MatchupSchema>;
+
+export const CarouselStateSchema = z.object({
+  cards: z.array(z.object({ defId: z.string().min(1), item: ComponentItemIdSchema.optional() })),
+  /** Player id that took each card, or null. */
+  taken: z.array(z.string().nullable()),
+  /** Pick order (player ids), lowest hp first. */
+  order: z.array(z.string()),
+  /** Index into `order` of the first player of the current wave. */
+  waveStart: z.number().int().min(0),
+  waveSize: z.number().int().min(1),
+});
+export type CarouselState = z.infer<typeof CarouselStateSchema>;
 
 export const GameStateSchema = z.object({
   /** Monotonic state version for PATCH ordering. */
@@ -113,5 +163,12 @@ export const GameStateSchema = z.object({
   cards: z.record(z.string(), CardInstanceSchema),
   matchups: z.array(MatchupSchema),
   log: z.array(ActionSchema),
+  /** 0-based index into the schedule. */
+  roundIndex: z.number().int().min(0),
+  /** Counter for deterministic card instance ids. */
+  nextInstanceId: z.number().int().min(0),
+  carousel: CarouselStateSchema.optional(),
+  /** Eliminated players' final boards serve as ghosts; kept in `players`. */
+  createdAt: z.number().int().min(0),
 });
 export type GameState = z.infer<typeof GameStateSchema>;

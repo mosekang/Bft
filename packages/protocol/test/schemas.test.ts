@@ -106,9 +106,10 @@ describe("messages", () => {
       { type: "SKIP_PLAYBACK" },
       { type: "EMOTE", id: 3 },
       { type: "PING" },
+      { type: "PICK_CHOICE", idx: 0 },
     ];
     for (const a of actions) expect(ActionSchema.parse(a)).toEqual(a);
-    expect(actions).toHaveLength(17);
+    expect(actions).toHaveLength(18);
   });
 
   it("rejects unknown actions and wrong protocol versions", () => {
@@ -137,13 +138,16 @@ describe("GameStateSchema", () => {
           id: "p1", nickname: "나", isBot: false, hp: 100, gold: 0, xp: 0, level: 3, winStreak: 0, loseStreak: 0,
           board: { slots: {}, forcePitch: { P1: false, P2: false, P3: false }, order: ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"] },
           bench: [null, null, null, null, null, null], shop: [null, null, null, null, null], shopLocked: false,
-          augments: [], stadium: "DOME", itemsUnequipped: [],
+          augments: [], stadium: "DOME", itemsUnequipped: [], ready: false, rerollCount: 0, stadiumPicked: false, idleRounds: 0, benchBonus: 0, scoutingActive: false,
         },
       ],
       pool: {},
       cards: {},
       matchups: [],
       log: [],
+      roundIndex: 0,
+      nextInstanceId: 0,
+      createdAt: 0,
     };
     expect(GameStateSchema.parse(state)).toEqual(state);
   });
