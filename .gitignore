@@ -23,3 +23,4 @@ apps/web/e2e/*.png
 apps/server/.wrangler/
 apps/web/dist-artifact/
 apps/web/dist-pages/
+.claude/worktrees/

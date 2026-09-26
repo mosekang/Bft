@@ -3,8 +3,11 @@ import type { Location, PlayerState, Slot } from "@dugout/protocol";
 import { computeEffects, rerollCost as rerollCostOf, xpCost as xpCostOf, sellValue, ownedIds } from "@dugout/engine";
 import { useMemo, useState } from "react";
 import { Bench } from "../components/Bench.js";
-import { Suspense, lazy } from "react";
-const Board3D = lazy(() => import("../components/Board3D.js").then((m) => ({ default: m.Board3D })));
+import { Suspense, lazy, useEffect } from "react";
+import { Board } from "../components/Board.js";
+import { haptic } from "../audio/index.js";
+import { initialQuality, qualityForced, tierFromFps, type Quality } from "../scene/quality.js";
+const BoardStage = lazy(() => import("../scene/BoardStage.js"));
 import { Button } from "../components/Button.js";
 import { CardSheet } from "../components/CardSheet.js";
 import { OpponentsBar } from "../components/OpponentsBar.js";
@@ -42,7 +45,13 @@ export function Run() {
   const interactive = state.phase === "PREP" && !me.ready && !busy;
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }));
 
-  const buzz = (ms: number) => { if (useSession.getState().settings.vibration && typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(ms); };
+  const qualitySetting = useSession((s) => s.settings.quality);
+  const [quality, setQuality] = useState<Quality>(() => initialQuality(qualitySetting));
+  useEffect(() => { setQuality(initialQuality(qualitySetting)); }, [qualitySetting]);
+  const onFps = qualitySetting === "auto" && !qualityForced() ? (fps: number) => setQuality((q) => tierFromFps(fps, q)) : undefined;
+  const [holo, setHolo] = useState<string | null>(null);
+  useEffect(() => { if (!holo) return; const id = window.setTimeout(() => setHolo(null), 3000); return () => window.clearTimeout(id); }, [holo]);
+  const buzz = (_ms: number) => haptic("light");
   const onTap = (loc: Location) => {
     if (!interactive && !(state.phase === "EVENT" || state.phase === "AUGMENT" || state.phase === "CAROUSEL")) return;
     buzz(10);
@@ -69,7 +78,7 @@ export function Run() {
       if (rect) {
         const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
         let best: { slot: Slot; d: number } | null = null;
-        document.querySelectorAll<HTMLElement>("[aria-label='" + t("run.board") + "'] button[data-slot]").forEach((el) => {
+        document.querySelectorAll<HTMLElement>("[aria-label='" + t("run.board") + "'] [data-slot]").forEach((el) => {
           const r = el.getBoundingClientRect();
           const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy);
           if (d < 56 && (!best || d < best.d)) best = { slot: el.dataset.slot as Slot, d };
@@ -91,13 +100,19 @@ export function Run() {
   return (
     <div className="flex h-full flex-col">
       <TopBar state={state} me={me} endsAt={room?.phaseEndsAt} />
-      <OpponentsBar state={state} onPick={setPeek} />
+      <OpponentsBar state={state} onPick={(id) => { if (quality !== "low" && holo !== id) setHolo(id); else { setHolo(null); setPeek(id); } }} />
       <SynergyPanel statuses={effects.run.synergies} />
       <DndContext sensors={sensors} onDragEnd={onDragEnd}>
         <div className="flex min-h-0 flex-1 flex-col gap-1 pb-1">
           <div className="min-h-[300px] flex-1">
             <Suspense fallback={<div className="field mx-2 h-full min-h-[300px] animate-pulse rounded-2xl" />}>
-              <Board3D state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} onMove={(from, to) => { void dispatch({ type: "MOVE", from, to }); select(null); }} />
+              {quality === "low" ? (
+                <div className="h-full overflow-y-auto"><Board state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} /></div>
+              ) : (
+                <BoardStage state={state} me={me} selected={selected} onTap={onTap} onOpen={openCard} interactive={interactive} quality={quality} {...(onFps ? { onFps } : {})}
+                  hologram={holo ? state.players.find((p) => p.id === holo) ?? null : null}
+                  onMove={(from, to) => { void dispatch({ type: "MOVE", from, to }); select(null); }} />
+              )}
             </Suspense>
           </div>
           <div className="flex items-center justify-end gap-3 px-3 text-[10px] leading-none text-[var(--ink-3)]">

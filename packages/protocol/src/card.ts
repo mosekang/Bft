@@ -118,6 +118,14 @@ export const PackTeamSchema = z.object({
   name: z.string().min(1),
   /** Hex colour for silhouettes / jersey numbers. */
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  /** Club nickname shown on uniforms (display only), e.g. "코메츠". */
+  nickname: z.string().min(1).max(12).optional(),
+  /** 2–4 letter wordmark for caps, helmets and the scoreboard. */
+  short: z.string().min(1).max(4).optional(),
+  /** Secondary uniform colour (piping, numbers). */
+  secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  /** Uniform pattern (display only). */
+  uniform: z.enum(["plain", "pinstripe", "sleeve", "sash"]).optional(),
 });
 export type PackTeam = z.infer<typeof PackTeamSchema>;
 

@@ -58,7 +58,7 @@ async function stepInner(page: Page): Promise<"done" | "progress"> {
     const benchCard = page.locator("[aria-label='벤치'] button[aria-label]").first();
     if (await benchCard.isVisible().catch(() => false)) {
       await benchCard.click(T);
-      const empty = page.locator("[aria-label='라인업'] button[data-slot]").filter({ hasText: "대체" }).first();
+      const empty = page.locator("[aria-label='라인업'] [data-slot]").filter({ hasText: "대체" }).first();
       if (await empty.isVisible().catch(() => false)) await empty.click(T);
     }
     if (await ready.isEnabled()) await ready.click(T);

@@ -31,7 +31,7 @@ function Slot({ slot, state, me, selected, onTap, onOpen, interactive }: Props &
   if (card && card.injuredRounds > 0) badge = `${t("run.injured")}${card.injuredRounds}`;
   else if (card && card.fatigue > 0) badge = `${t("run.tired")}${card.fatigue}`;
   return (
-    <div ref={dropRef} className={`relative ${isOver ? "rounded-xl ring-2 ring-[var(--ok)]" : ""}`}>
+    <div ref={dropRef} data-slot={slot} className={`relative ${isOver ? "rounded-xl ring-2 ring-[var(--ok)]" : ""}`}>
       <div ref={dragRef} style={style} {...(card && interactive ? { ...listeners, role: attributes.role, tabIndex: attributes.tabIndex } : {})} className={isDragging ? "opacity-70" : ""}>
         {def && card ? (
           <div className="relative">

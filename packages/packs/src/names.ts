@@ -24,17 +24,22 @@ export const FOREIGN_COUNTRIES = Object.keys(FOREIGN_SURNAMES);
 const INITIALS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "V", "W", "Y"] as const;
 
 /** Fictional clubs (§2). */
+/**
+ * Ten fictional city clubs in the KBO mould (city + nickname, bold two-colour
+ * uniforms). Names, wordmarks and colour pairs are invented: no real club
+ * name, emblem or trademark is used (DESIGN §2).
+ */
 export const FICTIONAL_TEAMS = [
-  { id: "seoul-a", name: "서울 A", color: "#c8102e" },
-  { id: "seoul-b", name: "서울 B", color: "#1d428a" },
-  { id: "incheon", name: "인천", color: "#e30613" },
-  { id: "suwon", name: "수원", color: "#0b3d91" },
-  { id: "daejeon", name: "대전", color: "#f26522" },
-  { id: "daegu", name: "대구", color: "#0d3b8c" },
-  { id: "gwangju", name: "광주", color: "#c70125" },
-  { id: "busan", name: "부산", color: "#0b5394" },
-  { id: "changwon", name: "창원", color: "#00a0b0" },
-  { id: "gocheok", name: "고척", color: "#7b1f2f" },
+  { id: "seoul-a", name: "서울 코메츠", nickname: "코메츠", short: "COM", color: "#c8102e", secondary: "#101820", uniform: "pinstripe" },
+  { id: "seoul-b", name: "서울 팔콘스", nickname: "팔콘스", short: "FAL", color: "#1d428a", secondary: "#e8e8e8", uniform: "pinstripe" },
+  { id: "incheon", name: "인천 하버스", nickname: "하버스", short: "HAR", color: "#e30613", secondary: "#f6c700", uniform: "plain" },
+  { id: "suwon", name: "수원 캐슬스", nickname: "캐슬스", short: "CAS", color: "#0b3d91", secondary: "#d7182a", uniform: "sash" },
+  { id: "daejeon", name: "대전 로켓츠", nickname: "로켓츠", short: "ROC", color: "#f26522", secondary: "#141414", uniform: "plain" },
+  { id: "daegu", name: "대구 블레이즈", nickname: "블레이즈", short: "BLZ", color: "#0d3b8c", secondary: "#f5f5f5", uniform: "sleeve" },
+  { id: "gwangju", name: "광주 피닉스", nickname: "피닉스", short: "PHX", color: "#c70125", secondary: "#1a1a1a", uniform: "plain" },
+  { id: "busan", name: "부산 오션스", nickname: "오션스", short: "OCN", color: "#0b5394", secondary: "#e31b23", uniform: "sleeve" },
+  { id: "changwon", name: "창원 매머드", nickname: "매머드", short: "MAM", color: "#00a0b0", secondary: "#b08d57", uniform: "plain" },
+  { id: "gocheok", name: "고척 메테오스", nickname: "메테오스", short: "MET", color: "#7b1f2f", secondary: "#c9a227", uniform: "sash" },
 ] as const;
 
 /** Stateful unique-name factory for one pack. */

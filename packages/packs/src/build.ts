@@ -168,7 +168,10 @@ export function buildPackFromCsv(hittersCsv: string, pitchersCsv: string, opts: 
     }
   }
 
-  const teamList = [...teams.entries()].map(([name, id], i) => ({ id, name, color: FICTIONAL_TEAMS[i % FICTIONAL_TEAMS.length]!.color }));
+  const teamList = [...teams.entries()].map(([name, id], i) => {
+    const look = FICTIONAL_TEAMS[i % FICTIONAL_TEAMS.length]!;
+    return { id, name, color: look.color, secondary: look.secondary, uniform: look.uniform };
+  });
   const pack: Pack = { formatVersion: 1, id: opts.id, name: opts.name, kind: "private", generatedBy: { tool: "@dugout/packs build", version: "1.0.0", seed: opts.seed ?? opts.id }, teams: teamList.length ? teamList : [{ id: "t1", name: "기타", color: "#64748b" }], cards };
   void PACK_COMPOSITION;
   return PackSchema.parse(pack);

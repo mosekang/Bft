@@ -23,7 +23,7 @@ function BenchSlot({ index, state, me, selected, onTap, onOpen, interactive }: P
   const { setNodeRef: dragRef, listeners, attributes, transform, isDragging } = useDraggable({ id: `bench:${index}`, disabled: !interactive || !card });
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 40 } : undefined;
   return (
-    <div ref={dropRef} className={isOver ? "rounded-xl ring-2 ring-[var(--ok)]" : ""}>
+    <div ref={dropRef} data-bench-index={index} className={isOver ? "rounded-xl ring-2 ring-[var(--ok)]" : ""}>
       <div ref={dragRef} style={style} {...(card && interactive ? { ...listeners, role: attributes.role, tabIndex: attributes.tabIndex } : {})} className={isDragging ? "opacity-70" : ""}>
         {def && card ? (
           <CardTile def={def} card={card} size="sm" selected={isSel} onClick={() => onTap({ kind: "bench", index })} onLongPress={() => onOpen(card.instanceId)} />
