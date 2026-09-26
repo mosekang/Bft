@@ -14,7 +14,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@dugout/engine": "workspace:*"
+    "@dugout/engine": "workspace:*",
+    "@dugout/packs": "workspace:*",
+    "@dugout/protocol": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.20.0"

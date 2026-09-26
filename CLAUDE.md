@@ -68,5 +68,7 @@ pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (Phase 2)
 
 ## 6. 현재 상태
 
-- **Phase 0 구현 완료, 설계 승인 대기.** protocol 스키마, engine config/rng/ratings/nicknames, packs 생성기·검증기·`fictional-v1.json`, cli·web 뼈대.
-- 다음: Phase 1 (engine 시뮬). 계획은 `docs/ADR/0001-phase0-decisions.md` 끝의 "Phase 1 계획" 참조.
+- 사용자가 **전체 Phase를 자동 승인**했다(2026-09-26). 각 Phase는 완료 기준 증거를 ADR에 남기고 커밋한다.
+- Phase 0 완료(ADR-0001). Phase 1 완료(ADR-0002): `engine/sim/*`, `sim-game` CLI.
+- 진행 중: Phase 2 (런 규칙·시너지·아이템·철학·봇·`applyAction`·`bot-arena`).
+- 미해결 결정: 무승부 비율(ADR-0002 #6).

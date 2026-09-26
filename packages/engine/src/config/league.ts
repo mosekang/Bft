@@ -17,7 +17,15 @@ export const LEAGUE = {
   probMax: 0.6,
 } as const;
 
-/** Rating pivot: `mult(r) = exp((r - PIVOT) * k)`. */
+/**
+ * Rating pivots: `mult(r) = exp((r - pivot) * k)`. §6.2 writes 55 for both;
+ * the split lets calibration centre each population (hitters share the
+ * lineup with 38-rated replacements, pitchers do not) so that a typical
+ * mid-run matchup lands on the §6.1 league rates. Mutable on purpose so the
+ * calibration CLI can sweep it; production code never writes to it.
+ */
+export const PIVOT = { hitter: 50, pitcher: 55 };
+/** Kept for formulas that are neutral between the two populations. */
 export const RATING_PIVOT = 55;
 
 /** `k` per rating (§6.2). Sign encodes direction. */
@@ -35,8 +43,17 @@ export const RATING_ADD = {
 } as const;
 
 /** Rating multiplier relative to league average. */
-export function ratingMult(rating: number, k: number): number {
-  return Math.exp((rating - RATING_PIVOT) * k);
+export function ratingMult(rating: number, k: number, pivot: number): number {
+  return Math.exp((rating - pivot) * k);
+}
+
+/**
+ * Per-type BABIP scaled so that the league batted-ball mix reproduces
+ * `LEAGUE.babip` (the raw §6.1 per-type values weight to .284, not .310).
+ */
+export function typeBabip(type: keyof typeof LEAGUE.babipByType): number {
+  const weighted = (Object.keys(LEAGUE.battedBall) as (keyof typeof LEAGUE.battedBall)[]).reduce((a, t) => a + LEAGUE.battedBall[t] * LEAGUE.babipByType[t], 0);
+  return LEAGUE.babipByType[type] * (LEAGUE.babip / weighted);
 }
 
 /** Plate-appearance resolution constants (§6.3). */
@@ -88,6 +105,13 @@ export const GAME = {
   maxInnings: 12,
   designatedHitter: true,
   maxEventsPerGame: 120,
+  /**
+   * Extra-inning environment: both sides use their best relievers and play
+   * for one run, so scoring per half drops (KBO extra innings are ~30 % less
+   * productive). Tuned so that ~35 % of games reaching the 10th end tied
+   * after the 12th, giving the §15.1 draw rate of 3–7 %.
+   */
+  extraInnings: { kMult: 1.25, bbMult: 0.85, hrMult: 0.7, babipAdd: -0.05 },
   highlightCount: 5,
   /** Performance budgets in ms. */
   budgetNodeMs: 30,

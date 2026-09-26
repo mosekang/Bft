@@ -8,11 +8,14 @@ describe("parseArgs", () => {
   });
 
   it("parses command and flags", () => {
-    expect(parseArgs(["bot-arena", "--games", "50", "--seed", "abc", "--json"])).toEqual({
+    expect(parseArgs(["bot-arena", "--games", "50", "--seed", "abc", "--json", "--level", "8"])).toEqual({
       command: "bot-arena",
       games: 50,
       seed: "abc",
       json: true,
+      level: 8,
+      stadium: "DOME",
+      pack: undefined,
     });
   });
 
@@ -42,12 +45,21 @@ describe("run", () => {
     expect(c.lines[0]).toMatch(/error/);
   });
 
-  it("stubs are deterministic per seed", () => {
+  it("sim-game is deterministic per seed and prints a box score", () => {
     const a = capture();
     const b = capture();
-    run(["sim-game", "--seed", "x"], a.out);
+    expect(run(["sim-game", "--seed", "x"], a.out)).toBe(0);
     run(["sim-game", "--seed", "x"], b.out);
     expect(a.lines).toEqual(b.lines);
+    expect(a.lines.join("\n")).toContain("하이라이트");
+    expect(run(["sim-game", "--seed", "x", "--stadium", "NOPE"], capture().out)).toBe(2);
     expect(run(["bot-arena", "--games", "3"], capture().out)).toBe(1);
+  });
+
+  it("sim-game aggregates many games", () => {
+    const c = capture();
+    expect(run(["sim-game", "--seed", "agg", "--games", "20", "--json"], c.out)).toBe(0);
+    const report = JSON.parse(c.lines.join("\n"));
+    expect(report.games).toBe(20);
   });
 });

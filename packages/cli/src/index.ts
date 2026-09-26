@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { ENGINE_VERSION, buildSchedule, createRng } from "@dugout/engine";
+import { ENGINE_VERSION, STADIUMS, buildSchedule } from "@dugout/engine";
+import { runSimGame } from "./simGame.js";
 import { HELP, parseArgs } from "./args.js";
 
 export function run(argv: readonly string[], out: (line: string) => void = console.log): number {
@@ -17,11 +18,11 @@ export function run(argv: readonly string[], out: (line: string) => void = conso
       out(HELP);
       return 0;
     case "sim-game": {
-      // Phase 1 will replace this with the real simulator.
-      const rng = createRng(opts.seed).fork("game");
-      out(`engine ${ENGINE_VERSION} · seed "${opts.seed}" · rng check ${rng.next().toFixed(6)}`);
-      out("sim-game: not implemented yet (Phase 1).");
-      return 1;
+      if (!(opts.stadium in STADIUMS)) {
+        out(`error: unknown stadium ${opts.stadium}. One of ${Object.keys(STADIUMS).join(", ")}`);
+        return 2;
+      }
+      return runSimGame({ seed: opts.seed, games: opts.games, level: opts.level, stadium: opts.stadium as keyof typeof STADIUMS, pack: opts.pack, json: opts.json }, out);
     }
     case "bot-arena": {
       // Phase 2 will replace this with the real arena.

@@ -5,13 +5,19 @@ export interface CliOptions {
   readonly seed: string;
   readonly games: number;
   readonly json: boolean;
+  readonly level: number;
+  readonly stadium: string;
+  readonly pack: string | undefined;
 }
 
 export const DEFAULT_OPTIONS: CliOptions = {
   command: "help",
   seed: "dev",
-  games: 1000,
+  games: 1,
   json: false,
+  level: 7,
+  stadium: "DOME",
+  pack: undefined,
 };
 
 /** Tiny argv parser: `dugout <command> [--seed X] [--games N] [--json]`. */
@@ -46,6 +52,24 @@ export function parseArgs(argv: readonly string[]): CliOptions {
       case "--json":
         opts = { ...opts, json: true };
         break;
+      case "--level": {
+        const v = Number(rest.shift());
+        if (!Number.isInteger(v) || v < 1 || v > 12) throw new Error("--level requires an integer 1..12");
+        opts = { ...opts, level: v };
+        break;
+      }
+      case "--stadium": {
+        const v = rest.shift();
+        if (v === undefined) throw new Error("--stadium requires a value");
+        opts = { ...opts, stadium: v };
+        break;
+      }
+      case "--pack": {
+        const v = rest.shift();
+        if (v === undefined) throw new Error("--pack requires a value");
+        opts = { ...opts, pack: v };
+        break;
+      }
       default:
         throw new Error(`Unknown flag: ${flag}`);
     }
@@ -56,7 +80,8 @@ export function parseArgs(argv: readonly string[]): CliOptions {
 export const HELP = `dugout — Dugout Tactics CLI
 
 Usage:
-  dugout sim-game  --seed <seed> [--json]      Simulate one game and print the box score (Phase 1)
+  dugout sim-game  --seed <seed> [--games N] [--level L] [--stadium ID] [--pack file] [--json]
+                   One game prints a box score; --games N prints aggregate stats.
   dugout bot-arena --games <n> --seed <seed>   Run n bot-vs-bot tournaments and print the balance report (Phase 2)
   dugout help
 `;
