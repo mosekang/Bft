@@ -59,9 +59,10 @@ async function step(page: Page): Promise<"done" | "progress"> {
 test("a full solo run completes on a phone viewport", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "덕아웃 택틱스" })).toBeVisible();
-  // Instant playback: cycle the settings button to "즉시".
-  const settings = page.getByRole("button", { name: /설정/ });
-  for (let i = 0; i < 3; i++) { if ((await settings.innerText()).includes("즉시")) break; await settings.click(); }
+  // Instant playback via the settings panel.
+  await page.getByRole("button", { name: "설정" }).click();
+  await page.getByRole("button", { name: "즉시" }).click();
+  await page.getByRole("button", { name: "닫기" }).click();
   await page.getByRole("button", { name: "새 게임" }).click();
   await expect(page.getByText("홈구장을 고르세요")).toBeVisible({ timeout: 30_000 });
   let rounds = 0;
