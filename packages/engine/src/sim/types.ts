@@ -79,6 +79,8 @@ export interface SimHitter {
   defEff: number;
   /** Display contact, used for automatic bunts. */
   contactDisplay: number;
+  /** Display power 1..99, presentation only (bat-crack strength, HR distance). */
+  powerDisplay?: number;
   mods: HitterMods;
   isReplacement: boolean;
 }

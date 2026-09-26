@@ -1,4 +1,4 @@
-import type { FieldPos, GameEvent } from "@dugout/protocol";
+import type { FieldPos, GameEvent, PlayMeta, RunnerMove, BbType, SwingKind } from "@dugout/protocol";
 import { GAME, RATING_PIVOT } from "../config/league.js";
 import { PITCHING } from "../config/fatigue.js";
 import { createRng, type Rng } from "../rng.js";
@@ -61,6 +61,8 @@ function fatigueSteps(u: PitcherUse): number {
 
 export function simulateGame(input: GameInput): GameOutput {
   const rng = createRng(input.seed, "game");
+  // Presentation-only stream: never feeds back into outcomes (swing looks etc.).
+  const fx = createRng(input.seed, "presentation");
   const regulation = input.regulationInnings ?? GAME.regulationInnings;
   const maxInnings = input.maxInnings ?? GAME.maxInnings;
   const events: GameEvent[] = [];
@@ -152,8 +154,10 @@ export function simulateGame(input: GameInput): GameOutput {
     def0.runsThisInning = 0;
     const meltdown = def0.runsPrevInning >= PITCHING.mental.meltdownRuns ? (100 - def0.p.r.mental) * PITCHING.mental.meltdownPerPoint : 0;
 
+    const scoredNow: string[] = [];
     const scoreRuns = (runners: SimHitter[], batter: SimHitter | null, rbi: boolean, u: PitcherUse) => {
       for (const r of runners) {
+        scoredNow.push(r.id);
         const wasLeading = score[idx(off.side)] > score[idx(def.side)];
         score[idx(off.side)]++;
         off.batting.get(r.id)!.r++;
@@ -176,8 +180,13 @@ export function simulateGame(input: GameInput): GameOutput {
       const pa = off.batting.get(batter.id)!;
       const paNo = (off.paCount.get(batter.id) ?? 0) + 1;
       off.paCount.set(batter.id, paNo);
-      const emit = (type: GameEvent["type"], meta: Record<string, unknown>, outsBefore = outs) =>
-        events.push({ inning, half, type, batter: batter.id, pitcher: pitcher.id, outs: outsBefore, runners: runnersBefore, scoreBefore, scoreAfter: [...score], meta: { batterName: batter.name, pitcherName: pitcher.name, ...meta } });
+      let basesBefore: Bases = [bases[0], bases[1], bases[2]];
+      let scoredIds: string[] = [];
+      let pitchesForMeta = 0;
+      const emit = (type: GameEvent["type"], meta: Record<string, unknown>, outsBefore = outs) => {
+        const play = playMeta(type, meta, basesBefore, bases, scoredIds, batter, pitcher, scoreBefore, inning, pitchesForMeta, fx, outs - outsBefore);
+        events.push({ inning, half, type, batter: batter.id, pitcher: pitcher.id, outs: outsBefore, runners: [...runnersBefore], scoreBefore, scoreAfter: [...score], meta: { batterName: batter.name, pitcherName: pitcher.name, ...meta, ...play } });
+      };
 
       // Stolen base attempt before the plate appearance.
       if (bases[0] && !bases[1]) {
@@ -198,8 +207,11 @@ export function simulateGame(input: GameInput): GameOutput {
           }
           runnersBefore[0] = !!bases[0];
           runnersBefore[1] = !!bases[1];
+          basesBefore = [bases[0], bases[1], bases[2]];
         }
       }
+      scoredNow.length = 0;
+      scoredIds = scoredNow;
 
       const risp = !!bases[1] || !!bases[2];
       const probs = paProbabilities({
@@ -210,6 +222,7 @@ export function simulateGame(input: GameInput): GameOutput {
 
       pa.pa++;
       let pitches = PITCHING.pitchesPerPa.base + rng.int(0, PITCHING.pitchesPerPa.randomMax);
+      pitchesForMeta = pitches;
 
       // Automatic bunt (SMALL_BALL): runner on first only, fewer than two outs, weak contact.
       const buntMax = Math.max(off.team.mods.buntEnabled ? off.team.mods.buntContactMax : 0, batter.mods.buntContactMax);
@@ -231,6 +244,7 @@ export function simulateGame(input: GameInput): GameOutput {
       const roll = rng.next();
       if (roll < probs.bb) {
         pitches += PITCHING.pitchesPerPa.walk;
+        pitchesForMeta = pitches;
         pa.bb++;
         u.line.bb++;
         const adv = forceAdvance(bases, batter, true);
@@ -239,6 +253,7 @@ export function simulateGame(input: GameInput): GameOutput {
         emit("BB", { runs: adv.scored.length });
       } else if (roll < probs.bb + probs.k) {
         pitches += PITCHING.pitchesPerPa.strikeout;
+        pitchesForMeta = pitches;
         pa.ab++;
         pa.k++;
         u.line.k++;
@@ -415,7 +430,7 @@ export function simulateGame(input: GameInput): GameOutput {
     winner,
     innings: inning,
     events,
-    highlights: pickHighlights(events),
+    highlights: markHighlights(events, pickHighlights(events)),
     home: box(home),
     away: box(away),
     mvp: pickMvp(home, away, winner),
@@ -425,6 +440,96 @@ export function simulateGame(input: GameInput): GameOutput {
     },
   };
   return output;
+}
+
+
+// ---------------------------------------------------------------------------
+// Presentation meta (§16.1)
+// ---------------------------------------------------------------------------
+
+const BB_OF: Record<string, BbType> = { GROUND: "GB", LINE: "LD", FLY: "FB", POPUP: "PU" };
+const BATTER_RUNS_OUT = new Set(["GO", "DP", "SH"]);
+
+/** Leverage before the play: (inning ≥ 7 ? 2 : 1) × (|diff| ≤ 2 ? 2 : 1). */
+export function leverageOf(inning: number, score: readonly [number, number]): number {
+  const w = GAME.importance;
+  return (inning >= w.lateInning ? w.lateInningWeight : 1) * (Math.abs(score[0] - score[1]) <= w.closeMargin ? w.closeWeight : 1);
+}
+
+const BATTER_OUT = new Set(["K", "FO", "LO", "PO", "SF", "GO", "DP", "SH"]);
+/** Plays where the trailing (forced) runner is the one put out. */
+const FORCE_PLAYS = new Set(["DP", "FC", "GO", "SH"]);
+
+/**
+ * Diff base occupancy before/after a play into runner moves (0 = batter at
+ * home, 4 = scored). Runners who vanish beyond the outs recorded on the play
+ * were stranded by the third out and are omitted.
+ */
+export function runnerMovesOf(type: string, before: Bases, after: Bases, scored: readonly string[], batterId: string | null, outsOnPlay = 0): RunnerMove[] {
+  const whereAfter = (id: string): 1 | 2 | 3 | 4 | null => {
+    for (let b = 0; b < 3; b++) if (after[b]?.id === id) return (b + 1) as 1 | 2 | 3;
+    return scored.includes(id) ? 4 : null;
+  };
+  const batterOut = batterId !== null && BATTER_OUT.has(type) && whereAfter(batterId) === null;
+  let runnerOuts = Math.max(0, outsOnPlay - (batterOut ? 1 : 0));
+  const vanished: { id: string; from: 1 | 2 | 3 }[] = [];
+  const moves: RunnerMove[] = [];
+  for (let b = 2; b >= 0; b--) {
+    const r = before[b];
+    if (!r) continue;
+    const from = (b + 1) as 1 | 2 | 3;
+    const to = whereAfter(r.id);
+    if (to === null) vanished.push({ id: r.id, from });
+    else if (to !== from) moves.push({ runner: r.id, from, to });
+  }
+  // Forced plays retire the trailing runner first; hits/steals the lead runner.
+  if (FORCE_PLAYS.has(type)) vanished.reverse();
+  for (const v of vanished) {
+    if (runnerOuts <= 0) break;
+    runnerOuts--;
+    moves.push({ runner: v.id, from: v.from, to: Math.min(v.from + 1, 4) as 2 | 3 | 4, out: true });
+  }
+  if (batterId) {
+    const to = whereAfter(batterId);
+    if (to !== null) moves.push({ runner: batterId, from: 0, to });
+    else if (batterOut && BATTER_RUNS_OUT.has(type)) moves.push({ runner: batterId, from: 0, to: 1, out: true });
+  }
+  return moves;
+}
+
+function playMeta(
+  type: GameEvent["type"], meta: Record<string, unknown>, before: Bases, after: Bases, scored: readonly string[],
+  batter: SimHitter, pitcher: SimPitcher, scoreBefore: readonly [number, number], inning: number, pitches: number, fx: Rng, outsOnPlay: number,
+): PlayMeta {
+  const isSteal = type === "SB" || type === "CS";
+  const swing: SwingKind = type === "K" ? (fx.chance(0.27) ? "looking" : "miss") : type === "SH" ? "bunt" : type === "BB" || isSteal ? "none" : "contact";
+  const bb = BB_OF[String(meta["battedBall"] ?? "")];
+  const play: PlayMeta = {
+    runnerMoves: runnerMovesOf(type, before, after, scored, isSteal ? null : batter.id, outsOnPlay),
+    pitchCount: isSteal ? 1 : pitches,
+    swing,
+    leverage: leverageOf(inning, scoreBefore),
+    isHighlight: false,
+    batterHand: effectiveHand(batter.bats, pitcher.throws),
+    pitcherHand: pitcher.throws,
+    power: batter.powerDisplay ?? batter.contactDisplay,
+  };
+  if (bb) play.bbType = bb;
+  else if (type === "HR") play.bbType = "FB";
+  if (meta["direction"] === "PULL" || meta["direction"] === "pull") play.direction = "pull";
+  else if (meta["direction"] === "OPPO" || meta["direction"] === "oppo") play.direction = "oppo";
+  else if (meta["direction"] !== undefined) play.direction = "center";
+  else if (type === "HR") play.direction = fx.pick(["pull", "pull", "center", "oppo"] as const);
+  if (typeof meta["fielder"] === "string") play.fielderSlot = meta["fielder"] as FieldPos;
+  return play;
+}
+
+function markHighlights(events: GameEvent[], idx: number[]): number[] {
+  for (const i of idx) {
+    const e = events[i];
+    if (e?.meta) e.meta["isHighlight"] = true;
+  }
+  return idx;
 }
 
 // ---------------------------------------------------------------------------

@@ -101,7 +101,7 @@ export function resolveTeam(input: ResolveInput): SimTeam {
     const r = boostHitter(def.hitter, starAdd(card) + (effects.ratingAdd.get(card.instanceId) ?? 0), effects.internalAdd.get(card.instanceId) ?? {});
     const display = hitterDisplay(r, def.pos);
     return {
-      id: card.instanceId, name: def.name, bats: def.bats, r, pos, defEff: effectiveDefense(def, r, pos), contactDisplay: display.contact,
+      id: card.instanceId, name: def.name, bats: def.bats, r, pos, defEff: effectiveDefense(def, r, pos), contactDisplay: display.contact, powerDisplay: display.power,
       mods: { ...defaultHitterMods(), ...(effects.hitterMods.get(card.instanceId) ?? {}) }, isReplacement: false,
     };
   };
