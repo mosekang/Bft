@@ -1,0 +1,31 @@
+{
+  "name": "@dugout/packs",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Player packs for Dugout Tactics: fictional pack generator, validator, and (Phase 5) CSV builder.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./fictional-v1.json": "./fictional-v1.json"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "generate": "tsx src/cli.ts generate",
+    "validate": "tsx src/cli.ts validate",
+    "build-pack": "tsx src/cli.ts build"
+  },
+  "dependencies": {
+    "@dugout/engine": "workspace:*",
+    "@dugout/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0"
+  }
+}

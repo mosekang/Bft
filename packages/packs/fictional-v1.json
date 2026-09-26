@@ -1,0 +1,2151 @@
+{
+  "formatVersion": 1,
+  "id": "fictional-v1",
+  "name": "가상 리그 v1",
+  "kind": "fictional",
+  "generatedBy": {
+    "tool": "@dugout/packs generate",
+    "version": "1.0.0",
+    "seed": "fictional-v1"
+  },
+  "teams": [
+    {
+      "id": "seoul-a",
+      "name": "서울 A",
+      "color": "#c8102e"
+    },
+    {
+      "id": "seoul-b",
+      "name": "서울 B",
+      "color": "#1d428a"
+    },
+    {
+      "id": "incheon",
+      "name": "인천",
+      "color": "#e30613"
+    },
+    {
+      "id": "suwon",
+      "name": "수원",
+      "color": "#0b3d91"
+    },
+    {
+      "id": "daejeon",
+      "name": "대전",
+      "color": "#f26522"
+    },
+    {
+      "id": "daegu",
+      "name": "대구",
+      "color": "#0d3b8c"
+    },
+    {
+      "id": "gwangju",
+      "name": "광주",
+      "color": "#c70125"
+    },
+    {
+      "id": "busan",
+      "name": "부산",
+      "color": "#0b5394"
+    },
+    {
+      "id": "changwon",
+      "name": "창원",
+      "color": "#00a0b0"
+    },
+    {
+      "id": "gocheok",
+      "name": "고척",
+      "color": "#7b1f2f"
+    }
+  ],
+  "cards": [
+    {
+      "id": "c1-h-01",
+      "name": "정병건",
+      "nickname": "감독이 좋아하는 타입",
+      "team": "seoul-a",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "C",
+      "pos2": [
+        "1B"
+      ],
+      "cost": 1,
+      "origin": "COLLEGE",
+      "classes": [
+        "CATCHER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 50,
+        "contactL": 50,
+        "contactR": 53,
+        "hrRate": 40,
+        "xbhRate": 49,
+        "bbRate": 64,
+        "gbTend": 47,
+        "pullTend": 44,
+        "speed": 67,
+        "sbSkill": 63,
+        "def": {
+          "C": 55,
+          "1B": 44
+        },
+        "arm": 53,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-02",
+      "name": "박시호",
+      "nickname": "발만 빠른 남자",
+      "team": "seoul-b",
+      "age": 38,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "CF",
+      "pos2": [],
+      "cost": 1,
+      "origin": "VETERAN",
+      "classes": [
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 46,
+        "contactL": 51,
+        "contactR": 56,
+        "hrRate": 38,
+        "xbhRate": 32,
+        "bbRate": 51,
+        "gbTend": 88,
+        "pullTend": 43,
+        "speed": 88,
+        "sbSkill": 88,
+        "def": {
+          "CF": 52
+        },
+        "arm": 48,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-03",
+      "name": "이건훈",
+      "nickname": "미래의 4번 타자",
+      "team": "daejeon",
+      "age": 22,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "3B",
+      "pos2": [
+        "SS"
+      ],
+      "cost": 1,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "SPEEDSTER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 49,
+        "contactL": 55,
+        "contactR": 38,
+        "hrRate": 45,
+        "xbhRate": 37,
+        "bbRate": 57,
+        "gbTend": 50,
+        "pullTend": 56,
+        "speed": 63,
+        "sbSkill": 75,
+        "def": {
+          "3B": 46,
+          "SS": 46
+        },
+        "arm": 48,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-04",
+      "name": "차재기",
+      "nickname": "라커룸의 리더",
+      "team": "gwangju",
+      "age": 32,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "SS",
+      "pos2": [
+        "3B"
+      ],
+      "cost": 1,
+      "origin": "VETERAN",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 64,
+        "contactL": 56,
+        "contactR": 58,
+        "hrRate": 42,
+        "xbhRate": 57,
+        "bbRate": 49,
+        "gbTend": 47,
+        "pullTend": 80,
+        "speed": 36,
+        "sbSkill": 39,
+        "def": {
+          "SS": 48,
+          "3B": 52
+        },
+        "arm": 55,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-05",
+      "name": "김준섭",
+      "nickname": "궂은일 전문",
+      "team": "busan",
+      "age": 24,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "1B",
+      "pos2": [
+        "RF",
+        "LF"
+      ],
+      "cost": 1,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 45,
+        "contactL": 37,
+        "contactR": 35,
+        "hrRate": 49,
+        "xbhRate": 61,
+        "bbRate": 48,
+        "gbTend": 41,
+        "pullTend": 63,
+        "speed": 43,
+        "sbSkill": 42,
+        "def": {
+          "1B": 38,
+          "RF": 35,
+          "LF": 33
+        },
+        "arm": 41,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-06",
+      "name": "정민식",
+      "nickname": "미래의 4번 타자",
+      "team": "seoul-a",
+      "age": 21,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "2B",
+      "pos2": [
+        "3B"
+      ],
+      "cost": 1,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "SLUGGER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 52,
+        "contactL": 45,
+        "contactR": 41,
+        "hrRate": 59,
+        "xbhRate": 53,
+        "bbRate": 50,
+        "gbTend": 41,
+        "pullTend": 51,
+        "speed": 68,
+        "sbSkill": 73,
+        "def": {
+          "2B": 46,
+          "3B": 43
+        },
+        "arm": 47,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-07",
+      "name": "조민욱",
+      "nickname": "묵묵한 2루수",
+      "team": "seoul-b",
+      "age": 24,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "1B",
+      "pos2": [
+        "LF"
+      ],
+      "cost": 1,
+      "origin": "COLLEGE",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 51,
+        "contactL": 60,
+        "contactR": 57,
+        "hrRate": 59,
+        "xbhRate": 44,
+        "bbRate": 50,
+        "gbTend": 41,
+        "pullTend": 35,
+        "speed": 57,
+        "sbSkill": 54,
+        "def": {
+          "1B": 47,
+          "LF": 42
+        },
+        "arm": 51,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-08",
+      "name": "A. 세스페데스",
+      "nickname": "바다 건너온 사나이",
+      "team": "incheon",
+      "age": 26,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "3B",
+      "pos2": [
+        "SS",
+        "1B"
+      ],
+      "cost": 1,
+      "origin": "FOREIGN",
+      "classes": [
+        "GOLD_GLOVE"
+      ],
+      "nationality": "CU",
+      "hitter": {
+        "kRate": 54,
+        "contactL": 59,
+        "contactR": 41,
+        "hrRate": 50,
+        "xbhRate": 39,
+        "bbRate": 44,
+        "gbTend": 66,
+        "pullTend": 43,
+        "speed": 44,
+        "sbSkill": 46,
+        "def": {
+          "3B": 64,
+          "SS": 56,
+          "1B": 65
+        },
+        "arm": 73,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-h-09",
+      "name": "송원욱",
+      "nickname": "감독이 좋아하는 타입",
+      "team": "suwon",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "3B",
+      "pos2": [
+        "1B"
+      ],
+      "cost": 1,
+      "origin": "COLLEGE",
+      "classes": [
+        "SLUGGER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 34,
+        "contactL": 39,
+        "contactR": 41,
+        "hrRate": 74,
+        "xbhRate": 65,
+        "bbRate": 44,
+        "gbTend": 18,
+        "pullTend": 90,
+        "speed": 43,
+        "sbSkill": 42,
+        "def": {
+          "3B": 56,
+          "1B": 47
+        },
+        "arm": 61,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-01",
+      "name": "임정철",
+      "nickname": "성실한 3번 타자",
+      "team": "daejeon",
+      "age": 24,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "2B",
+      "pos2": [
+        "3B"
+      ],
+      "cost": 2,
+      "origin": "COLLEGE",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 70,
+        "contactL": 65,
+        "contactR": 64,
+        "hrRate": 54,
+        "xbhRate": 44,
+        "bbRate": 53,
+        "gbTend": 59,
+        "pullTend": 60,
+        "speed": 64,
+        "sbSkill": 64,
+        "def": {
+          "2B": 56,
+          "3B": 40
+        },
+        "arm": 61,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-02",
+      "name": "박현훈",
+      "nickname": "궂은일 전문",
+      "team": "seoul-a",
+      "age": 27,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 75,
+        "contactL": 63,
+        "contactR": 79,
+        "hrRate": 62,
+        "xbhRate": 59,
+        "bbRate": 69,
+        "gbTend": 61,
+        "pullTend": 47,
+        "speed": 43,
+        "sbSkill": 39,
+        "def": {},
+        "arm": 61,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-03",
+      "name": "김한서",
+      "nickname": "궂은일 전문",
+      "team": "changwon",
+      "age": 23,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "C",
+      "pos2": [],
+      "cost": 2,
+      "origin": "COLLEGE",
+      "classes": [
+        "CATCHER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 59,
+        "contactL": 46,
+        "contactR": 62,
+        "hrRate": 67,
+        "xbhRate": 60,
+        "bbRate": 49,
+        "gbTend": 69,
+        "pullTend": 60,
+        "speed": 44,
+        "sbSkill": 53,
+        "def": {
+          "C": 60
+        },
+        "arm": 63,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-04",
+      "name": "김광진",
+      "nickname": "고졸 신인",
+      "team": "suwon",
+      "age": 20,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "SS",
+      "pos2": [],
+      "cost": 2,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "CLUTCH",
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 66,
+        "contactL": 65,
+        "contactR": 56,
+        "hrRate": 44,
+        "xbhRate": 39,
+        "bbRate": 67,
+        "gbTend": 68,
+        "pullTend": 45,
+        "speed": 66,
+        "sbSkill": 60,
+        "def": {
+          "SS": 60
+        },
+        "arm": 61,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-05",
+      "name": "김경훈",
+      "nickname": "저니맨",
+      "team": "gocheok",
+      "age": 31,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "1B",
+      "pos2": [
+        "LF",
+        "3B"
+      ],
+      "cost": 2,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "GOLD_GLOVE",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 60,
+        "contactL": 55,
+        "contactR": 55,
+        "hrRate": 40,
+        "xbhRate": 40,
+        "bbRate": 46,
+        "gbTend": 62,
+        "pullTend": 61,
+        "speed": 69,
+        "sbSkill": 61,
+        "def": {
+          "1B": 76,
+          "LF": 62,
+          "3B": 59
+        },
+        "arm": 69,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-06",
+      "name": "양규찬",
+      "nickname": "라커룸의 리더",
+      "team": "daegu",
+      "age": 32,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "VETERAN",
+      "classes": [
+        "GOLD_GLOVE",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 59,
+        "contactL": 62,
+        "contactR": 61,
+        "hrRate": 63,
+        "xbhRate": 51,
+        "bbRate": 61,
+        "gbTend": 40,
+        "pullTend": 60,
+        "speed": 47,
+        "sbSkill": 54,
+        "def": {},
+        "arm": 59,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-07",
+      "name": "손하민",
+      "nickname": "묵묵한 2루수",
+      "team": "busan",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "CF",
+      "pos2": [],
+      "cost": 2,
+      "origin": "COLLEGE",
+      "classes": [
+        "SPEEDSTER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 39,
+        "contactL": 47,
+        "contactR": 47,
+        "hrRate": 50,
+        "xbhRate": 62,
+        "bbRate": 53,
+        "gbTend": 70,
+        "pullTend": 38,
+        "speed": 70,
+        "sbSkill": 65,
+        "def": {
+          "CF": 57
+        },
+        "arm": 50,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-08",
+      "name": "신건현",
+      "nickname": "저니맨",
+      "team": "daegu",
+      "age": 26,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "LF",
+      "pos2": [],
+      "cost": 2,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "SLUGGER",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 47,
+        "contactL": 55,
+        "contactR": 60,
+        "hrRate": 59,
+        "xbhRate": 59,
+        "bbRate": 44,
+        "gbTend": 51,
+        "pullTend": 67,
+        "speed": 66,
+        "sbSkill": 70,
+        "def": {
+          "LF": 59
+        },
+        "arm": 57,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c2-h-09",
+      "name": "권진기",
+      "nickname": "저니맨",
+      "team": "changwon",
+      "age": 27,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "2B",
+      "pos2": [
+        "3B",
+        "SS"
+      ],
+      "cost": 2,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "SPEEDSTER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 56,
+        "contactL": 51,
+        "contactR": 44,
+        "hrRate": 51,
+        "xbhRate": 57,
+        "bbRate": 52,
+        "gbTend": 61,
+        "pullTend": 59,
+        "speed": 66,
+        "sbSkill": 55,
+        "def": {
+          "2B": 68,
+          "3B": 58,
+          "SS": 64
+        },
+        "arm": 66,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-01",
+      "name": "양서완",
+      "nickname": "미래의 4번 타자",
+      "team": "daejeon",
+      "age": 20,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "LF",
+      "pos2": [],
+      "cost": 3,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 66,
+        "contactL": 58,
+        "contactR": 70,
+        "hrRate": 67,
+        "xbhRate": 67,
+        "bbRate": 71,
+        "gbTend": 46,
+        "pullTend": 44,
+        "speed": 54,
+        "sbSkill": 50,
+        "def": {
+          "LF": 80
+        },
+        "arm": 74,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-02",
+      "name": "박성현",
+      "nickname": "성실한 3번 타자",
+      "team": "suwon",
+      "age": 29,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "1B",
+      "pos2": [],
+      "cost": 3,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "SPEEDSTER",
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 82,
+        "contactL": 66,
+        "contactR": 75,
+        "hrRate": 49,
+        "xbhRate": 44,
+        "bbRate": 65,
+        "gbTend": 34,
+        "pullTend": 46,
+        "speed": 64,
+        "sbSkill": 66,
+        "def": {
+          "1B": 69
+        },
+        "arm": 65,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-03",
+      "name": "B. 게레로",
+      "nickname": "용병 스카우트의 자랑",
+      "team": "daejeon",
+      "age": 31,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "SS",
+      "pos2": [
+        "3B",
+        "2B"
+      ],
+      "cost": 3,
+      "origin": "FOREIGN",
+      "classes": [
+        "CONTACT_HITTER",
+        "SLUGGER"
+      ],
+      "nationality": "DO",
+      "hitter": {
+        "kRate": 68,
+        "contactL": 71,
+        "contactR": 64,
+        "hrRate": 63,
+        "xbhRate": 69,
+        "bbRate": 61,
+        "gbTend": 49,
+        "pullTend": 60,
+        "speed": 65,
+        "sbSkill": 65,
+        "def": {
+          "SS": 57,
+          "3B": 58,
+          "2B": 54
+        },
+        "arm": 56,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-04",
+      "name": "정규성",
+      "nickname": "성실한 3번 타자",
+      "team": "seoul-a",
+      "age": 23,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "2B",
+      "pos2": [],
+      "cost": 3,
+      "origin": "COLLEGE",
+      "classes": [
+        "SLUGGER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 53,
+        "contactL": 60,
+        "contactR": 51,
+        "hrRate": 69,
+        "xbhRate": 81,
+        "bbRate": 79,
+        "gbTend": 43,
+        "pullTend": 72,
+        "speed": 49,
+        "sbSkill": 44,
+        "def": {
+          "2B": 57
+        },
+        "arm": 63,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-05",
+      "name": "이지진",
+      "nickname": "저니맨",
+      "team": "seoul-a",
+      "age": 31,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "C",
+      "pos2": [
+        "1B"
+      ],
+      "cost": 3,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "CATCHER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 71,
+        "contactL": 64,
+        "contactR": 79,
+        "hrRate": 63,
+        "xbhRate": 62,
+        "bbRate": 44,
+        "gbTend": 72,
+        "pullTend": 73,
+        "speed": 60,
+        "sbSkill": 50,
+        "def": {
+          "C": 79,
+          "1B": 80
+        },
+        "arm": 77,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-06",
+      "name": "박경식",
+      "nickname": "출루 기계",
+      "team": "suwon",
+      "age": 25,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "RF",
+      "pos2": [
+        "CF"
+      ],
+      "cost": 3,
+      "origin": "COLLEGE",
+      "classes": [
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 53,
+        "contactL": 53,
+        "contactR": 63,
+        "hrRate": 77,
+        "xbhRate": 69,
+        "bbRate": 82,
+        "gbTend": 42,
+        "pullTend": 61,
+        "speed": 48,
+        "sbSkill": 54,
+        "def": {
+          "RF": 81,
+          "CF": 64
+        },
+        "arm": 73,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-07",
+      "name": "박수빈",
+      "nickname": "고졸 신인",
+      "team": "changwon",
+      "age": 22,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "3B",
+      "pos2": [
+        "SS"
+      ],
+      "cost": 3,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 80,
+        "contactL": 70,
+        "contactR": 87,
+        "hrRate": 54,
+        "xbhRate": 59,
+        "bbRate": 63,
+        "gbTend": 49,
+        "pullTend": 41,
+        "speed": 68,
+        "sbSkill": 76,
+        "def": {
+          "3B": 69,
+          "SS": 56
+        },
+        "arm": 70,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-08",
+      "name": "정하철",
+      "nickname": "풀스윙 머신",
+      "team": "daejeon",
+      "age": 24,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "CF",
+      "pos2": [
+        "LF"
+      ],
+      "cost": 3,
+      "origin": "COLLEGE",
+      "classes": [
+        "SLUGGER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 53,
+        "contactL": 50,
+        "contactR": 45,
+        "hrRate": 76,
+        "xbhRate": 89,
+        "bbRate": 73,
+        "gbTend": 23,
+        "pullTend": 68,
+        "speed": 66,
+        "sbSkill": 70,
+        "def": {
+          "CF": 68,
+          "LF": 68
+        },
+        "arm": 73,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c3-h-09",
+      "name": "박경진",
+      "nickname": "볼넷 공장장",
+      "team": "incheon",
+      "age": 37,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "RF",
+      "pos2": [
+        "CF",
+        "LF"
+      ],
+      "cost": 3,
+      "origin": "VETERAN",
+      "classes": [
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 45,
+        "contactL": 51,
+        "contactR": 45,
+        "hrRate": 55,
+        "xbhRate": 58,
+        "bbRate": 85,
+        "gbTend": 48,
+        "pullTend": 52,
+        "speed": 70,
+        "sbSkill": 73,
+        "def": {
+          "RF": 62,
+          "CF": 50,
+          "LF": 54
+        },
+        "arm": 66,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-01",
+      "name": "정서서",
+      "nickname": "안타 제조기",
+      "team": "daejeon",
+      "age": 24,
+      "bats": "L",
+      "throws": "L",
+      "role": "H",
+      "pos": "CF",
+      "pos2": [],
+      "cost": 4,
+      "origin": "COLLEGE",
+      "classes": [
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 94,
+        "contactL": 89,
+        "contactR": 89,
+        "hrRate": 44,
+        "xbhRate": 52,
+        "bbRate": 48,
+        "gbTend": 55,
+        "pullTend": 56,
+        "speed": 79,
+        "sbSkill": 73,
+        "def": {
+          "CF": 75
+        },
+        "arm": 77,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-02",
+      "name": "박준호",
+      "nickname": "궂은일 전문",
+      "team": "incheon",
+      "age": 27,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "RF",
+      "pos2": [],
+      "cost": 4,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "SLUGGER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 57,
+        "contactL": 65,
+        "contactR": 55,
+        "hrRate": 79,
+        "xbhRate": 77,
+        "bbRate": 69,
+        "gbTend": 42,
+        "pullTend": 56,
+        "speed": 60,
+        "sbSkill": 73,
+        "def": {
+          "RF": 82
+        },
+        "arm": 80,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-03",
+      "name": "이찬호",
+      "nickname": "스프레이 히터",
+      "team": "busan",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLUTCH",
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 95,
+        "contactL": 98,
+        "contactR": 78,
+        "hrRate": 72,
+        "xbhRate": 64,
+        "bbRate": 74,
+        "gbTend": 59,
+        "pullTend": 70,
+        "speed": 61,
+        "sbSkill": 66,
+        "def": {},
+        "arm": 78,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-04",
+      "name": "이동진",
+      "nickname": "포수 미트의 마술사",
+      "team": "suwon",
+      "age": 32,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "C",
+      "pos2": [
+        "1B"
+      ],
+      "cost": 4,
+      "origin": "VETERAN",
+      "classes": [
+        "CATCHER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 73,
+        "contactL": 71,
+        "contactR": 73,
+        "hrRate": 53,
+        "xbhRate": 59,
+        "bbRate": 66,
+        "gbTend": 50,
+        "pullTend": 41,
+        "speed": 78,
+        "sbSkill": 83,
+        "def": {
+          "C": 82,
+          "1B": 77
+        },
+        "arm": 77,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-05",
+      "name": "최시기",
+      "nickname": "도루왕",
+      "team": "incheon",
+      "age": 19,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "SS",
+      "pos2": [],
+      "cost": 4,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "SLUGGER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 67,
+        "contactL": 58,
+        "contactR": 75,
+        "hrRate": 87,
+        "xbhRate": 85,
+        "bbRate": 68,
+        "gbTend": 33,
+        "pullTend": 79,
+        "speed": 86,
+        "sbSkill": 86,
+        "def": {
+          "SS": 75
+        },
+        "arm": 76,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-06",
+      "name": "김동빈",
+      "nickname": "호타준족",
+      "team": "suwon",
+      "age": 30,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "GOLD_GLOVE",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 76,
+        "contactL": 78,
+        "contactR": 65,
+        "hrRate": 81,
+        "xbhRate": 90,
+        "bbRate": 77,
+        "gbTend": 67,
+        "pullTend": 53,
+        "speed": 80,
+        "sbSkill": 78,
+        "def": {},
+        "arm": 69,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-07",
+      "name": "이하건",
+      "nickname": "감독이 좋아하는 타입",
+      "team": "seoul-b",
+      "age": 26,
+      "bats": "S",
+      "throws": "R",
+      "role": "H",
+      "pos": "LF",
+      "pos2": [
+        "RF"
+      ],
+      "cost": 4,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "SLUGGER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 69,
+        "contactL": 65,
+        "contactR": 61,
+        "hrRate": 83,
+        "xbhRate": 82,
+        "bbRate": 79,
+        "gbTend": 42,
+        "pullTend": 57,
+        "speed": 82,
+        "sbSkill": 70,
+        "def": {
+          "LF": 60,
+          "RF": 64
+        },
+        "arm": 63,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c4-h-08",
+      "name": "구성수",
+      "nickname": "1루는 통과역",
+      "team": "incheon",
+      "age": 25,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "RF",
+      "pos2": [],
+      "cost": 4,
+      "origin": "COLLEGE",
+      "classes": [
+        "CONTACT_HITTER",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 77,
+        "contactL": 77,
+        "contactR": 89,
+        "hrRate": 64,
+        "xbhRate": 63,
+        "bbRate": 66,
+        "gbTend": 60,
+        "pullTend": 40,
+        "speed": 99,
+        "sbSkill": 91,
+        "def": {
+          "RF": 78
+        },
+        "arm": 75,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-01",
+      "name": "김한영",
+      "nickname": "볼넷 공장장",
+      "team": "gocheok",
+      "age": 38,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "CF",
+      "pos2": [
+        "RF",
+        "LF"
+      ],
+      "cost": 5,
+      "origin": "VETERAN",
+      "classes": [
+        "SLUGGER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 84,
+        "contactL": 85,
+        "contactR": 71,
+        "hrRate": 71,
+        "xbhRate": 82,
+        "bbRate": 84,
+        "gbTend": 38,
+        "pullTend": 62,
+        "speed": 83,
+        "sbSkill": 81,
+        "def": {
+          "CF": 99,
+          "RF": 83,
+          "LF": 97
+        },
+        "arm": 95,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-02",
+      "name": "강경우",
+      "nickname": "1루는 통과역",
+      "team": "gwangju",
+      "age": 26,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "SS",
+      "pos2": [],
+      "cost": 5,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "CONTACT_HITTER",
+        "GOLD_GLOVE"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 99,
+        "contactL": 99,
+        "contactR": 98,
+        "hrRate": 58,
+        "xbhRate": 74,
+        "bbRate": 86,
+        "gbTend": 48,
+        "pullTend": 61,
+        "speed": 97,
+        "sbSkill": 85,
+        "def": {
+          "SS": 88
+        },
+        "arm": 94,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-03",
+      "name": "최상건",
+      "nickname": "5툴 플레이어",
+      "team": "daejeon",
+      "age": 24,
+      "bats": "S",
+      "throws": "R",
+      "role": "H",
+      "pos": "3B",
+      "pos2": [],
+      "cost": 5,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "SPEEDSTER",
+        "SLUGGER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 72,
+        "contactL": 74,
+        "contactR": 84,
+        "hrRate": 93,
+        "xbhRate": 81,
+        "bbRate": 78,
+        "gbTend": 52,
+        "pullTend": 57,
+        "speed": 81,
+        "sbSkill": 88,
+        "def": {
+          "3B": 77
+        },
+        "arm": 73,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-04",
+      "name": "김상성",
+      "nickname": "도루왕",
+      "team": "busan",
+      "age": 29,
+      "bats": "R",
+      "throws": "R",
+      "role": "H",
+      "pos": "2B",
+      "pos2": [
+        "C",
+        "SS"
+      ],
+      "cost": 5,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "GOLD_GLOVE",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 73,
+        "contactL": 88,
+        "contactR": 74,
+        "hrRate": 87,
+        "xbhRate": 86,
+        "bbRate": 79,
+        "gbTend": 53,
+        "pullTend": 77,
+        "speed": 99,
+        "sbSkill": 99,
+        "def": {
+          "2B": 92,
+          "C": 98,
+          "SS": 93
+        },
+        "arm": 97,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-05",
+      "name": "전도철",
+      "nickname": "볼넷 공장장",
+      "team": "suwon",
+      "age": 24,
+      "bats": "S",
+      "throws": "R",
+      "role": "H",
+      "pos": "RF",
+      "pos2": [
+        "LF"
+      ],
+      "cost": 5,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLUTCH",
+        "CONTACT_HITTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 98,
+        "contactL": 94,
+        "contactR": 95,
+        "hrRate": 57,
+        "xbhRate": 61,
+        "bbRate": 84,
+        "gbTend": 54,
+        "pullTend": 59,
+        "speed": 83,
+        "sbSkill": 74,
+        "def": {
+          "RF": 70,
+          "LF": 78
+        },
+        "arm": 80,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c5-h-06",
+      "name": "정찬진",
+      "nickname": "1루는 통과역",
+      "team": "daegu",
+      "age": 19,
+      "bats": "L",
+      "throws": "R",
+      "role": "H",
+      "pos": "LF",
+      "pos2": [],
+      "cost": 5,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "GOLD_GLOVE",
+        "SPEEDSTER"
+      ],
+      "nationality": "KR",
+      "hitter": {
+        "kRate": 85,
+        "contactL": 86,
+        "contactR": 82,
+        "hrRate": 86,
+        "xbhRate": 80,
+        "bbRate": 78,
+        "gbTend": 55,
+        "pullTend": 68,
+        "speed": 99,
+        "sbSkill": 99,
+        "def": {
+          "LF": 91
+        },
+        "arm": 99,
+        "clutch": 0
+      }
+    },
+    {
+      "id": "c1-sp-01",
+      "name": "양광완",
+      "nickname": "롱릴리프 전문",
+      "team": "busan",
+      "age": 24,
+      "bats": "L",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 1,
+      "origin": "COLLEGE",
+      "classes": [
+        "FINESSE",
+        "INNING_EATER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 41,
+        "bbRate": 42,
+        "hrRate": 55,
+        "gbRate": 61,
+        "contactVsL": 44,
+        "contactVsR": 50,
+        "stamina": 45,
+        "mental": 65,
+        "hold": 61,
+        "armAngle": 84
+      }
+    },
+    {
+      "id": "c1-sp-02",
+      "name": "안영호",
+      "nickname": "불펜의 소금",
+      "team": "daegu",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 1,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "INNING_EATER",
+        "FINESSE"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 30,
+        "bbRate": 56,
+        "hrRate": 68,
+        "gbRate": 73,
+        "contactVsL": 35,
+        "contactVsR": 34,
+        "stamina": 61,
+        "mental": 51,
+        "hold": 55,
+        "armAngle": 56
+      }
+    },
+    {
+      "id": "c1-rp-01",
+      "name": "주찬원",
+      "nickname": "심장이 약한 투수",
+      "team": "suwon",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 1,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "CLOSER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 59,
+        "bbRate": 49,
+        "hrRate": 42,
+        "gbRate": 43,
+        "contactVsL": 55,
+        "contactVsR": 67,
+        "stamina": 32,
+        "mental": 32,
+        "hold": 63,
+        "armAngle": 71
+      }
+    },
+    {
+      "id": "c1-rp-02",
+      "name": "정준민",
+      "nickname": "불펜의 소금",
+      "team": "incheon",
+      "age": 29,
+      "bats": "R",
+      "throws": "R",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 1,
+      "origin": "MILITARY_DONE",
+      "classes": [
+        "FIREBALLER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 61,
+        "bbRate": 62,
+        "hrRate": 30,
+        "gbRate": 33,
+        "contactVsL": 59,
+        "contactVsR": 47,
+        "stamina": 19,
+        "mental": 66,
+        "hold": 48,
+        "armAngle": 48
+      }
+    },
+    {
+      "id": "c2-sp-01",
+      "name": "E. 잭슨",
+      "nickname": "용병 에이스",
+      "team": "gocheok",
+      "age": 33,
+      "bats": "L",
+      "throws": "L",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "FOREIGN",
+      "classes": [
+        "FIREBALLER"
+      ],
+      "nationality": "US",
+      "pitcher": {
+        "kRate": 60,
+        "bbRate": 59,
+        "hrRate": 59,
+        "gbRate": 49,
+        "contactVsL": 69,
+        "contactVsR": 66,
+        "stamina": 62,
+        "mental": 45,
+        "hold": 36,
+        "armAngle": 69
+      }
+    },
+    {
+      "id": "c2-sp-02",
+      "name": "이용혁",
+      "nickname": "싱커볼러",
+      "team": "gocheok",
+      "age": 20,
+      "bats": "L",
+      "throws": "L",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "FINESSE",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 69,
+        "bbRate": 45,
+        "hrRate": 67,
+        "gbRate": 78,
+        "contactVsL": 63,
+        "contactVsR": 53,
+        "stamina": 51,
+        "mental": 67,
+        "hold": 76,
+        "armAngle": 58
+      }
+    },
+    {
+      "id": "c2-sp-03",
+      "name": "박호규",
+      "nickname": "땅볼 유도의 달인",
+      "team": "incheon",
+      "age": 35,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "VETERAN",
+      "classes": [
+        "FIREBALLER",
+        "FINESSE"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 54,
+        "bbRate": 47,
+        "hrRate": 73,
+        "gbRate": 86,
+        "contactVsL": 66,
+        "contactVsR": 56,
+        "stamina": 59,
+        "mental": 67,
+        "hold": 79,
+        "armAngle": 27
+      }
+    },
+    {
+      "id": "c2-rp-01",
+      "name": "홍현건",
+      "nickname": "9회의 남자",
+      "team": "daejeon",
+      "age": 23,
+      "bats": "L",
+      "throws": "L",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 2,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLOSER",
+        "FIREBALLER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 69,
+        "bbRate": 63,
+        "hrRate": 55,
+        "gbRate": 49,
+        "contactVsL": 71,
+        "contactVsR": 70,
+        "stamina": 29,
+        "mental": 45,
+        "hold": 59,
+        "armAngle": 57
+      }
+    },
+    {
+      "id": "c3-sp-01",
+      "name": "김경기",
+      "nickname": "저니맨",
+      "team": "seoul-b",
+      "age": 26,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 3,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "INNING_EATER",
+        "FINESSE"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 56,
+        "bbRate": 57,
+        "hrRate": 67,
+        "gbRate": 68,
+        "contactVsL": 49,
+        "contactVsR": 48,
+        "stamina": 74,
+        "mental": 61,
+        "hold": 80,
+        "armAngle": 55
+      }
+    },
+    {
+      "id": "c3-sp-02",
+      "name": "M. 라이언",
+      "nickname": "싱커볼러",
+      "team": "seoul-a",
+      "age": 27,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 3,
+      "origin": "FOREIGN",
+      "classes": [
+        "FINESSE"
+      ],
+      "nationality": "AU",
+      "pitcher": {
+        "kRate": 66,
+        "bbRate": 71,
+        "hrRate": 81,
+        "gbRate": 91,
+        "contactVsL": 67,
+        "contactVsR": 62,
+        "stamina": 58,
+        "mental": 43,
+        "hold": 54,
+        "armAngle": 64
+      }
+    },
+    {
+      "id": "c3-sp-03",
+      "name": "황찬환",
+      "nickname": "롱릴리프 전문",
+      "team": "seoul-a",
+      "age": 23,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 3,
+      "origin": "COLLEGE",
+      "classes": [
+        "FIREBALLER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 67,
+        "bbRate": 48,
+        "hrRate": 73,
+        "gbRate": 63,
+        "contactVsL": 61,
+        "contactVsR": 64,
+        "stamina": 83,
+        "mental": 67,
+        "hold": 38,
+        "armAngle": 40
+      }
+    },
+    {
+      "id": "c3-rp-01",
+      "name": "J. 밀러",
+      "nickname": "스피드건 파괴자",
+      "team": "busan",
+      "age": 27,
+      "bats": "L",
+      "throws": "R",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 3,
+      "origin": "FOREIGN",
+      "classes": [
+        "FIREBALLER",
+        "CLOSER"
+      ],
+      "nationality": "US",
+      "pitcher": {
+        "kRate": 91,
+        "bbRate": 57,
+        "hrRate": 63,
+        "gbRate": 69,
+        "contactVsL": 76,
+        "contactVsR": 81,
+        "stamina": 29,
+        "mental": 58,
+        "hold": 78,
+        "armAngle": 47
+      }
+    },
+    {
+      "id": "c4-sp-01",
+      "name": "김승찬",
+      "nickname": "산전수전 다 겪은 남자",
+      "team": "suwon",
+      "age": 36,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "VETERAN",
+      "classes": [
+        "FIREBALLER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 82,
+        "bbRate": 70,
+        "hrRate": 79,
+        "gbRate": 69,
+        "contactVsL": 72,
+        "contactVsR": 76,
+        "stamina": 78,
+        "mental": 80,
+        "hold": 42,
+        "armAngle": 67
+      }
+    },
+    {
+      "id": "c4-sp-02",
+      "name": "황용진",
+      "nickname": "땅볼 유도의 달인",
+      "team": "seoul-b",
+      "age": 27,
+      "bats": "L",
+      "throws": "L",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "JOURNEYMAN",
+      "classes": [
+        "FINESSE",
+        "INNING_EATER"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 67,
+        "bbRate": 62,
+        "hrRate": 83,
+        "gbRate": 90,
+        "contactVsL": 68,
+        "contactVsR": 53,
+        "stamina": 78,
+        "mental": 79,
+        "hold": 43,
+        "armAngle": 38
+      }
+    },
+    {
+      "id": "c4-sp-03",
+      "name": "정석혁",
+      "nickname": "땅볼 유도의 달인",
+      "team": "seoul-b",
+      "age": 35,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "VETERAN",
+      "classes": [
+        "FINESSE",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 70,
+        "bbRate": 67,
+        "hrRate": 86,
+        "gbRate": 91,
+        "contactVsL": 65,
+        "contactVsR": 63,
+        "stamina": 78,
+        "mental": 87,
+        "hold": 73,
+        "armAngle": 69
+      }
+    },
+    {
+      "id": "c4-rp-01",
+      "name": "임서현",
+      "nickname": "땅볼 유도의 달인",
+      "team": "incheon",
+      "age": 25,
+      "bats": "R",
+      "throws": "R",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 4,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLOSER",
+        "FINESSE"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 76,
+        "bbRate": 70,
+        "hrRate": 72,
+        "gbRate": 78,
+        "contactVsL": 72,
+        "contactVsR": 64,
+        "stamina": 65,
+        "mental": 72,
+        "hold": 55,
+        "armAngle": 56
+      }
+    },
+    {
+      "id": "c5-sp-01",
+      "name": "심병현",
+      "nickname": "파이어볼러",
+      "team": "daejeon",
+      "age": 22,
+      "bats": "R",
+      "throws": "R",
+      "role": "SP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 5,
+      "origin": "HS_PROSPECT",
+      "classes": [
+        "INNING_EATER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 88,
+        "bbRate": 66,
+        "hrRate": 91,
+        "gbRate": 89,
+        "contactVsL": 80,
+        "contactVsR": 81,
+        "stamina": 78,
+        "mental": 86,
+        "hold": 28,
+        "armAngle": 42
+      }
+    },
+    {
+      "id": "c5-rp-01",
+      "name": "정원욱",
+      "nickname": "좌타 킬러",
+      "team": "seoul-a",
+      "age": 23,
+      "bats": "L",
+      "throws": "L",
+      "role": "RP",
+      "pos": "DH",
+      "pos2": [],
+      "cost": 5,
+      "origin": "COLLEGE",
+      "classes": [
+        "CLOSER",
+        "CLUTCH"
+      ],
+      "nationality": "KR",
+      "pitcher": {
+        "kRate": 84,
+        "bbRate": 86,
+        "hrRate": 82,
+        "gbRate": 90,
+        "contactVsL": 98,
+        "contactVsR": 76,
+        "stamina": 50,
+        "mental": 99,
+        "hold": 49,
+        "armAngle": 34
+      }
+    }
+  ]
+}

@@ -5,8 +5,8 @@ export default defineConfig({
     projects: ["packages/*"],
     coverage: {
       provider: "v8",
-      include: ["packages/engine/src/**/*.ts"],
-      exclude: ["packages/engine/src/**/index.ts", "packages/engine/src/types/**"],
+      include: ["packages/engine/src/**/*.ts", "packages/packs/src/**/*.ts", "packages/protocol/src/**/*.ts"],
+      exclude: ["**/index.ts", "packages/packs/src/cli.ts"],
       thresholds: {
         lines: 80,
         functions: 80,

@@ -1,8 +1,8 @@
 {
-  "name": "@dugout/engine",
+  "name": "@dugout/protocol",
   "version": "0.0.1",
   "private": true,
-  "description": "Pure TypeScript simulation engine for Dugout Tactics. No DOM, no React.",
+  "description": "Shared zod schemas and types for Dugout Tactics: packs, game state, client/server messages.",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -14,11 +14,10 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@dugout/protocol": "workspace:*"
+    "zod": "^4.1.0"
   }
 }

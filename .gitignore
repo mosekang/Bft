@@ -9,3 +9,8 @@ coverage/
 .env.*
 !.env.example
 *.tsbuildinfo
+
+# Real-player packs are personal and never committed (DESIGN.md §2, §5.6)
+packages/packs/private/
+packs/private/
+*.private.pack.json

@@ -9,12 +9,15 @@
   },
   "scripts": {
     "dev": "pnpm --filter @dugout/web dev",
-    "build": "pnpm -r --filter './packages/**' build && pnpm --filter @dugout/web build",
+    "build": "pnpm --filter @dugout/web build",
     "typecheck": "pnpm -r typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "cli": "pnpm --filter @dugout/cli start",
+    "pack:generate": "pnpm --filter @dugout/packs generate",
+    "pack:validate": "pnpm --filter @dugout/packs validate",
+    "pack:build": "pnpm --filter @dugout/packs build-pack",
     "clean": "pnpm -r exec rm -rf dist coverage node_modules/.vite"
   },
   "devDependencies": {
