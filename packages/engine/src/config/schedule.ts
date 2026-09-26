@@ -37,6 +37,11 @@ export const SCHEDULE = {
   timers: { prepS1: 30, prep: 40, carouselWave: 6, carouselWaveJourneyman: 9, augment: 25, playback: 20, settle: 4 },
   /** Carousel cost range by stage (§10.1). */
   carouselCosts: { 2: [1, 2], 3: [2, 3], 4: [3, 3], 5: [3, 4], 6: [4, 5] } as Readonly<Record<number, readonly [number, number]>>,
+  /**
+   * Extra draw weight per cost inside a stage's carousel range (§10.1 fixes the
+   * range, not the mix). Default 1 = proportional to pool copies.
+   */
+  carouselCostWeight: { 6: { 5: 3 } } as Readonly<Record<number, Readonly<Record<number, number>>>>,
   carouselWithItemStages: [2, 3] as readonly number[],
   carouselCards: 8,
   carouselWaveSize: 2,

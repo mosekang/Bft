@@ -17,7 +17,8 @@ export const ARCHETYPE_DEFS: Readonly<Record<Archetype, ArchetypeDef>> = {
   LONG_BALL: { id: "LONG_BALL", nameKo: "뻥야구팀", preferredTags: ["SLUGGER", "RIGHTY_BAT", "FIREBALLER"], rerollTendency: "LOW", levelPace: "STANDARD", reserveGold: null, preferredStadium: "HITTER_FRIENDLY" },
   SMALL_BALL: { id: "SMALL_BALL", nameKo: "스몰볼팀", preferredTags: ["SPEEDSTER", "CONTACT_HITTER", "FINESSE"], rerollTendency: "MID", levelPace: "STANDARD", reserveGold: null, preferredStadium: "ARTIFICIAL_TURF" },
   FOREIGN_RELIANT: { id: "FOREIGN_RELIANT", nameKo: "용병의존팀", preferredTags: ["FOREIGN", "VETERAN"], rerollTendency: "LOW", levelPace: "STANDARD", reserveGold: null },
-  PROSPECTS: { id: "PROSPECTS", nameKo: "유망주팀", preferredTags: ["HS_PROSPECT", "CONTACT_HITTER"], rerollTendency: "HIGH", levelPace: "SLOW", reserveGold: 30 },
+  /** levelPace STANDARD instead of §11.1 "느림" (ADR-0010): slow-rolling made it the strongest archetype by 0.8 places. */
+  PROSPECTS: { id: "PROSPECTS", nameKo: "유망주팀", preferredTags: ["HS_PROSPECT", "CONTACT_HITTER"], rerollTendency: "HIGH", levelPace: "STANDARD", reserveGold: 30 },
   DEFENSE_FIRST: { id: "DEFENSE_FIRST", nameKo: "수비의팀", preferredTags: ["GOLD_GLOVE", "CATCHER", "FINESSE"], rerollTendency: "MID", levelPace: "STANDARD", reserveGold: null, preferredStadium: "PITCHER_FRIENDLY" },
   ECON: { id: "ECON", nameKo: "이자팀", preferredTags: [], rerollTendency: "NONE", levelPace: "SLOW", reserveGold: 50 },
   COPYCAT: { id: "COPYCAT", nameKo: "카피팀", preferredTags: [], rerollTendency: "MID", levelPace: "STANDARD", reserveGold: null },
@@ -26,6 +27,15 @@ export const ARCHETYPE_DEFS: Readonly<Record<Archetype, ArchetypeDef>> = {
 
 /** Shop scoring weights (§11.2). */
 export const BOT_SHOP_SCORE = { ovr: 0.5, tagFit: 20, starProgress: 15, costPenalty: 3 } as const;
+
+/**
+ * Late-game 5-cost hunting (§15.1 5-cost ★★ rate): from `minLevel`, a 5-cost
+ * card scores `singleBonus` extra, or `pairBonus` when a copy is already owned.
+ * In S6+ at level 9+ (and ≥ `minLevel`), a bot holding a 5-cost ★ keeps rerolling ("hunting")
+ * with probability `huntRerollProb` per reroll, down to `huntFloor` gold,
+ * at most `huntMaxRerolls` times per round.
+ */
+export const BOT_LATE_FIVE_COST = { minLevel: 8, singleBonus: 12, pairBonus: 30, huntRerollProb: 0.97, huntFloor: 2, huntMaxRerolls: 30 } as const;
 
 /**
  * Board synergies (v3 §18.3) a card would feed, in tag-fit units (a
@@ -37,7 +47,7 @@ export const BOT_BOARD_SYNERGY_FIT: Readonly<Record<BoardSynergyId, number>> = {
 
 /** Board synergies each archetype actively chases (counted like preferred tags). */
 export const BOT_BOARD_SYNERGY_PREFS: Readonly<Record<Archetype, readonly BoardSynergyId[]>> = {
-  LONG_BALL: ["HOMEGROWN"], SMALL_BALL: ["LEADOFF", "SWITCH_HITTER"], FOREIGN_RELIANT: ["SWITCH_HITTER"], PROSPECTS: ["HOMEGROWN"],
+  LONG_BALL: ["HOMEGROWN"], SMALL_BALL: [], FOREIGN_RELIANT: ["SWITCH_HITTER"], PROSPECTS: ["HOMEGROWN"],
   DEFENSE_FIRST: ["UTILITY", "BACKUP_CATCHER", "SIDEARM"], ECON: [], COPYCAT: [], REROLL: ["UTILITY", "SIDEARM"],
 };
 

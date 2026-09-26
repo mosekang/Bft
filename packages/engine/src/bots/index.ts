@@ -1,7 +1,7 @@
 import type { Action, AugmentId, CardDef, GameState, Location, PlayerState, Pos, StadiumId, SynergyId } from "@dugout/protocol";
 import { POS } from "@dugout/protocol";
 import { AUGMENT_BY_ID } from "../config/augments.js";
-import { ARCHETYPE_DEFS, BOT_AUGMENT_PREFS, BOT_ITEM_PREFS, BOT_SHOP_SCORE, type ArchetypeDef } from "../config/bots.js";
+import { ARCHETYPE_DEFS, BOT_AUGMENT_PREFS, BOT_ITEM_PREFS, BOT_LATE_FIVE_COST, BOT_SHOP_SCORE, type ArchetypeDef } from "../config/bots.js";
 import { ITEM_BY_ID } from "../config/items.js";
 import { boardSynergyFit } from "./boardFit.js";
 import { ECONOMY } from "../config/economy.js";
@@ -80,7 +80,8 @@ function shopScore(def: CardDef, p: PlayerState, state: GameState, ctx: RunConte
   const fit = tagFit(def, arch, boardTags) + boardSynergyFit(def, p, state, ctx, arch.id);
   let score = cardOvr(def) * w.ovr + fit * w.tagFit + progress * w.starProgress - def.cost * w.costPenalty;
   if (arch.id === "REROLL" && def.cost > 2) score -= 20;
-  if (def.cost === 5 && progress >= 1 && p.level >= LEVELS.max - 1) score += 12;
+  const late = BOT_LATE_FIVE_COST;
+  if (def.cost === 5 && p.level >= late.minLevel) score += progress >= 1 ? late.pairBonus : late.singleBonus;
   return score;
 }
 
@@ -338,15 +339,18 @@ export const bots: BotController = {
     buyMerges();
     levelUp();
     shopPass();
-    for (let r = 0; r < 20; r++) {
+    const late = BOT_LATE_FIVE_COST;
+    for (let r = 0; r < late.huntMaxRerolls; r++) {
       const p = P(s, playerId);
       const eff = computeEffects(p, s.cards, ctx, round.stage).run;
       const cost = rerollCostFor(p, eff);
-      if (r >= 12 && !(round.stage >= 6 && p.level >= LEVELS.max - 1)) break;
-      const line = arch.id === "REROLL" ? 10 : arch.id === "PROSPECTS" ? 30 : arch.id === "ECON" ? 50 : reserve(arch, p);
       const lateGame = round.stage >= 6 && p.level >= LEVELS.max - 1;
-      const prob = lateGame ? Math.max(rerollProb, 0.9) : rerollProb;
-      const floor = lateGame ? Math.min(line, 10) : line;
+      // Holding a 5-cost ★ late: dig for the pair (§15.1 5-cost ★★ rate).
+      const hunting = lateGame && p.level >= late.minLevel && ownedIds(p).some((id) => s.cards[id]!.star === 1 && ctx.defs.get(s.cards[id]!.defId)?.cost === 5);
+      if (r >= (hunting ? late.huntMaxRerolls : lateGame ? 20 : 12)) break;
+      const line = arch.id === "REROLL" ? 10 : arch.id === "PROSPECTS" ? 30 : arch.id === "ECON" ? 50 : reserve(arch, p);
+      const prob = hunting ? late.huntRerollProb : lateGame ? Math.max(rerollProb, 0.9) : rerollProb;
+      const floor = hunting ? late.huntFloor : lateGame ? Math.min(line, 10) : line;
       if (p.gold - cost < floor || !rng.chance(prob)) break;
       const before = s;
       s = act(s, playerId, { type: "REROLL" }, ctx);

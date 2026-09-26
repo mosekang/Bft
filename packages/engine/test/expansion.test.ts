@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ARCHETYPES, AUGMENT_IDS, PackSchema, SPECIAL_ITEM_IDS, type AugmentId, type CardDef, type CardInstance, type GameState, type Pack, type Slot } from "@dugout/protocol";
+import { ARCHETYPES, AUGMENT_IDS, PackSchema, SPECIAL_ITEM_IDS, type AugmentId, type CardDef, type CardInstance, type GameState, type Pack, type Pos, type Slot } from "@dugout/protocol";
 import {
   AUGMENT_BY_ID,
   BOARD_SYNERGY_RULES,
@@ -39,12 +39,12 @@ const pack: Pack = PackSchema.parse(JSON.parse(readFileSync(resolve(__dirname, "
 const ctx = createContext(pack);
 setAssertions(true);
 
-const HITTER_SLOTS: Slot[] = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
+const HITTER_SLOTS: Pos[] = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 const hitters = pack.cards.filter((c) => c.role === "H");
 const pitchers = pack.cards.filter((c) => c.role !== "H");
 
 /** A PREP-phase run where "me" owns exactly `defs` on the board (hitters in lineup order, pitchers P1..P3). */
-function withBoard(defs: CardDef[], opts: { star?: 1 | 2; augments?: AugmentId[]; order?: Slot[] } = {}): GameState {
+function withBoard(defs: CardDef[], opts: { star?: 1 | 2; augments?: AugmentId[]; order?: Pos[] } = {}): GameState {
   let s = createRun(ctx, { seed: "expansion", players: [{ id: "me", nickname: "나", isBot: false }] });
   s = { ...s, phase: "PREP" };
   const cards: Record<string, CardInstance> = {};
@@ -58,7 +58,7 @@ function withBoard(defs: CardDef[], opts: { star?: 1 | 2; augments?: AugmentId[]
   });
   return {
     ...s, cards,
-    players: s.players.map((x) => (x.id === "me" ? { ...x, level: 10, gold: 50, augments: opts.augments ?? [], board: { ...x.board, slots, order: opts.order ?? [...HITTER_SLOTS] as typeof x.board.order } } : x)),
+    players: s.players.map((x) => (x.id === "me" ? { ...x, level: 10, gold: 50, augments: opts.augments ?? [], board: { ...x.board, slots, order: opts.order ?? [...HITTER_SLOTS] } } : x)),
   };
 }
 const me = (s: GameState) => s.players.find((p) => p.id === "me")!;

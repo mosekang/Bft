@@ -1,5 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 1`] = `"LONG_BALL:8:8|SMALL_BALL:7:9|FOREIGN_RELIANT:6:9|PROSPECTS:5:9|DEFENSE_FIRST:4:9|ECON:2:9|COPYCAT:1:9|REROLL:3:8"`;
+exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 1`] = `"LONG_BALL:4:9|SMALL_BALL:3:9|FOREIGN_RELIANT:8:8|PROSPECTS:6:8|DEFENSE_FIRST:1:9|ECON:7:9|COPYCAT:5:9|REROLL:2:8"`;
 
-exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 2`] = `"2378602461-3372735569-448859592-1577076292"`;
+exports[`full bot runs > golden snapshot: seed 12345 final placements and pool hash stay fixed 2`] = `"3484610719-1062491466-3102729320-1208566205"`;

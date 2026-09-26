@@ -24,14 +24,19 @@ export const LEAGUE = {
  * mid-run matchup lands on the §6.1 league rates. Mutable on purpose so the
  * calibration CLI can sweep it; production code never writes to it.
  */
-export const PIVOT = { hitter: 57, pitcher: 55 };
+export const PIVOT = { hitter: 59, pitcher: 55 };
 /** Kept for formulas that are neutral between the two populations. */
 export const RATING_PIVOT = 55;
 
-/** `k` per rating (§6.2). Sign encodes direction. */
+/**
+ * `k` per rating (§6.2 values ×1.1, ADR-0010). Sign encodes direction. The
+ * v3 board carries rating-invisible effects (HOMEGROWN, LEADOFF, …), so the
+ * strong-team win rate (§15.1) sat on its 0.65 floor; ×1.1 restores margin
+ * and `PIVOT.hitter` 57 → 59 keeps runs per game centred.
+ */
 export const RATING_K = {
-  hitter: { kRate: -0.018, bbRate: 0.02, hrRate: 0.03 },
-  pitcher: { kRate: 0.018, bbRate: -0.02, hrRate: -0.022 },
+  hitter: { kRate: -0.0198, bbRate: 0.022, hrRate: 0.033 },
+  pitcher: { kRate: 0.0198, bbRate: -0.022, hrRate: -0.0242 },
 } as const;
 
 /** Additive coefficients per rating point above the pivot (§6.2). */
@@ -108,10 +113,11 @@ export const GAME = {
   /**
    * Extra-inning environment: both sides use their best relievers and play
    * for one run, so scoring per half drops (KBO extra innings are ~30 % less
-   * productive). Tuned so that ~35 % of games reaching the 10th end tied
-   * after the 12th, giving the §15.1 draw rate of 3–7 %.
+   * productive). Tuned by bot-arena (ADR-0010; was 1.25/0.85/0.7/−.05 at a
+   * 1.9 % draw rate) so that about half of the games reaching the 10th end
+   * tied after the 12th, giving the §15.1 draw rate of 3–7 % (≈ 4.5 %).
    */
-  extraInnings: { kMult: 1.25, bbMult: 0.85, hrMult: 0.7, babipAdd: -0.05 },
+  extraInnings: { kMult: 1.8, bbMult: 0.5, hrMult: 0.3, babipAdd: -0.13 },
   highlightCount: 5,
   /** Performance budgets in ms. */
   budgetNodeMs: 30,

@@ -12,7 +12,8 @@ export function buildCarousel(state: GameState, stage: number, rng: Rng, ctx: Ru
   for (let i = 0; i < SCHEDULE.carouselCards; i++) {
     const candidates = ctx.pack.cards.filter((c) => c.cost >= lo && c.cost <= hi && (pool[c.id] ?? 0) > 0);
     if (candidates.length === 0) break;
-    const def = candidates[rng.weightedIndex(candidates.map((c) => pool[c.id] ?? 0))]!;
+    const costWeight = SCHEDULE.carouselCostWeight[stage] ?? {};
+    const def = candidates[rng.weightedIndex(candidates.map((c) => (pool[c.id] ?? 0) * (costWeight[c.cost] ?? 1)))]!;
     pool[def.id] = (pool[def.id] ?? 0) - 1;
     cards.push(SCHEDULE.carouselWithItemStages.includes(stage) ? { defId: def.id, item: randomComponent(rng) } : { defId: def.id });
   }
