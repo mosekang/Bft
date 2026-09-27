@@ -59,9 +59,9 @@ export function wallPath(d: ParkDims): [number, number][] {
  */
 export const BOARD_SPOTS: Record<string, [number, number, number]> = {
   C: [0, 0, -2], "1B": [-19, 0, 24], "2B": [-11, 0, 37], SS: [11, 0, 37], "3B": [19, 0, 24],
-  LF: [31, 0, 58], CF: [0, 0, 66], RF: [-31, 0, 58], DH: [-11, 0, -4], P1: [0, 0.25, 18.4],
+  LF: [26, 0, 46], CF: [0, 0, 52], RF: [-26, 0, 46], DH: [-12, 0, -5], P1: [0, 0.25, 18.4],
   // Bullpen mounds in LF foul territory.
-  P2: [26, 0, 9], P3: [33, 0, 15],
+  P2: [24, 0, 6], P3: [30, 0, 11],
 };
 
 export const DUGOUT_SPACING = 4.6;
@@ -156,5 +156,5 @@ export function drawField(g: CanvasRenderingContext2D, w: number, h: number, d: 
   g.fillStyle = "rgba(244,244,240,0.35)";
   for (const [x, z] of [[-11, -4], [11, -4]] as const) { const [cx, cz] = P(x, z); g.beginPath(); g.ellipse(cx, cz, 0.8 * sx, 0.8 * sz, 0, 0, Math.PI * 2); g.fill(); }
   // Bullpen mounds.
-  disc(26, 9, 2.4, "#b8733f"); disc(33, 15, 2.4, "#b8733f");
+  disc(24, 6, 2.6, "#b8733f"); disc(30, 11, 2.6, "#b8733f");
 }

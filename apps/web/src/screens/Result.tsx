@@ -2,6 +2,7 @@ import { POS, type SynergyId } from "@dugout/protocol";
 import { computeEffects } from "@dugout/engine";
 import { useMemo, useRef } from "react";
 import { Avatar } from "../lib/avatar.js";
+import { CardArt } from "../components/CardArt.js";
 import { cardOvrWithStar } from "../lib/format.js";
 import { topMemories } from "../lib/memories.js";
 import { ctx } from "../lib/pack.js";
@@ -44,7 +45,7 @@ export function Result() {
   const share = async () => {
     const text = `덕아웃 택틱스 — ${me.placement}위 (${state.roundIndex + 1}라운드, 시드 ${state.seed})`;
     try {
-      const blob = await renderShareImage(me.placement ?? 8, state.round, mvpDef?.name ?? "", mvpCard ? `★${mvpCard.star} · OVR ${cardOvrWithStar(mvpDef!, mvpCard)}` : "", memories.map((m) => m.text), portraitRef.current?.querySelector("svg") ?? null);
+      const blob = await renderShareImage(me.placement ?? 8, state.round, mvpDef?.name ?? "", mvpCard ? `★${mvpCard.star} · OVR ${cardOvrWithStar(mvpDef!, mvpCard)}` : "", memories.map((m) => m.text), portraitRef.current?.querySelector("svg, img") ?? null);
       const file = blob ? new File([blob], "dugout-tactics.png", { type: "image/png" }) : null;
       if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text });
       else if (file) { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); URL.revokeObjectURL(a.href); }
@@ -63,7 +64,7 @@ export function Result() {
       </div>
       {mvpDef && mvpCard && (
         <div className="panel rise mt-3 flex items-center gap-3 rounded-2xl p-3">
-          <div ref={portraitRef} className="shrink-0 rounded-xl bg-gradient-to-b from-[#f7f3e8] to-[#e9e2d0] p-1"><Avatar def={mvpDef} size={72} /></div>
+          <div ref={portraitRef} className="shrink-0 rounded-xl bg-gradient-to-b from-[#f7f3e8] to-[#e9e2d0] p-1"><CardArt def={mvpDef} size={72} /></div>
           <div className="min-w-0">
             <div className="led text-[12px] tracking-[0.3em]">MVP</div>
             <div className="display truncate text-[22px]">{mvpDef.name} <span className="text-[var(--gold)]">{"★".repeat(mvpCard.star)}</span></div>
@@ -101,7 +102,7 @@ export function Result() {
 }
 
 /** 1080×1350 share card: placement, MVP portrait and the best plays (§14.1, Web Share API). */
-async function renderShareImage(place: number, round: string, mvpName: string, mvpLine: string, plays: string[], svg: SVGSVGElement | null): Promise<Blob | null> {
+async function renderShareImage(place: number, round: string, mvpName: string, mvpLine: string, plays: string[], svg: Element | null): Promise<Blob | null> {
   const cv = document.createElement("canvas");
   cv.width = 1080; cv.height = 1350;
   const g = cv.getContext("2d");
@@ -114,7 +115,8 @@ async function renderShareImage(place: number, round: string, mvpName: string, m
   g.fillStyle = "#fff"; g.font = "bold 72px 'Black Han Sans', sans-serif"; g.fillText("덕아웃 택틱스", 540, 200);
   g.font = "bold 260px 'Bebas Neue', sans-serif"; g.fillStyle = "#ffcf3f"; g.fillText(`${place}위`, 540, 470);
   g.font = "36px 'Noto Sans KR', sans-serif"; g.fillStyle = "#cbd5e1"; g.fillText(`시즌 종료 · S${round}`, 540, 530);
-  if (svg) {
+  if (svg instanceof HTMLImageElement) g.drawImage(svg, 340, 560, 400, 400);
+  else if (svg) {
     const xml = new XMLSerializer().serializeToString(svg).replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
     const img = new Image();
     const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml" }));

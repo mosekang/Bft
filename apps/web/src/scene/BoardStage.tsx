@@ -27,11 +27,11 @@ import { TARGET_FPS, type Quality } from "./quality.js";
 import { Stadium } from "./Stadium.js";
 import { FpsProbe, Ticker, fitCamera, toScreen } from "./stageKit.js";
 
-const FIG = 5.4;
-const BENCH_FIG = 3.9;
+const FIG = 6.6;
+const BENCH_FIG = 4.6;
 const HITTER_SLOTS: readonly Slot[] = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
 const isHitterSlot = (s: Slot) => HITTER_SLOTS.includes(s);
-const SNAP_RADIUS = 13;
+const SNAP_RADIUS = 11;
 
 export interface BoardStageProps {
   state: GameState;
@@ -171,12 +171,12 @@ function Scene(props: BoardStageProps & { onLabels: (l: LabelPos[]) => void; col
   // Camera fit (portrait-aware) + parallax.
   const fitPoints = useMemo(() => {
     const pts: THREE.Vector3[] = [];
-    for (const s of SLOTS) { const p = BOARD_SPOTS[s]!; pts.push(new THREE.Vector3(p[0], 0, p[2] - 6), new THREE.Vector3(p[0], FIG * 2.1, p[2])); }
+    for (const s of SLOTS) { const p = BOARD_SPOTS[s]!; pts.push(new THREE.Vector3(p[0], 0, p[2] - 5), new THREE.Vector3(p[0], FIG * 1.9, p[2])); }
     for (const seat of dugoutSeats("home", 6, DUGOUT_SPACING)) pts.push(new THREE.Vector3(seat.pos[0], 0, seat.pos[2]));
     return pts;
   }, []);
-  const target = useMemo(() => new THREE.Vector3(0, 0, 30), []);
-  const refit = () => fitCamera(camera as THREE.PerspectiveCamera, target, fitPoints, yaw.current, 0.95, 0.94);
+  const target = useMemo(() => new THREE.Vector3(0, 0, 24), []);
+  const refit = () => fitCamera(camera as THREE.PerspectiveCamera, target, fitPoints, yaw.current, 0.8, 0.95);
   useEffect(() => { refit(); }, [size.width, size.height]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Labels follow the camera (projected once per camera change).

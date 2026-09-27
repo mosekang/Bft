@@ -34,13 +34,17 @@ export function Ticker({ fps, clock, timeScale }: { fps: number; clock: React.Mu
 }
 
 /** Average FPS over the first `ms`, reported once (DESIGN §15.6 auto tier). */
-export function FpsProbe({ ms = 2000, onResult }: { ms?: number; onResult: (fps: number) => void }) {
+export function FpsProbe({ ms = 2000, warmup = 1500, onResult }: { ms?: number; warmup?: number; onResult: (fps: number) => void }) {
   const start = useRef<number | null>(null);
+  const born = useRef<number | null>(null);
   const frames = useRef(0);
   const done = useRef(false);
   useFrame(() => {
     if (done.current) return;
     const now = performance.now();
+    // Skip the first frames: shader compilation stalls are not the steady frame rate.
+    if (born.current === null) born.current = now;
+    if (now - born.current < warmup) return;
     if (start.current === null) { start.current = now; return; }
     frames.current++;
     if (now - start.current >= ms) { done.current = true; onResult((frames.current * 1000) / (now - start.current)); }

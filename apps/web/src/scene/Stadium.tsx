@@ -61,7 +61,7 @@ function Field({ dims }: { dims: ParkDims }) {
         <mesh key={`${x},${z}`} position={[x, 0.05, z]} rotation-y={Math.PI / 4}><boxGeometry args={[0.38, 0.08, 0.38]} /><meshBasicMaterial color="#fafaf5" /></mesh>
       ))}
       <mesh position={[0, 0.02, 0]} rotation-x={-Math.PI / 2}><circleGeometry args={[0.3, 5]} /><meshBasicMaterial color="#fafaf5" /></mesh>
-      {([[26, 9], [33, 15]] as const).map(([x, z]) => (
+      {([[24, 6], [30, 11]] as const).map(([x, z]) => (
         <mesh key={`bp${x}`} position={[x, 0.1, z]}><cylinderGeometry args={[2.0, 2.3, 0.2, 18]} /><meshLambertMaterial color="#b8733f" /></mesh>
       ))}
     </group>
@@ -331,8 +331,9 @@ function Dugout({ side, color, scale }: { side: "home" | "away"; color: string; 
     <group position={[f.center[0], 0, f.center[1]]} rotation-y={f.yaw}>
       <mesh position={[0, -0.95, 0]}><boxGeometry args={[L, 0.2, 2.2 * s]} /><meshLambertMaterial color="#3f3a36" /></mesh>
       <mesh position={[0, 0.5 * s, -1.1 * s]}><boxGeometry args={[L, 2.6 * s, 0.3]} /><meshLambertMaterial color="#1f2937" /></mesh>
-      <mesh position={[0, 1.8 * s, -0.1 * s]}><boxGeometry args={[L + 0.4, 0.25 * s, 2.5 * s]} /><meshLambertMaterial color="#111827" /></mesh>
-      <mesh position={[0, 1.8 * s, 1.16 * s]}><boxGeometry args={[L + 0.4, 0.45 * s, 0.12]} /><meshBasicMaterial color={color} /></mesh>
+      {/* Prep scale (s > 1) drops the roof so the seated bench stays visible from the board camera. */}
+      {s <= 1 && <mesh position={[0, 1.8 * s, -0.1 * s]}><boxGeometry args={[L + 0.4, 0.25 * s, 2.5 * s]} /><meshLambertMaterial color="#111827" /></mesh>}
+      <mesh position={[0, s <= 1 ? 1.8 * s : 0.9, s <= 1 ? 1.16 * s : 1.3 * s]}><boxGeometry args={[L + 0.4, s <= 1 ? 0.45 * s : 0.9, 0.12]} /><meshBasicMaterial color={color} /></mesh>
       <mesh position={[0, -0.9 + 0.45 * s, -0.55 * s]}><boxGeometry args={[L - 0.5, 0.15 * s, 0.5 * s]} /><meshLambertMaterial color="#6b4f3a" /></mesh>
       <mesh position={[0, 0.1, 1.15 * s]}><boxGeometry args={[L, 0.9, 0.1]} /><meshLambertMaterial color="#0d3b24" /></mesh>
     </group>

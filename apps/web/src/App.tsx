@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
+
+const Gallery = lazy(() => import("./scene/Gallery.js"));
+const GALLERY = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("gallery");
 import { Toast } from "./components/Toast.js";
 import { Lobby } from "./screens/Lobby.js";
 import { Playback } from "./screens/Playback.js";
@@ -15,6 +18,7 @@ export function App() {
   const room = useRun((s) => s.room);
   const load = useSession((s) => s.load);
   useEffect(() => { void load(); }, [load]);
+  if (GALLERY) return <Suspense fallback={null}><Gallery /></Suspense>;
   let screen: JSX.Element;
   if (room && !state) screen = <RoomLobby />;
   else if (!state) screen = <Lobby />;

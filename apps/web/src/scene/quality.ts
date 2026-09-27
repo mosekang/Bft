@@ -34,11 +34,14 @@ export function qualityForced(): boolean {
   return q === "high" || q === "mid" || q === "low";
 }
 
-/** Tier from the average FPS of the first two seconds (auto mode only). */
+/**
+ * Tier from the average FPS of the first seconds (auto mode only). Never
+ * drops to the 2D fallback: a phone that stutters while shaders compile
+ * still gets the 3D game, just without the high-tier extras.
+ */
 export function tierFromFps(avg: number, current: Quality): Quality {
-  if (avg >= 55) return "high";
-  if (avg < 30) return "low";
-  return current === "high" ? "mid" : current;
+  if (current === "low") return "low";
+  return avg >= 55 ? "high" : "mid";
 }
 
 export const PARTICLE_SCALE: Record<Quality, number> = { high: 1, mid: 0.5, low: 0.25 };
