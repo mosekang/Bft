@@ -12,10 +12,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&display=swap" />
     <title>덕아웃 택틱스</title>
-    <script type="module" crossorigin src="/Bft/assets/index-042dQT97.js"></script>
-    <link rel="stylesheet" crossorigin href="/Bft/assets/index-BGnM94k5.css">
+    <script type="module" crossorigin src="/Bft/assets/index-d4jWqXqh.js"></script>
+    <link rel="stylesheet" crossorigin href="/Bft/assets/index-Dw56ld-X.css">
   <link rel="manifest" href="/Bft/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Bft/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
+    <div id="splash" aria-hidden="true" style="position:fixed;inset:0;z-index:100;display:grid;place-items:center;pointer-events:none;background:radial-gradient(120% 70% at 50% 0%,#1e3a5f 0%,#0b1224 55%,#04070f 100%);transition:opacity .45s ease">
+      <style>
+        #splash .ball{width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#f1efe6 55%,#cfc9b8 100%);box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative;overflow:hidden;margin:0 auto;animation:sp-spin 1s linear infinite}
+        #splash .ball:before,#splash .ball:after{content:"";position:absolute;top:8px;bottom:8px;width:30px;border:3px dashed #d33;border-radius:50%}
+        #splash .ball:before{left:-18px;border-left:none;border-top:none;border-bottom:none}
+        #splash .ball:after{right:-18px;border-right:none;border-top:none;border-bottom:none}
+        #splash h1{font-family:"Black Han Sans","Noto Sans KR",system-ui,sans-serif;font-weight:400;font-size:44px;line-height:1;margin:22px 0 6px;color:#fff;text-align:center;text-shadow:0 4px 0 #0b1224}
+        #splash h1 span{color:#fcd34d}
+        #splash p{font:600 12px system-ui,sans-serif;letter-spacing:.4em;color:#ffb547;text-align:center;margin:0}
+        @keyframes sp-spin{to{transform:rotate(360deg)}}
+      </style>
+      <div><div class="ball"></div><h1>덕아웃 <span>택틱스</span></h1><p>LOADING</p></div>
+    </div>
   </body>
 </html>
