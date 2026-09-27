@@ -6,6 +6,7 @@ import { PACK_COMPOSITION, PACK_CARD_COUNT, baseNickname, cardOvr, createRng } f
 import { PackSchema, type CardDef, type ClassTag, type Cost, type Hand, type HitterRatings, type OriginTag, type Pack, type PitcherRatings, type Pos } from "@dugout/protocol";
 import { CLASS_MINIMUMS, generatePack } from "./generate.js";
 import { FICTIONAL_TEAMS } from "./names.js";
+import { hitterClassMargins, pitcherClassMargins } from "./tags.js";
 
 export interface HitterRow {
   name: string; team: string; bats: string; throws: string; pos: string; age: number; PA: number; AVG: number; OBP: number; SLG: number;
@@ -123,17 +124,11 @@ export function buildPackFromCsv(hittersCsv: string, pitchersCsv: string, opts: 
     const nat = c.nationality ?? "KR";
     if (c.role === "H" && c.hitter) {
       const d = { contact: (c.hitter.kRate + c.hitter.contactL + c.hitter.contactR) / 3, power: c.hitter.hrRate, speed: c.hitter.speed, defense: c.hitter.def[c.pos] ?? 40 };
-      if (d.power >= 70 && d.contact < d.power) classes.push("SLUGGER");
-      if (d.contact >= 70) classes.push("CONTACT_HITTER");
-      if (d.speed >= 70) classes.push("SPEEDSTER");
-      if (d.defense >= 72) classes.push("GOLD_GLOVE");
+      for (const m of hitterClassMargins(d, c.pos)) if (m.ok) classes.push(m.tag);
       if (c.pos === "C") classes.unshift("CATCHER");
     } else if (c.pitcher) {
-      const stuff = c.pitcher.kRate, mov = c.pitcher.gbRate;
-      if (stuff >= 72) classes.push("FIREBALLER");
-      if (mov >= 68 && stuff < 65) classes.push("FINESSE");
-      if (c.pitcher.stamina >= 72 && c.role === "SP") classes.push("INNING_EATER");
-      if (c.role === "RP" && stuff >= 70) classes.push("CLOSER");
+      const view = { stuff: c.pitcher.kRate, movement: c.pitcher.gbRate, stamina: c.pitcher.stamina, mental: c.pitcher.mental };
+      for (const m of pitcherClassMargins(view, c.role === "RP" ? "RP" : "SP")) if (m.ok && m.tag !== "CLUTCH") classes.push(m.tag);
     }
     const mental = c.pitcher?.mental ?? 55;
     if ((mental >= 75 || rng.chance(0.15)) && classes.length < 2 && !classes.includes("CLUTCH")) classes.push("CLUTCH");

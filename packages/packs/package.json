@@ -19,7 +19,8 @@
     "test": "vitest run",
     "generate": "tsx src/cli.ts generate",
     "validate": "tsx src/cli.ts validate",
-    "build-pack": "tsx src/cli.ts build"
+    "build-pack": "tsx src/cli.ts build",
+    "roster": "tsx src/cli.ts roster"
   },
   "dependencies": {
     "@dugout/engine": "workspace:*",

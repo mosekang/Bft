@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { generatePack } from "./generate.js";
 import { validatePack } from "./validate.js";
 import { buildPackFromCsv } from "./build.js";
+import { buildPackFromRoster } from "./roster.js";
+import { parseRosterCsv, parseTeamsCsv } from "./rosterCsv.js";
 
 const HELP = `dugout packs
 
@@ -12,6 +14,8 @@ const HELP = `dugout packs
   validate [<file>]                          Validate a pack JSON (default: fictional-v1.json)
   build --hitters h.csv --pitchers p.csv --out my.json [--id my-kbo-2026] [--name "내 팩"]
                                              CSV -> private pack (never commit the output)
+  roster --roster r.csv --teams t.csv --out my.json [--id my-pack] [--name "내 팩"] [--seed s]
+                                             Hand-authored roster (costs + display ratings) -> private pack
 `;
 
 export function run(argv: readonly string[], out: (s: string) => void = console.log): number {
@@ -61,6 +65,27 @@ export function run(argv: readonly string[], out: (s: string) => void = console.
       for (const e of report.errors) out(`  note: ${e}`);
       out("This pack is private (kind: private). Do not commit it.");
       return 0;
+    }
+    case "roster": {
+      const r = flag("--roster");
+      const t = flag("--teams");
+      const file = flag("--out");
+      if (!r || !t || !file) { out(HELP); return 2; }
+      const id = flag("--id") ?? "private-roster";
+      const seed = flag("--seed");
+      const { pack, notes } = buildPackFromRoster(parseRosterCsv(readFileSync(resolve(r), "utf8")), parseTeamsCsv(readFileSync(resolve(t), "utf8")), {
+        id,
+        name: flag("--name") ?? id,
+        ...(seed !== undefined ? { seed } : {}),
+      });
+      const report = validatePack(pack);
+      writeFileSync(resolve(file), `${JSON.stringify(pack, null, 2)}\n`);
+      out(`wrote ${resolve(file)} (${pack.cards.length} cards) — ${report.ok ? "valid" : "INVALID"}`);
+      for (const n of notes) out(`  note: ${n}`);
+      for (const w of report.warnings) out(`  warning: ${w}`);
+      for (const e of report.errors) out(`  error: ${e}`);
+      out("This pack is private (kind: private). Do not commit it.");
+      return report.ok ? 0 : 1;
     }
     default:
       out(HELP);
