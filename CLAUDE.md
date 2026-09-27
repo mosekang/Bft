@@ -58,6 +58,7 @@ pnpm dev                          # 웹 개발 서버 (--host)
 pnpm pack:generate --seed fictional-v1     # 가상 팩 재생성 (커밋본과 같아야 함; 생성기 변경 시에만)
 pnpm pack:validate [file.json]             # 팩 검증 (§5.3 제약)
 pnpm pack:build input.csv --out my.json    # CSV → 개인 팩 (Phase 5)
+pnpm pack:roster --roster r.csv --teams t.csv --out my.json --id my-pack   # 수기 로스터(코스트+표시치) → 개인 팩. 입력·출력은 packages/packs/private/에만
 pnpm cli sim-game --seed X                 # 1경기 박스스코어
 pnpm cli bot-arena --games 1000 --seed X   # 밸런스 리포트 (§15.1)
 pnpm --filter @dugout/web test:e2e         # Playwright: 솔로 1판 완주 + 친구방 2클라이언트 + v3(3D 보드·중계·CSV 팩)

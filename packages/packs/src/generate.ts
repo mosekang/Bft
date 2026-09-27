@@ -48,9 +48,9 @@ const RP_CLASS_QUOTA: Readonly<Partial<Record<ClassTag, number>>> = { CLOSER: 4,
 export const CLASS_MINIMUMS: Readonly<Record<ClassTag, number>> = {
   SLUGGER: 6, CONTACT_HITTER: 6, SPEEDSTER: 6, GOLD_GLOVE: 6, CATCHER: 4, FIREBALLER: 6, FINESSE: 6, INNING_EATER: 4, CLOSER: 4, CLUTCH: 6,
 };
-const HITTER_CLASSES: readonly ClassTag[] = ["SLUGGER", "CONTACT_HITTER", "SPEEDSTER", "GOLD_GLOVE", "CLUTCH"];
-const SP_CLASSES: readonly ClassTag[] = ["FIREBALLER", "FINESSE", "INNING_EATER", "CLUTCH"];
-const RP_CLASSES: readonly ClassTag[] = ["FIREBALLER", "FINESSE", "CLOSER", "CLUTCH"];
+export const HITTER_CLASSES: readonly ClassTag[] = ["SLUGGER", "CONTACT_HITTER", "SPEEDSTER", "GOLD_GLOVE", "CLUTCH"];
+export const SP_CLASSES: readonly ClassTag[] = ["FIREBALLER", "FINESSE", "INNING_EATER", "CLUTCH"];
+export const RP_CLASSES: readonly ClassTag[] = ["FIREBALLER", "FINESSE", "CLOSER", "CLUTCH"];
 
 const AGE_RANGE: Readonly<Record<OriginTag, readonly [number, number]>> = {
   HS_PROSPECT: [19, 22], COLLEGE: [23, 25], VETERAN: [32, 38], FOREIGN: [26, 33], MILITARY_DONE: [25, 29], JOURNEYMAN: [24, 31],
@@ -180,7 +180,6 @@ function buildShells(rng: Rng): Shell[] {
 
 const clamp = (n: number, lo = 1, hi = 99) => Math.max(lo, Math.min(hi, Math.round(n)));
 const jitter = (rng: Rng, sd: number) => Math.round((rng.next() + rng.next() + rng.next() - 1.5) * sd * 1.6);
-const j8 = (rng: Rng) => rng.int(-8, 8);
 
 function hitterBias(shell: Shell): Record<"contact" | "power" | "eye" | "speed" | "defense", number> {
   const b = { contact: 0, power: 0, eye: 0, speed: 0, defense: 0 };
@@ -209,81 +208,125 @@ function pitcherBias(shell: Shell): Record<"stuff" | "control" | "movement" | "s
   return b;
 }
 
-function makeHitterRatings(rng: Rng, shell: Shell, target: number): HitterRatings {
-  const bias = hitterBias(shell);
-  let contact = target + bias.contact + jitter(rng, 8);
-  let power = target + bias.power + jitter(rng, 9);
-  let eye = target + bias.eye + jitter(rng, 10);
-  let speed = target + bias.speed + jitter(rng, 12);
-  let defense = shell.pos === "DH" ? 40 : target + bias.defense + jitter(rng, 9);
+/** Base values for the five visible hitter ratings (plus throwing arm) that internals are derived from. */
+export interface HitterBase {
+  contact: number;
+  power: number;
+  eye: number;
+  speed: number;
+  defense: number;
+  arm: number;
+}
+
+/** Base values for the five visible pitcher ratings. */
+export interface PitcherBase {
+  stuff: number;
+  control: number;
+  movement: number;
+  stamina: number;
+  mental: number;
+}
+
+/** The parts of a card that shape its internal ratings. */
+export type RatingShell = Pick<Shell, "cost" | "role" | "pos" | "pos2" | "bats" | "throws" | "classes">;
+
+/**
+ * Hitter internals from display-level bases (§5.5): each internal is its
+ * display base ± `spread`; hidden tendencies follow the class tags.
+ */
+export function deriveHitterRatings(rng: Rng, shell: RatingShell, base: HitterBase, spread = 8): HitterRatings {
+  const j = () => rng.int(-spread, spread);
   const platoon = shell.bats === "L" ? 4 : shell.bats === "R" ? -4 : 0;
-  const build = (): HitterRatings => {
-    const def: Partial<Record<Pos, number>> = {};
-    if (shell.pos !== "DH") def[shell.pos] = clamp(defense + j8(rng));
-    for (const p of shell.pos2) if (p !== "DH") def[p] = clamp(defense - 6 + j8(rng));
-    return {
-      kRate: clamp(contact + j8(rng)),
-      contactL: clamp(contact - platoon + j8(rng)),
-      contactR: clamp(contact + platoon + j8(rng)),
-      hrRate: clamp(power + j8(rng)),
-      xbhRate: clamp(power + j8(rng)),
-      bbRate: clamp(eye + j8(rng)),
-      gbTend: clamp(55 + jitter(rng, 15) - (shell.classes.includes("SLUGGER") ? 15 : 0) + (shell.classes.includes("SPEEDSTER") ? 8 : 0)),
-      pullTend: clamp(55 + jitter(rng, 15) + (shell.classes.includes("SLUGGER") ? 8 : 0)),
-      speed: clamp(speed + j8(rng)),
-      sbSkill: clamp(speed + j8(rng)),
-      def,
-      arm: clamp((shell.pos === "DH" ? target : defense) + j8(rng)),
-      clutch: 0,
-    };
+  const def: Partial<Record<Pos, number>> = {};
+  if (shell.pos !== "DH") def[shell.pos] = clamp(base.defense + j());
+  for (const p of shell.pos2) if (p !== "DH") def[p] = clamp(base.defense - 6 + j());
+  return {
+    kRate: clamp(base.contact + j()),
+    contactL: clamp(base.contact - platoon + j()),
+    contactR: clamp(base.contact + platoon + j()),
+    hrRate: clamp(base.power + j()),
+    xbhRate: clamp(base.power + j()),
+    bbRate: clamp(base.eye + j()),
+    gbTend: clamp(55 + jitter(rng, 15) - (shell.classes.includes("SLUGGER") ? 15 : 0) + (shell.classes.includes("SPEEDSTER") ? 8 : 0)),
+    pullTend: clamp(55 + jitter(rng, 15) + (shell.classes.includes("SLUGGER") ? 8 : 0)),
+    speed: clamp(base.speed + j()),
+    sbSkill: clamp(base.speed + j()),
+    def,
+    arm: clamp(base.arm + j()),
+    clutch: 0,
   };
+}
+
+/** Pitcher internals from display-level bases (§5.5). `sidearm` pins a low arm angle. */
+export function derivePitcherRatings(rng: Rng, shell: RatingShell, base: PitcherBase, sidearm: boolean, spread = 8): PitcherRatings {
+  const j = () => rng.int(-spread, spread);
+  const platoon = shell.throws === "L" ? 5 : 0;
+  return {
+    kRate: clamp(base.stuff + j()),
+    bbRate: clamp(base.control + j()),
+    hrRate: clamp(base.movement + j()),
+    gbRate: clamp(base.movement + (shell.classes.includes("FINESSE") ? 12 : 0) + j()),
+    contactVsL: clamp(base.stuff + platoon + j()),
+    contactVsR: clamp(base.stuff - Math.round(platoon / 2) + j()),
+    stamina: clamp(base.stamina + j()),
+    mental: clamp(base.mental + j()),
+    hold: clamp(55 + jitter(rng, 15)),
+    armAngle: clamp(sidearm ? rng.int(15, 35) : 55 + jitter(rng, 18)),
+  };
+}
+
+/**
+ * Rebuild ratings until the card's OVR sits inside its cost band (§5.3),
+ * shifting every base by the miss each time (at most 12 tries).
+ */
+export function fitToCostBand<R extends HitterRatings | PitcherRatings>(shell: RatingShell, build: () => R, shift: (delta: number) => void): R {
+  const withRatings = (r: R) => (shell.role === "H" ? { ...shell, hitter: r as HitterRatings } : { ...shell, pitcher: r as PitcherRatings });
   let ratings = build();
   const [lo, hi] = PACK_COMPOSITION[shell.cost].ovr;
   for (let i = 0; i < 12; i++) {
-    const ovr = ovrOf({ ...shell, hitter: ratings });
+    const ovr = ovrOf(withRatings(ratings));
     if (ovr >= lo && ovr <= hi) break;
-    const delta = ovr < lo ? lo - ovr + 1 : hi - ovr - 1;
-    contact += delta; power += delta; eye += delta; speed += delta;
-    if (shell.pos !== "DH") defense += delta;
+    shift(ovr < lo ? lo - ovr + 1 : hi - ovr - 1);
     ratings = build();
   }
   return ratings;
+}
+
+function makeHitterRatings(rng: Rng, shell: Shell, target: number): HitterRatings {
+  const bias = hitterBias(shell);
+  const b: HitterBase = {
+    contact: target + bias.contact + jitter(rng, 8),
+    power: target + bias.power + jitter(rng, 9),
+    eye: target + bias.eye + jitter(rng, 10),
+    speed: target + bias.speed + jitter(rng, 12),
+    defense: 0,
+    arm: 0,
+  };
+  b.defense = shell.pos === "DH" ? 40 : target + bias.defense + jitter(rng, 9);
+  const build = () => deriveHitterRatings(rng, shell, { ...b, arm: shell.pos === "DH" ? target : b.defense });
+  return fitToCostBand(shell, build, (delta) => {
+    b.contact += delta; b.power += delta; b.eye += delta; b.speed += delta;
+    if (shell.pos !== "DH") b.defense += delta;
+  });
 }
 
 function makePitcherRatings(rng: Rng, shell: Shell, target: number): PitcherRatings {
   const bias = pitcherBias(shell);
-  let stuff = target + bias.stuff + jitter(rng, 8);
-  let control = target + bias.control + jitter(rng, 9);
-  let movement = target + bias.movement + jitter(rng, 9);
-  let stamina = target + bias.stamina + jitter(rng, 8);
-  let mental = target + bias.mental + jitter(rng, 12);
+  const b: PitcherBase = {
+    stuff: target + bias.stuff + jitter(rng, 8),
+    control: target + bias.control + jitter(rng, 9),
+    movement: target + bias.movement + jitter(rng, 9),
+    stamina: target + bias.stamina + jitter(rng, 8),
+    mental: target + bias.mental + jitter(rng, 12),
+  };
   const sidearm = rng.chance(0.15);
-  const platoon = shell.throws === "L" ? 5 : 0;
-  const build = (): PitcherRatings => ({
-    kRate: clamp(stuff + j8(rng)),
-    bbRate: clamp(control + j8(rng)),
-    hrRate: clamp(movement + j8(rng)),
-    gbRate: clamp(movement + (shell.classes.includes("FINESSE") ? 12 : 0) + j8(rng)),
-    contactVsL: clamp(stuff + platoon + j8(rng)),
-    contactVsR: clamp(stuff - Math.round(platoon / 2) + j8(rng)),
-    stamina: clamp(stamina + j8(rng)),
-    mental: clamp(mental + j8(rng)),
-    hold: clamp(55 + jitter(rng, 15)),
-    armAngle: clamp(sidearm ? rng.int(15, 35) : 55 + jitter(rng, 18)),
+  const build = () => derivePitcherRatings(rng, shell, b, sidearm);
+  return fitToCostBand(shell, build, (delta) => {
+    b.stuff += delta; b.control += delta; b.movement += delta; b.stamina += delta; b.mental += delta;
   });
-  let ratings = build();
-  const [lo, hi] = PACK_COMPOSITION[shell.cost].ovr;
-  for (let i = 0; i < 12; i++) {
-    const ovr = ovrOf({ ...shell, pitcher: ratings });
-    if (ovr >= lo && ovr <= hi) break;
-    const delta = ovr < lo ? lo - ovr + 1 : hi - ovr - 1;
-    stuff += delta; control += delta; movement += delta; stamina += delta; mental += delta;
-    ratings = build();
-  }
-  return ratings;
 }
 
-function ovrOf(partial: Shell & { hitter?: HitterRatings; pitcher?: PitcherRatings }): number {
+function ovrOf(partial: RatingShell & { hitter?: HitterRatings; pitcher?: PitcherRatings }): number {
   const stub = { id: "x", name: "x", nickname: "x", team: "x", age: 25, ...partial } as CardDef;
   return cardOvr(stub);
 }

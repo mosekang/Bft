@@ -18,6 +18,7 @@
     "pack:generate": "pnpm --filter @dugout/packs generate",
     "pack:validate": "pnpm --filter @dugout/packs validate",
     "pack:build": "pnpm --filter @dugout/packs build-pack",
+    "pack:roster": "pnpm --filter @dugout/packs roster",
     "clean": "pnpm -r exec rm -rf dist coverage node_modules/.vite"
   },
   "devDependencies": {

@@ -82,6 +82,7 @@ export const HELP = `dugout — Dugout Tactics CLI
 Usage:
   dugout sim-game  --seed <seed> [--games N] [--level L] [--stadium ID] [--pack file] [--json]
                    One game prints a box score; --games N prints aggregate stats.
-  dugout bot-arena --games <n> --seed <seed>   Run n bot-vs-bot tournaments and print the balance report (Phase 2)
+  dugout bot-arena --games <n> --seed <seed> [--pack file] [--json]
+                   Run n bot-vs-bot tournaments and print the balance report (Phase 2)
   dugout help
 `;
