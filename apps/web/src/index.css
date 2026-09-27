@@ -182,3 +182,19 @@ canvas { touch-action: none; display: block; }
 @property --foil-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes foil-spin { to { --foil-a: 360deg; } }
 @media (prefers-reduced-motion: reduce) { .bcard--foil::after { animation: none; } }
+
+/* Lobby: full-bleed 3D hero scene with a game menu dock. */
+.lobby__sky { background: radial-gradient(120% 70% at 50% 0%, #1e3a5f 0%, #0b1224 55%, #04070f 100%); }
+.lobby__shade { background: linear-gradient(180deg, rgba(4,7,15,0.55) 0%, rgba(4,7,15,0) 26%, rgba(4,7,15,0) 48%, rgba(4,7,15,0.82) 70%, #04070f 100%); }
+.lobby__chip { background: rgba(8,12,24,0.62); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(6px); box-shadow: 0 4px 14px rgba(0,0,0,0.35); }
+.lobby__avatar { background: linear-gradient(160deg, #fde68a, #f59e0b); color: #451a03; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.25); }
+.lobby__logo { color: #fff; -webkit-text-stroke: 2px #0b1224; paint-order: stroke fill; text-shadow: 0 4px 0 #0b1224, 0 10px 24px rgba(0,0,0,0.6); transform: rotate(-3deg); }
+.lobby__logo-gold { color: #fcd34d; text-shadow: 0 4px 0 #0b1224, 0 0 22px rgba(245,158,11,0.55); }
+.lobby__dock { background: linear-gradient(180deg, transparent 0%, rgba(4,7,15,0.7) 30%, rgba(4,7,15,0.92) 100%); }
+.lobby__play { position: relative; overflow: hidden; letter-spacing: 0.08em; }
+.lobby__play::after { content: ""; position: absolute; inset: -20% -40%; background: linear-gradient(105deg, transparent 42%, rgba(255,255,255,0.45) 50%, transparent 58%); transform: translateX(-60%); animation: play-shine 3.2s ease-in-out infinite; pointer-events: none; }
+@keyframes play-shine { 0%, 55% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+.lobby__nav { background: rgba(8,12,24,0.7); border: 1px solid rgba(255,255,255,0.1); }
+.lobby__tab { background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
+.lobby__tab:active { transform: translateY(1px); background: rgba(255,255,255,0.16); }
+@media (prefers-reduced-motion: reduce) { .lobby__play::after { animation: none; } }

@@ -93,3 +93,6 @@ pnpm --filter @dugout/server dev:cf        # wrangler dev (Cloudflare)
 - 캐릭터 외형은 `lib/appearance.ts` 하나에서 결정론 생성 → SVG 초상(`lib/avatar.tsx`)과 3D가 같은 얼굴. 외부 이미지·모델·음원 금지(`packages/assets/LICENSES.md`).
 - 품질: `?q=high|mid|low`로 강제. 자동화 브라우저(webdriver)는 low(2D)로 시작하므로 기존 e2e는 2D 경로를 탄다. 3D는 `e2e/v3.spec.ts`가 `?q=mid`로 검증.
 - 연출 난수는 엔진의 별도 `presentation` 스트림 → 연출 필드를 바꿔도 경기 결과·골든 불변.
+- 캐릭터: `scene/figureBatch.ts`(인스턴싱 SD 캐릭터: 툰+림라이트+외곽선+데칼 아틀라스). 카드 일러스트는 `scene/portraits.ts`가 오프스크린 WebGL로 흉상을 렌더해 webp로 캐시(`components/CardArt.tsx`, 실패 시 SVG).
+- 히어로 씬: 로비·결과 화면은 `scene/LobbyStage.tsx`의 `HeroStage`(mood lobby/win/lose), 구장 선택은 `scene/StadiumPreview.tsx`. low 품질이면 2D 대체. 디버그: `?gallery`, `?gallery=win|lose`.
+- 개인 팩: `pnpm pack:roster`(수기 로스터 CSV → 팩). 결과물은 `packages/packs/private/`에만, 기기에서 설정 → 팩 관리로 가져온다.

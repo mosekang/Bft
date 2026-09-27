@@ -8,3 +8,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+// Fade out the boot splash from index.html once React has painted.
+requestAnimationFrame(() => {
+  const el = document.getElementById("splash");
+  if (!el) return;
+  window.setTimeout(() => { el.style.opacity = "0"; window.setTimeout(() => el.remove(), 500); }, 250);
+});

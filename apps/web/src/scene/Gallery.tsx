@@ -7,8 +7,24 @@ import type { Actor } from "./actor.js";
 import type { AnyClip } from "./clips.js";
 import { Figures } from "./Figures.js";
 import { Ticker } from "./stageKit.js";
+import { HeroStage, heroCards, type HeroMood } from "./LobbyStage.js";
 
 export default function Gallery() {
+  const mode = new URLSearchParams(window.location.search).get("gallery");
+  if (mode === "win" || mode === "lose") return <HeroGallery mood={mode} />;
+  return <FigureGallery />;
+}
+
+function HeroGallery({ mood }: { mood: HeroMood }) {
+  const defs = useMemo(() => heroCards(pack.cards), []);
+  return (
+    <div style={{ position: "fixed", inset: 0 }}>
+      <div style={{ position: "relative", height: "46vh" }}><HeroStage quality="mid" sceneKey={mood} defs={defs} mood={mood} stars={[3, 2, 1, 2, 1]} band={[-0.74, 0.22]} title={mood === "win" ? "WINNER" : "GAME SET"} /></div>
+    </div>
+  );
+}
+
+function FigureGallery() {
   const clock = useRef(0);
   const actors = useRef<Actor[]>([]);
   useMemo(() => {

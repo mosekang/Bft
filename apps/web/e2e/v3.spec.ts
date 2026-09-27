@@ -10,7 +10,7 @@ test("3D board and broadcast playback", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/?q=mid");
-  await page.getByRole("button", { name: "새 게임" }).click();
+  await page.getByRole("button", { name: "새 게임" }).click({ timeout: 30_000 }); // lobby 3D scene compiles shaders first (SwiftShader)
   await page.getByRole("button", { name: "이 구장으로" }).first().click();
   const board = page.locator("[aria-label='라인업']");
   await expect(board.locator("canvas")).toBeVisible({ timeout: 30_000 });

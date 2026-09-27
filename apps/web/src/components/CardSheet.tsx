@@ -3,6 +3,7 @@ import { ITEM_BY_ID, STAR_BONUS, nicknameAtStar, createRng } from "@dugout/engin
 import { Button } from "./Button.js";
 import { Avatar } from "../lib/avatar.js";
 import { CardArt } from "./CardArt.js";
+import { teamColor } from "../lib/pack.js";
 import { Suspense, lazy } from "react";
 import { currentQuality } from "../scene/quality.js";
 
@@ -33,7 +34,7 @@ export function CardSheet({ def, card, inventory = [], sellValue, onSell, onEqui
       <div className="panel rise max-h-[82vh] w-full overflow-y-auto rounded-t-3xl p-4 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/20" />
         <div className="flex items-start justify-between gap-3">
-          <div className="shrink-0 rounded-2xl bg-gradient-to-b from-[#f7f3e8] to-[#e9e2d0] p-1 shadow-lg"><CardArt def={def} size={88} /></div>
+          <div className={`relative h-[124px] w-[104px] shrink-0 overflow-hidden rounded-2xl shadow-lg ring-2 cost-${def.cost}`} style={{ ["--tw-ring-color" as string]: "var(--cost)" }}><div className="bcard__art" style={{ ["--team" as string]: teamColor(def.team) }}><CardArt def={def} size={104} fill className="bcard__img" /></div></div>
           {currentQuality() && currentQuality() !== "low" && <div className="w-[88px] shrink-0"><Suspense fallback={null}><FigurePreview def={def} {...(card ? { card } : {})} height={96} /></Suspense></div>}
           <div className="min-w-0 flex-1">
             <div className="display text-[22px] leading-tight">{def.name} {card && card.star > 1 && <span className="text-[var(--gold)]">{stars(card.star)}</span>}</div>

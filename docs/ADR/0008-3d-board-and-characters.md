@@ -18,3 +18,11 @@
 
 - 2D 카드 그리드 유지 + 일러스트만 추가: "보드 위에서 선수가 서 있는" 느낌이 나지 않아 기각.
 - 실제 선수 사진: §2 실명 데이터 금지 원칙과 충돌, 라이선스 문제 → 절차적 초상으로 대체.
+
+## Addendum (2026-09-27): game-feel pass
+
+- Characters rebuilt as SD (big head, toon ramp, rim light, inverted-hull outlines, blob shadows) in one instanced `FigureBatch`; decals (numbers, wordmarks from `pack.teams[].short`, faces) come from canvas atlases — still no external assets.
+- Card illustrations are 3D busts rendered offscreen once per card and cached as webp data URLs; the SVG avatar remains the fallback (no WebGL, low tier).
+- The FPS probe never demotes to the 2D tier on its own (shader-compile stalls on phones were dropping players into 2D); it skips a 1.5 s warm-up. 2D is reached only without WebGL2, under webdriver, or by setting.
+- Lobby, stadium select and result screens gained 3D hero scenes (active pack's stars at home plate, fireworks; MVP line-up celebrates or hangs heads by placement). All cosmetic; no engine state.
+- Real-name packs stay on-device: `pnpm pack:roster` builds from a hand-authored roster table into `packages/packs/private/` (gitignored), imported via Settings → 팩 관리. The public site ships only `fictional-v1`.

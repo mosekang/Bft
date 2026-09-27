@@ -1,6 +1,6 @@
 import { POS, type SynergyId } from "@dugout/protocol";
 import { computeEffects } from "@dugout/engine";
-import { useMemo, useRef } from "react";
+import { Suspense, lazy, useMemo, useRef } from "react";
 import { Avatar } from "../lib/avatar.js";
 import { CardArt } from "../components/CardArt.js";
 import { cardOvrWithStar } from "../lib/format.js";
@@ -13,6 +13,9 @@ import { t } from "../i18n/index.js";
 import { defOf } from "../lib/pack.js";
 import { ME, useRun } from "../store/run.js";
 import { useSession } from "../store/session.js";
+import { initialQuality } from "../scene/quality.js";
+
+const HeroStage = lazy(() => import("../scene/LobbyStage.js").then((m) => ({ default: m.HeroStage })));
 
 export function Result() {
   const state = useRun((s) => s.state)!;
@@ -41,6 +44,15 @@ export function Result() {
   const mvpCard = mvp ? state.cards[mvp.id] : undefined;
   const mvpDef = mvpCard ? defOf(mvpCard.defId) : undefined;
   const memories = topMemories(state.seed);
+  const quality = initialQuality(useSession((s) => s.settings.quality));
+  // Celebration line-up: MVP centre, then the strongest teammates.
+  const hero = useMemo(() => {
+    const cards = [...Object.values(me.board.slots), ...me.bench].map((id) => (id ? state.cards[id] : undefined)).filter((c): c is NonNullable<typeof c> => !!c);
+    cards.sort((a, b) => (a.instanceId === mvp?.id ? -1 : b.instanceId === mvp?.id ? 1 : cardOvrWithStar(defOf(b.defId), b) - cardOvrWithStar(defOf(a.defId), a)));
+    const top = cards.slice(0, 5);
+    return { defs: top.map((c) => defOf(c.defId)), stars: top.map((c) => c.star) };
+  }, [me, state, mvp]);
+  const won = (me.placement ?? 8) <= 4;
   const portraitRef = useRef<HTMLDivElement>(null);
   const share = async () => {
     const text = `덕아웃 택틱스 — ${me.placement}위 (${state.roundIndex + 1}라운드, 시드 ${state.seed})`;
@@ -56,14 +68,27 @@ export function Result() {
     }
   };
   return (
-    <main className="flex h-full flex-col overflow-y-auto p-4">
-      <div className="scoreboard pop mt-6 rounded-3xl p-5 text-center">
-        <div className="led text-[13px] tracking-[0.4em]">FINAL</div>
-        <h1 className="display mt-1 text-[56px] leading-none">{me.placement}<span className="text-[26px]">{t("result.place")}</span></h1>
-        <p className="mt-1 text-[13px] text-[var(--ink-2)]">{t("result.title")} · S{state.round} · ♥ {me.hp}</p>
-      </div>
+    <main className="flex h-full flex-col overflow-y-auto">
+      {quality !== "low" && hero.defs.length > 0 ? (
+        <section className="relative h-[46vh] min-h-[280px] shrink-0 overflow-hidden">
+          <Suspense fallback={null}><HeroStage quality={quality} sceneKey={`${state.seed}:${me.placement}`} defs={hero.defs} stars={hero.stars} mood={won ? "win" : "lose"} band={[-0.74, 0.22]} title={won ? "WINNER" : "GAME SET"} /></Suspense>
+          <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(4,7,15,0.7) 0%, transparent 34%, transparent 70%, #04070f 100%)" }} />
+          <div className="pop pointer-events-none absolute inset-x-0 top-3 text-center">
+            <div className="led text-[13px] tracking-[0.4em]">FINAL</div>
+            <h1 className={`lobby__logo display mt-1 text-[64px] leading-none ${won ? "text-[var(--gold)]" : ""}`} style={{ transform: "none" }}>{me.placement}<span className="text-[28px]">{t("result.place")}</span></h1>
+            <p className="mt-1 text-[12px] font-semibold text-white/80">{t("result.title")} · S{state.round} · ♥ {me.hp}</p>
+          </div>
+        </section>
+      ) : (
+        <div className="scoreboard pop mx-4 mt-6 rounded-3xl p-5 text-center">
+          <div className="led text-[13px] tracking-[0.4em]">FINAL</div>
+          <h1 className="display mt-1 text-[56px] leading-none">{me.placement}<span className="text-[26px]">{t("result.place")}</span></h1>
+          <p className="mt-1 text-[13px] text-[var(--ink-2)]">{t("result.title")} · S{state.round} · ♥ {me.hp}</p>
+        </div>
+      )}
+      <div className="flex flex-1 flex-col px-4 pb-4">
       {mvpDef && mvpCard && (
-        <div className="panel rise mt-3 flex items-center gap-3 rounded-2xl p-3">
+        <div className={`panel rise relative z-[1] ${quality !== "low" && hero.defs.length > 0 ? "-mt-6" : "mt-3"} flex items-center gap-3 rounded-2xl p-3 ring-1 ring-[var(--gold)]/40`}>
           <div ref={portraitRef} className="shrink-0 rounded-xl bg-gradient-to-b from-[#f7f3e8] to-[#e9e2d0] p-1"><CardArt def={mvpDef} size={72} /></div>
           <div className="min-w-0">
             <div className="led text-[12px] tracking-[0.3em]">MVP</div>
@@ -96,6 +121,7 @@ export function Result() {
         <Button onClick={() => void abandon().then(() => newRun("", nickname))}>{t("result.again")}</Button>
         <Button variant="secondary" onClick={() => void share()}>{t("result.share")}</Button>
         <Button variant="ghost" onClick={() => void abandon().then(leave)}>{t("result.lobby")}</Button>
+      </div>
       </div>
     </main>
   );
